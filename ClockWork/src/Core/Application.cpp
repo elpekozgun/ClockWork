@@ -1,16 +1,44 @@
 #include "Application.h"
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_internal.h>
-#include <imgui.h>
-#include "imgui_impl_opengl3_loader.h"
+
 
 namespace CW::Core
 {
+	void TimedStartOnThread(std::function<void()> func, const uint32_t interval)
+	{
+		std::thread([func, interval]
+		{
+			while (true)
+			{
+				func();
+				auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
+				std::this_thread::sleep_until(x);
+			}
+		}).detach();
+	}
+
+	void Application::UpdatePhysics()
+	{
+		std::cout << "thread id " << std::this_thread::get_id() << std::endl;
+		while (_isRunning)
+		{
+			std::cout << "hello from physics thread\n";
+			auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+			std::this_thread::sleep_until(x);
+		}
+	}
+
+	void Application::RunPhysicsThread()
+	{
+		std::thread(&Application::UpdatePhysics, this).detach();
+	}
+
+
 
 	Application::Application(const std::string& name) :
 		_name(name), _window(nullptr), _backColor{0.15f, 0.15f, 0.15f, 1.0f}
 	{
+		std::cout << "main thread id " << std::this_thread::get_id() << std::endl;
+
 		_isRunning = false;
 	}
 
@@ -64,17 +92,18 @@ namespace CW::Core
 
 		ImGui_ImplGlfw_InitForOpenGL(_window, true);
 		ImGui_ImplOpenGL3_Init(glslVersion);
-
-		//glClearColor(_backColor[0], _backColor[1], _backColor[2], _backColor[3]);
 		
 		_isRunning = true;
+
+		RunPhysicsThread();
+
 		while (_isRunning)
 		{
 			glfwPollEvents();
-
+			
 			glClearColor(_backColor[0], _backColor[1], _backColor[2], _backColor[3]);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+			
 			HandleInput();
 
 			UpdateUI();
@@ -127,7 +156,7 @@ namespace CW::Core
 
 		if (glfwGetKey(_window, CW::Key::KEY_SPACE))
 		{ 
-			//_showText= !_showText;
+
 		}
 	}
 

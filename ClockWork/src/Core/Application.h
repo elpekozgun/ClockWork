@@ -10,6 +10,16 @@
 #include "../3rd/glfw/include/GLFW/glfw3.h"
 #include "imgui.h"
 
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_internal.h>
+#include <imgui.h>
+#include "imgui_impl_opengl3_loader.h"
+
+#include <chrono>
+#include <thread>
+#include <functional>
+
 namespace CW::Core
 {
 	class CW_API Application
@@ -25,6 +35,8 @@ namespace CW::Core
 		void UpdateUI();
 		void Render();
 		void Simulate();
+		void UpdatePhysics();
+		void RunPhysicsThread();
 
 	public:
 		explicit Application(const std::string& name);
