@@ -1,13 +1,11 @@
 #include "ClockWork.h"
 
+#include <memory>
+
 int main()
 {
-    CW::Core::Window* window = new CW::Core::Window();
-
-    window->InitWindow("Game", 1440, 960);
-    window->Update();
+    auto app = std::make_unique<CW::Core::Application>("game");
+    app->Run(1920, 1080);
     
-
-    delete window;
     return 0;
 }

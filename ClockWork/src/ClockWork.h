@@ -1,4 +1,3 @@
 #pragma once
 
-#include <iostream>
-#include "Core/Window.h"
+#include "Core/Application.h"
