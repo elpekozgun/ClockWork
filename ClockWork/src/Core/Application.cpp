@@ -21,7 +21,7 @@ namespace CW::Core
 		std::cout << "thread id " << std::this_thread::get_id() << std::endl;
 		while (_isRunning)
 		{
-			OnPhysics.Invoke();
+			OnPhysics.Invoke("physics updated");
 			//std::cout << "hello from physics thread\n";
 			auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 			std::this_thread::sleep_until(x);
@@ -32,8 +32,6 @@ namespace CW::Core
 	{
 		std::thread(&Application::UpdatePhysics, this).detach();
 	}
-
-
 
 	Application::Application(const std::string& name) :
 		_name(name), _window(nullptr), _backColor{0.15f, 0.15f, 0.15f, 1.0f}
@@ -98,8 +96,11 @@ namespace CW::Core
 
 		RunPhysicsThread();
 
+
 		while (_isRunning)
 		{
+			auto tStart = std::chrono::system_clock::now();
+
 			glfwPollEvents();
 			
 			glClearColor(_backColor[0], _backColor[1], _backColor[2], _backColor[3]);
@@ -110,7 +111,12 @@ namespace CW::Core
 			UpdateUI();
 
 			glfwSwapBuffers(_window);
-			OnRender.Invoke();
+			
+			auto tEnd = std::chrono::system_clock::now();
+
+			auto ms = (std::chrono::duration_cast<std::chrono::milliseconds>(tEnd - tStart)).count();
+
+			OnRender.Invoke((int)(1000.0f / ms));
 		}
 	}
 

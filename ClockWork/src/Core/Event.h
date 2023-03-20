@@ -9,34 +9,36 @@
 
 using namespace std;
 
+
+template<typename S>
 class IDelegate
 {
 public:
-	virtual void operator()() = 0;
-	virtual bool operator==(IDelegate* other) = 0;
+	virtual void operator()(S param) = 0;
+	virtual bool operator==(IDelegate<S>* other) = 0;
 };
 
-template<typename T>
-class Delegate : public IDelegate
+template<typename T, typename S>
+class Delegate : public IDelegate<S>
 {
 public:
 	Delegate() = default;
 	virtual ~Delegate() = default;
 
-	void Set(T* instance, void (T::* action)())
+	void Set(T* instance, void (T::* action)(S param))
 	{
 		_instance = instance;
 		_action = action;
 	}
 
-	void operator()() override
+	void operator()(S param) override
 	{
-		(_instance->*_action)();
+		(_instance->*_action)(param);
 	}
 
-	inline bool operator==(IDelegate* other) override
+	inline bool operator==(IDelegate<S>* other) override
 	{
-		Delegate* otherDelegate = dynamic_cast<Delegate*>(other);
+		Delegate* otherDelegate = dynamic_cast<Delegate<T,S>*>(other);
 		if (otherDelegate == nullptr)
 			return false;
 		return (this->_action == otherDelegate->_action) &&
@@ -44,33 +46,39 @@ public:
 	}
 
 private:
-	void (T::* _action)();
+	void (T::* _action)(S param);
 	T* _instance;
 };
 
 
-
-class CW_API Event
+template<typename S>
+class Event
 {
 public:
 	Event() = default;
 
-	void operator+=(IDelegate* delegate)
+	void operator+=(IDelegate<S>* delegate)
 	{
 		_invocationList.insert(delegate);
 	}
 
-	void operator-=(IDelegate* delegate)
+	void operator-=(IDelegate<S>* delegate)
 	{
 		_invocationList.erase(delegate);
 	}
 
-	void Invoke() const;
+	void Invoke(S param) const 
+	{
+		for (const auto& invoker : _invocationList)
+		{
+			(*invoker)(param);
+		}
+	}
 
-	IDelegate* operator=(IDelegate* delegate) = delete;
+	IDelegate<S>* operator=(IDelegate<S>* delegate) = delete;
 
 private:
-	typedef std::unordered_set<IDelegate*> Delegates;
+	typedef std::unordered_set<IDelegate<S>*> Delegates;
 	Delegates _invocationList;
 };
 

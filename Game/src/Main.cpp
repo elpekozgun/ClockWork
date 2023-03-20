@@ -5,68 +5,32 @@
 #include <thread>
 #include <chrono>
 
-class Test
-{
-public:
-    Event TestEvent;
-
-    inline void DoStuff(int val)
-    {
-        auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(val);
-        std::this_thread::sleep_until(x);
-        TestEvent.Invoke();
-    }
-
-};
-
-class AnotherClass
-{
-public:
-
-    Delegate<AnotherClass> Action;
-
-    inline AnotherClass()
-    {
-        Action.Set(this, &AnotherClass::Trigger);
-    }
-
-    void Trigger()
-    {
-        cout << "hello\n";
-    }
-};
-
-void OnPhysics()
-{
-    cout << "physics updated\n";
-}
-
-void OnRender()
-{
-    cout << "render completed\n";
-}
-
 class EventConsumer
 {
 public:
-    Delegate<EventConsumer> onPhysics;
-    Delegate<EventConsumer> onRender;
+    CW::Core::Application* _app;
 
-    inline EventConsumer()
+    Delegate<EventConsumer, std::string> onPhysics;
+    Delegate<EventConsumer, int> onRender;
+
+    EventConsumer(CW::Core::Application* const app) : _app(app)
     {
         onPhysics.Set(this, &EventConsumer::OnPhysics);
         onRender.Set(this, &EventConsumer::OnRender);
+
+        app->OnPhysics += &onPhysics;
+        app->OnRender += &onRender;
     }
 
 private:
-    void OnPhysics()
+    void OnPhysics(std::string param)
     {
-        cout << "physics updated\n";
+        cout << param << "\n";
     }
 
-    void OnRender()
+    void OnRender(int renderTime)
     {
-        cout << "render completed\n";
+        cout << "Frame Time: " << renderTime << " hz\n";
     }
 };
 
@@ -74,9 +38,7 @@ int main()
 {
     auto app = std::make_unique<CW::Core::Application>("game");
 
-    EventConsumer e;
-    app->OnRender += &e.onRender;
-    app->OnPhysics += &e.onPhysics;
+    EventConsumer e(app.get());
 
     app->Run(1920, 1080);
 

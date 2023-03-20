@@ -33,8 +33,8 @@ namespace CW::Core
 		void HandleInput();
 		void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 
-		Event OnRender;
-		Event OnPhysics;
+		Event<int> OnRender;
+		Event<std::string> OnPhysics;
 
 	private:
 		GLFWwindow* _window;
