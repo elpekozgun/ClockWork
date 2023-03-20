@@ -19,11 +19,23 @@
 #include <chrono>
 #include <thread>
 #include <functional>
+#include "Event.h"
 
 namespace CW::Core
 {
 	class CW_API Application
 	{
+	public:
+		explicit Application(const std::string& name);
+		~Application();
+
+		void Run(const unsigned int height, const unsigned int width);
+		void HandleInput();
+		void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
+
+		Event OnRender;
+		Event OnPhysics;
+
 	private:
 		GLFWwindow* _window;
 		ImGuiIO* io = nullptr;
@@ -38,13 +50,7 @@ namespace CW::Core
 		void UpdatePhysics();
 		void RunPhysicsThread();
 
-	public:
-		explicit Application(const std::string& name);
-		~Application();
-
-		void Run(const unsigned int height, const unsigned int width);
-		void HandleInput();
-		void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
+	
 	};
 
 }

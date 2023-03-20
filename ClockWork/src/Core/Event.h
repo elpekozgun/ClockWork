@@ -1,76 +1,77 @@
 #pragma once
+
 #include <unordered_set>
 #include <functional>
+#include <memory>
+#include <iostream>
+
+#include "Core/Core.h"
 
 using namespace std;
 
-
-template<typename T>
-class Delegate
+class IDelegate
 {
 public:
-	typedef function<void(T)> Act;
-	Act Action;
-
-	//typedef void (*Action)(T);
-
-	//inline void Set(const Action action)
-	inline void Set(function<void(T)> action)
-	{
-		Action = action;
-	}
-
-	//inline void Set(void*() action)
-	//{
-	//	Action = action;
-	//}
-
-	template<typename T>
-	//inline void operator=(void (*action)(T))
-	inline void operator=(function<void(T)> action)
-	{
-		Action = action;
-	}
+	virtual void operator()() = 0;
+	virtual bool operator==(IDelegate* other) = 0;
 };
 
-
 template<typename T>
-class Event
+class Delegate : public IDelegate
 {
-	typedef void (*Action)(T);
-
 public:
-	inline void operator+=(Delegate<T> del) 
+	Delegate() = default;
+	virtual ~Delegate() = default;
+
+	void Set(T* instance, void (T::* action)())
 	{
-		//_invocationList.push_back(&del);
-		_invocationList.insert(&del);
+		_instance = instance;
+		_action = action;
 	}
 
-	inline void operator+=(Action act)
+	void operator()() override
 	{
-		Delegate<T> del;
-		del.Set(act);
-
-		_invocationList.insert(del);
+		(_instance->*_action)();
 	}
 
-	inline void operator-=(Delegate<T> del) 
+	inline bool operator==(IDelegate* other) override
 	{
-		_invocationList.erase(&del); 
+		Delegate* otherDelegate = dynamic_cast<Delegate*>(other);
+		if (otherDelegate == nullptr)
+			return false;
+		return (this->_action == otherDelegate->_action) &&
+			(this->_instance == otherDelegate->_instance);
 	}
-	inline void operator()(T param) = delete;
-	
-	inline void Invoke(T param) 
-	{ 
-		for (const Delegate<T>* const itr : _invocationList)
-		{
-			itr->Action(param);
-		}
-	}
-	
-	//Event& operator=(Delegate<T> delegate) delete;
 
 private:
-	unordered_set<Delegate<T>*> _invocationList;
+	void (T::* _action)();
+	T* _instance;
 };
+
+
+
+class CW_API Event
+{
+public:
+	Event() = default;
+
+	void operator+=(IDelegate* delegate)
+	{
+		_invocationList.insert(delegate);
+	}
+
+	void operator-=(IDelegate* delegate)
+	{
+		_invocationList.erase(delegate);
+	}
+
+	void Invoke() const;
+
+	IDelegate* operator=(IDelegate* delegate) = delete;
+
+private:
+	typedef std::unordered_set<IDelegate*> Delegates;
+	Delegates _invocationList;
+};
+
 

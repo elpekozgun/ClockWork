@@ -21,7 +21,8 @@ namespace CW::Core
 		std::cout << "thread id " << std::this_thread::get_id() << std::endl;
 		while (_isRunning)
 		{
-			std::cout << "hello from physics thread\n";
+			OnPhysics.Invoke();
+			//std::cout << "hello from physics thread\n";
 			auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 			std::this_thread::sleep_until(x);
 		}
@@ -109,6 +110,7 @@ namespace CW::Core
 			UpdateUI();
 
 			glfwSwapBuffers(_window);
+			OnRender.Invoke();
 		}
 	}
 

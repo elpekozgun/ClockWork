@@ -1,4 +1,5 @@
 #include "ClockWork.h"
+#include <Core/Core.h>
 
 #include <memory>
 #include <thread>
@@ -7,60 +8,78 @@
 class Test
 {
 public:
-    Event<int> TestEvent;
+    Event TestEvent;
 
-    void DoStuff(int val)
+    inline void DoStuff(int val)
     {
         auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(val);
         std::this_thread::sleep_until(x);
-        TestEvent.Invoke(val);
+        TestEvent.Invoke();
     }
 
 };
-
-//void Action(int t)
-//{
-//    cout << "hello" << endl;
-//}
 
 class AnotherClass
 {
 public:
-    Delegate<int> Act;
-    std::function<void(int)> act = std::bind(&AnotherClass::Action, this, placeholders::_1);
 
-    AnotherClass()
+    Delegate<AnotherClass> Action;
+
+    inline AnotherClass()
     {
-        Act.Set(act);
-        //Act = (Action);
+        Action.Set(this, &AnotherClass::Trigger);
     }
 
-    void Action(int t)
+    void Trigger()
     {
-
+        cout << "hello\n";
     }
 };
 
+void OnPhysics()
+{
+    cout << "physics updated\n";
+}
 
+void OnRender()
+{
+    cout << "render completed\n";
+}
 
+class EventConsumer
+{
+public:
+    Delegate<EventConsumer> onPhysics;
+    Delegate<EventConsumer> onRender;
+
+    inline EventConsumer()
+    {
+        onPhysics.Set(this, &EventConsumer::OnPhysics);
+        onRender.Set(this, &EventConsumer::OnRender);
+    }
+
+private:
+    void OnPhysics()
+    {
+        cout << "physics updated\n";
+    }
+
+    void OnRender()
+    {
+        cout << "render completed\n";
+    }
+};
 
 int main()
 {
-    //auto app = std::make_unique<CW::Core::Application>("game");
-    //app->Run(1920, 1080);
-    
-    AnotherClass class1;
-    AnotherClass class2;
-    AnotherClass class3;
-    AnotherClass class4;
+    auto app = std::make_unique<CW::Core::Application>("game");
 
-    Test test;
-    test.TestEvent += class1.Act;
-    test.TestEvent += class2.Act;
-    test.TestEvent += class3.Act;
-    test.TestEvent += class4.Act;
+    EventConsumer e;
+    app->OnRender += &e.onRender;
+    app->OnPhysics += &e.onPhysics;
 
-    test.DoStuff(1000);
+    app->Run(1920, 1080);
+
 
     return 0;
 }
