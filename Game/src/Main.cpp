@@ -4,6 +4,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <random>
 
 class EventConsumer
 {
@@ -34,14 +35,81 @@ private:
     }
 };
 
-int main()
+void Basic()
 {
     auto app = std::make_unique<CW::Core::Application>("game");
 
-    EventConsumer e(app.get());
+    //EventConsumer e(app.get());
 
     app->Run(1920, 1080);
 
+    
+}
 
+void ECSTest() 
+{
+    ECS& ecs = ECS::Instance();
+    ecs.Init();
+
+    ecs.RegisterComponent<Gravity>();
+    ecs.RegisterComponent<Transform>();
+    ecs.RegisterComponent<RigidBody>();
+
+    auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
+
+    Mask mask;
+    mask.set(ecs.GetComponentType<Gravity>());
+    mask.set(ecs.GetComponentType<Transform>());
+    mask.set(ecs.GetComponentType<RigidBody>());
+    ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
+
+    std::vector<Entity> entities(1000);
+
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
+    std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+    std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
+    std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+
+    float scale = randScale(generator);
+
+    for (auto& entity : entities)
+    {
+        entity = ecs.CreateEntity();
+
+        ecs.AddComponent(entity, Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+        ecs.AddComponent(entity, RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0)});
+        ecs.AddComponent(entity, Transform
+        {  
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    }
+
+    float dt = 0;
+
+    bool quit = 0;
+
+    ecs.GetComponent<Transform>(entities[0]);
+
+    while (!quit)
+    {
+        auto tStart = std::chrono::high_resolution_clock::now();
+
+        physicsSystem->Update(dt);
+
+        auto tEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> elapsed = tEnd - tStart;
+        dt = elapsed.count();
+        std::cout << dt << "\n";
+    }
+
+}
+
+int main()
+{
+    ECSTest();
     return 0;
 }

@@ -3,25 +3,12 @@
 
 namespace CW::Core
 {
-	void TimedStartOnThread(std::function<void()> func, const uint32_t interval)
-	{
-		std::thread([func, interval]
-		{
-			while (true)
-			{
-				func();
-				auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
-				std::this_thread::sleep_until(x);
-			}
-		}).detach();
-	}
-
 	void Application::UpdatePhysics()
 	{
 		std::cout << "thread id " << std::this_thread::get_id() << std::endl;
 		while (_isRunning)
 		{
-			OnPhysics.Invoke("physics updated");
+			//OnPhysics.Invoke("physics updated");
 			//std::cout << "hello from physics thread\n";
 			auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 			std::this_thread::sleep_until(x);
@@ -33,10 +20,24 @@ namespace CW::Core
 		std::thread(&Application::UpdatePhysics, this).detach();
 	}
 
+	void Application::Log(float s)
+	{
+		std::cout << s << "\n";
+	}
+
 	Application::Application(const std::string& name) :
 		_name(name), _window(nullptr), _backColor{0.15f, 0.15f, 0.15f, 1.0f}
 	{
 		std::cout << "main thread id " << std::this_thread::get_id() << std::endl;
+
+		_renderSystem = std::make_unique<RenderSystem>(0);
+		_physicsSystem = std::make_unique<PhysicsSystem>(50);
+
+		OnRenderCompleted.Set(this, &Application::Log);
+		OnPhysicsCompleted.Set(this,&Application::Log);
+
+		_renderSystem.get()->OnUpdated += &OnRenderCompleted;
+		_physicsSystem.get()->OnUpdated += &OnPhysicsCompleted;
 
 		_isRunning = false;
 	}
@@ -94,12 +95,11 @@ namespace CW::Core
 		
 		_isRunning = true;
 
-		RunPhysicsThread();
-
+		//RunPhysicsThread();
 
 		while (_isRunning)
 		{
-			auto tStart = std::chrono::system_clock::now();
+			auto tStart = std::chrono::high_resolution_clock::now();
 
 			glfwPollEvents();
 			
@@ -112,11 +112,17 @@ namespace CW::Core
 
 			glfwSwapBuffers(_window);
 			
-			auto tEnd = std::chrono::system_clock::now();
+			auto tEnd = std::chrono::high_resolution_clock::now();
 
-			auto ms = (std::chrono::duration_cast<std::chrono::milliseconds>(tEnd - tStart)).count();
+			std::chrono::duration<float> elapsed = tEnd - tStart;
+			float deltaTime = elapsed.count() * 1000;
 
-			OnRender.Invoke((int)(1000.0f / ms));
+			// Add System manager to iterate over all.
+			_physicsSystem.get()->Update(deltaTime);
+			_renderSystem.get()->Update(deltaTime);
+
+
+			//OnRender.Invoke((int)(1000.0f / ms));
 		}
 	}
 

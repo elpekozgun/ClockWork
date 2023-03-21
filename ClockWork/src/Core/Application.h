@@ -5,6 +5,8 @@
 #include "Core/Config.h"
 #include "Core/KeyCode.h"
 #include "Core/MouseButton.h"
+#include "Physics/PhysicsSystem.h"
+#include "Rendering/RenderSystem.h"
 
 #include "glad/glad.h"
 #include "../3rd/glfw/include/GLFW/glfw3.h"
@@ -19,6 +21,7 @@
 #include <chrono>
 #include <thread>
 #include <functional>
+#include <memory>
 #include "Event.h"
 
 namespace CW::Core
@@ -30,8 +33,6 @@ namespace CW::Core
 		~Application();
 
 		void Run(const unsigned int height, const unsigned int width);
-		void HandleInput();
-		void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 
 		Event<int> OnRender;
 		Event<std::string> OnPhysics;
@@ -44,11 +45,21 @@ namespace CW::Core
 		float _backColor[4];
 		std::string _name;
 
+		std::unique_ptr<RenderSystem> _renderSystem;
+		std::unique_ptr<PhysicsSystem> _physicsSystem;
+
+		Delegate<Application, float> OnRenderCompleted;
+		Delegate<Application, float> OnPhysicsCompleted;
+
+		void Log(float s);
+
+		void HandleInput();
 		void UpdateUI();
 		void Render();
 		void Simulate();
 		void UpdatePhysics();
 		void RunPhysicsThread();
+		void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 
 	
 	};
