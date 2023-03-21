@@ -2,6 +2,7 @@
 #include "ECS/Core/EcsType.h"
 #include "glm.hpp"
 #include "ECS/Core/ECS.h"
+#include "Core/Event.h"
 
 using namespace glm;
 
@@ -29,4 +30,9 @@ class CW_API PseudoPhysicsSystem : public System
 {
 public:
 	void Update(float dt) override;
+	Event<float> OnUpdated;
+
+private:
+	float _updateRate = 50;
+	float _currentDelta = 0;
 };

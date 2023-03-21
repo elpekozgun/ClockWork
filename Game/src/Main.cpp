@@ -35,6 +35,24 @@ private:
     }
 };
 
+class EventTracker
+{
+public:
+    Delegate<EventTracker, float> OnEvent;
+
+    EventTracker()
+    {
+        OnEvent.Set(this, &EventTracker::OnPhysics);
+    }
+    
+
+private:
+    void OnPhysics(float time)
+    {
+        cout << "physics updated in: "<< time << " ms.\n";
+    }
+};
+
 void Basic()
 {
     auto app = std::make_unique<CW::Core::Application>("game");
@@ -92,7 +110,10 @@ void ECSTest()
 
     bool quit = 0;
 
-    ecs.GetComponent<Transform>(entities[0]);
+    EventTracker consumer;
+
+    physicsSystem->OnUpdated += &consumer.OnEvent;
+
 
     while (!quit)
     {
@@ -101,9 +122,7 @@ void ECSTest()
         physicsSystem->Update(dt);
 
         auto tEnd = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> elapsed = tEnd - tStart;
-        dt = elapsed.count();
-        std::cout << dt << "\n";
+        dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
     }
 
 }
