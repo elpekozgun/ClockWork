@@ -2,22 +2,25 @@
 
 #include <iostream>
 
-void RenderSystem::Update(float deltaTime)
+namespace CW
 {
-	_deltaTime += deltaTime;
-	if (_deltaTime >= _updateRate)
+	void RenderSystem::Update(float deltaTime)
 	{
-		OnUpdated.Invoke(_deltaTime);
-		_deltaTime = 0;
+		_deltaTime += deltaTime;
+		if (_deltaTime >= _updateRate)
+		{
+			OnUpdated.Invoke(_deltaTime);
+			_deltaTime = 0;
+		}
 	}
-}
 
-float RenderSystem::GetUpdateRate() const
-{
-	return _deltaTime;
-}
+	float RenderSystem::GetUpdateRate() const
+	{
+		return _deltaTime;
+	}
 
-void RenderSystem::Shutdown() const
-{
+	void RenderSystem::Shutdown() const
+	{
 
+	}
 }

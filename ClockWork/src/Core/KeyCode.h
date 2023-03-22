@@ -1,6 +1,6 @@
 #pragma once
 
-namespace CW::Key
+namespace CW
 {
 	constexpr auto KEY_SPACE = 32;
 	constexpr auto KEY_APOSTROPHE = 39; /* ' */

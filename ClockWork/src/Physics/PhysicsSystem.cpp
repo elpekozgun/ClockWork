@@ -4,22 +4,25 @@
 
 using namespace std;
 
-void PhysicsSystem::Update(float deltaTime)
+namespace CW
 {
-	_deltaTime += deltaTime;
-	if (_deltaTime >= _updateRate)
+	void PhysicsSystem::Update(float deltaTime)
 	{
-		OnUpdated.Invoke(_deltaTime);
-		_deltaTime = 0;
+		_deltaTime += deltaTime;
+		if (_deltaTime >= _updateRate)
+		{
+			OnUpdated.Invoke(_deltaTime);
+			_deltaTime = 0;
+		}
 	}
-}
 
-float PhysicsSystem::GetUpdateRate() const
-{
-	return _deltaTime;
-}
+	float PhysicsSystem::GetUpdateRate() const
+	{
+		return _deltaTime;
+	}
 
-void PhysicsSystem::Shutdown() const
-{
+	void PhysicsSystem::Shutdown() const
+	{
 
+	}
 }

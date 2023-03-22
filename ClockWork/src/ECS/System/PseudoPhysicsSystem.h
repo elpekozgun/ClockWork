@@ -1,38 +1,25 @@
 #pragma once
-#include "ECS/Core/EcsType.h"
+#include "../ECS.h"
+#include "../Component/Component.h"
+#include "../ISystem.h"
 #include "glm.hpp"
-#include "ECS/Core/ECS.h"
 #include "Core/Event.h"
+#include <iostream>
 
 using namespace glm;
 
-struct CW_API Gravity 
+namespace CW
 {
-	vec3 _force;
-};
+	class CW_API PseudoPhysicsSystem : public ISystem
+	{
+	public:
+		void Update(float dt) override;
+		void GetInput(int input) override;
 
-struct CW_API RigidBody
-{
-	vec3 velocity;
-	vec3 acceleration;
-};
+		Event<float> OnUpdated;
 
-struct CW_API Transform
-{
-	vec3 position;
-	vec3 rotation;
-	vec3 scale;
-};
-
-
-
-class CW_API PseudoPhysicsSystem : public System
-{
-public:
-	void Update(float dt) override;
-	Event<float> OnUpdated;
-
-private:
-	float _updateRate = 50;
-	float _currentDelta = 0;
-};
+	private:
+		float _updateRate = 50;
+		float _currentDelta = 0;
+	};
+}

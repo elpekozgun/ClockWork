@@ -1,23 +1,33 @@
 #include "PseudoPhysicsSystem.h"
 
-
-void PseudoPhysicsSystem::Update(float dt)
+namespace CW
 {
-	_currentDelta += dt;
-	if (_currentDelta >= _updateRate)
+	void PseudoPhysicsSystem::Update(float dt)
 	{
-		ECS& instance = ECS::Instance();
-		for (auto& entity : _entities)
+		_currentDelta += dt;
+		if (_currentDelta >= _updateRate)
 		{
-			auto& transform = instance.GetComponent<Transform>(entity);
-			auto& rigidBody = instance.GetComponent<RigidBody>(entity);
-			const auto& gravity = instance.GetComponent<Gravity>(entity);
+			ECS& instance = ECS::Instance();
+			for (auto& entity : _entities)
+			{
+				auto& transform = instance.GetComponent<Transform>(entity);
+				auto& rigidBody = instance.GetComponent<RigidBody>(entity);
+				const auto& gravity = instance.GetComponent<Gravity>(entity);
 
-			transform.position += rigidBody.velocity * dt;
-			rigidBody.velocity += gravity._force * dt;
+				transform.position += rigidBody.velocity * dt;
+				rigidBody.velocity += gravity._force * dt;
+			}
+			OnUpdated.Invoke(_currentDelta);
+			_currentDelta = 0;
 		}
-		OnUpdated.Invoke(_currentDelta);
-		_currentDelta = 0;
 	}
-}
 
+	void PseudoPhysicsSystem::GetInput(int input)
+	{
+		if (input == CW::KEY_T)
+		{
+			std::cout << "T pressed" << std::endl;
+		}
+	}
+
+}

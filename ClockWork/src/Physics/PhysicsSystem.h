@@ -1,13 +1,16 @@
 #pragma once
 
-#include "Core/ISystem.h"
+#include "Core/OldSystem.h"
 
-class PhysicsSystem : public ISystem
+namespace CW
 {
-public:
-	using ISystem::ISystem;
+	class PhysicsSystem : public OldSystem
+	{
+	public:
+		using OldSystem::OldSystem;
 
-	void Update(float deltaTime) override;
-	void Shutdown() const override;
-	float GetUpdateRate() const override;
-};
+		void Update(float deltaTime) override;
+		void Shutdown() const override;
+		float GetUpdateRate() const override;
+	};
+}

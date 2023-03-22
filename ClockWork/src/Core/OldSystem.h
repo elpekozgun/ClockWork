@@ -2,11 +2,11 @@
 
 #include "Event.h"
 
-class ISystem
+class OldSystem
 {
 public:
-	ISystem(float updateRate) : _updateRate(updateRate) {}
-	virtual ~ISystem() {};
+	OldSystem(float updateRate) : _updateRate(updateRate) {}
+	virtual ~OldSystem() {};
 	
 	virtual void Update(float deltaTime) = 0;
 	//{

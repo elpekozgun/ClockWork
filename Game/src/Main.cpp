@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <random>
+#include <ECS/Entity/Entity.h>
 
 class EventConsumer
 {
@@ -19,8 +20,8 @@ public:
         onPhysics.Set(this, &EventConsumer::OnPhysics);
         onRender.Set(this, &EventConsumer::OnRender);
 
-        app->OnPhysics += &onPhysics;
-        app->OnRender += &onRender;
+        //app->OnPhysics += &onPhysics;
+        //app->OnRender += &onRender;
     }
 
 private:
@@ -59,10 +60,12 @@ void Basic()
 
     //EventConsumer e(app.get());
 
-    app->Run(1920, 1080);
+    app->Run(640, 480);
 
     
 }
+
+using namespace CW;
 
 void ECSTest() 
 {
@@ -74,20 +77,23 @@ void ECSTest()
     ecs.RegisterComponent<RigidBody>();
 
     auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
+    {
+        ComponentMask mask;
+        mask.set(ecs.GetComponentType<Gravity>());
+        mask.set(ecs.GetComponentType<Transform>());
+        mask.set(ecs.GetComponentType<RigidBody>());
+        ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
+    }
 
-    Mask mask;
-    mask.set(ecs.GetComponentType<Gravity>());
-    mask.set(ecs.GetComponentType<Transform>());
-    mask.set(ecs.GetComponentType<RigidBody>());
-    ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
-
-    std::vector<Entity> entities(1000);
+    std::vector<EntityId> entities(5);
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
     std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
     std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
     std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+
+
 
     float scale = randScale(generator);
 
@@ -105,6 +111,9 @@ void ECSTest()
         });
 
     }
+    
+    ecs.DestroyEntity(entities[3]);
+
 
     float dt = 0;
 
@@ -127,8 +136,131 @@ void ECSTest()
 
 }
 
+void EntityTest()
+{
+    ECS& ecs = ECS::Instance();
+    ecs.Init();
+
+    ecs.RegisterComponent<Gravity>();
+    ecs.RegisterComponent<Transform>();
+    ecs.RegisterComponent<RigidBody>();
+    ecs.RegisterComponent<RigidBody>();
+
+    auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
+    {
+        ComponentMask mask;
+        mask.set(ecs.GetComponentType<Gravity>());
+        mask.set(ecs.GetComponentType<Transform>());
+        mask.set(ecs.GetComponentType<RigidBody>());
+        ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
+    }
+
+    auto a = ecs.GetComponentType<RigidBody>();
+
+
+    Entity parent1 = Entity::New();
+    
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
+    std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+    std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
+    std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+
+    float scale = randScale(generator);
+
+    parent1.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    parent1.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    parent1.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    Entity child11 = Entity::New(parent1);
+    Entity child12 = Entity::New(parent1);
+
+    Entity parent2 = Entity::New();
+    parent2.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    parent2.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    parent2.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    Entity child21 = Entity::New(parent2);
+    Entity child22 = Entity::New(parent2);
+    Entity child23 = Entity::New(parent2);
+
+    child11.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    child11.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    child11.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    child12.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    child12.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    child12.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    child21.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    child21.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    child21.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    child22.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    child22.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    child22.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    child23.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
+    child23.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
+    child23.AddComponent(Transform
+        {
+            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
+            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
+            .scale = vec3(1,1,1)
+        });
+
+    float dt = 0;
+
+    bool quit = 0;
+
+    EventTracker consumer;
+
+    physicsSystem->OnUpdated += &consumer.OnEvent;
+
+    while (!quit)
+    {
+        auto tStart = std::chrono::high_resolution_clock::now();
+
+        physicsSystem->Update(dt);
+
+        auto tEnd = std::chrono::high_resolution_clock::now();
+        dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
+    }
+
+}
+
 int main()
 {
-    ECSTest();
+    Basic();
     return 0;
 }

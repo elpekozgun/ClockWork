@@ -13,19 +13,19 @@ enum eRenderSpec
 {
 	Opengl = 0,
 	Directx,
-	Vulkan,
-	Metal
+	Vulkan
 };
 
 #ifdef CW_PLATFORM_WINDOWS
 
-#ifdef CW_BUILD_DLL
-#define CW_API __declspec(dllexport)
-#else
-#define CW_API __declspec(dllimport)
-#endif 
+	#ifdef CW_BUILD_DLL
+	#define CW_API __declspec(dllexport)
+	#else
+	#define CW_API __declspec(dllimport)
+	#endif 
 constexpr eOS OperatingSystem = eOS::Windows;
 #else
+
 #endif 
 
 #ifdef CW_APISPEC_OPENGL
@@ -34,9 +34,7 @@ constexpr eRenderSpec RendererApi = Render_Spec::OpenGl;
 constexpr eRenderSpec RendererApi = Render_Spec::DirectX;
 #elif CW_APISPEC_VULKAN
 constexpr eRenderSpec RendererApi = Render_Spec::Vulkan;
-#elif CW_APISPEC_METAL
-constexpr eRenderSpec RendererApi = Render_Spec::Metal;
-#elses
+#else
 constexpr eRenderSpec RendererApi = eRenderSpec::Opengl;
 #endif
 
