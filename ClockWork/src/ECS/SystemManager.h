@@ -28,13 +28,17 @@ namespace CW
 			_masks.insert({ typeName, mask });
 		}
 
-		void EntityDestroyed(EntityId entity)
+		// We delete the last element, since we already set the last elements data to the deleted index.
+		void DestroyEntity(EntityId entity)
 		{
 			for (const auto& kvp : _systems)
 			{
-				auto system = kvp.second;
+				const auto& system = kvp.second;
 
-				system->_entities.erase(entity);
+				auto last = system->_entities.size() - 1;
+				system->_entities.erase(last);
+
+				//system->_entities.erase(entity);
 			}
 		}
 

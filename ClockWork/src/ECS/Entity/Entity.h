@@ -5,13 +5,24 @@
 
 namespace CW
 {
-	class Entity
+	/* 
+		might need to update the EntityID on this element as we are only swapping the index of deleted item with the last element.
+		for example if we delete the entity with id 3 in a 6 element of entities, we have to update the entity with id 5 which is the last to deleted index 3.
+	*/
+
+	//TODO: fix the issue where the adress of child changes.
+
+	class CW_API Entity
 	{
 	public:
 		static Entity New() 
 		{
 			auto entityId = ECS::Instance().CreateEntity();
 			Entity entity(entityId);
+			
+			s_lastEntity = &entity;
+			s_lastEntityId = entityId;
+
 			return entity;
 		}
 
@@ -20,6 +31,10 @@ namespace CW
 			auto entityId = ECS::Instance().CreateEntity();
 			Entity entity(entityId);
 			parent.AddChild(entity);
+			
+			s_lastEntity = &entity;
+			s_lastEntityId = entityId;
+			
 			return entity;
 		}
 
@@ -70,13 +85,24 @@ namespace CW
 			for (auto& child : entity._children)
 			{
 				DestroyRecursive(child);
+				entity.DestroyChild(child);
+			}
+
+			if (entity._parent != nullptr)
+			{
+				entity._parent->DestroyChild(entity);
 			}
 
 			ECS::Instance().DestroyEntity(entity._id);
+			s_lastEntity->_id = entity._id;
+			s_lastEntityId--;
 		}
 
 		EntityId _id;
 		std::vector<Entity> _children;
 		Entity* _parent = nullptr;
+
+		static Entity* s_lastEntity;
+		static EntityId s_lastEntityId;
 	};
 }

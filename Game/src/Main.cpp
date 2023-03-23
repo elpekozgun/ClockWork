@@ -243,6 +243,11 @@ void EntityTest()
 
     bool quit = 0;
 
+
+    child12.Destroy();
+    child22.Destroy();
+
+
     EventTracker consumer;
 
     physicsSystem->OnUpdated += &consumer.OnEvent;
@@ -261,6 +266,8 @@ void EntityTest()
 
 int main()
 {
-    Basic();
+    EntityTest();
+
+    //Basic();
     return 0;
 }

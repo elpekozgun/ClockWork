@@ -31,8 +31,8 @@ namespace CW
 		void DestroyEntity(EntityId entity)
 		{
 			_entityManager->DestroyEntity(entity);
-			_componentManager->EntityDestroyed(entity);
-			_systemManager->EntityDestroyed(entity);
+			_componentManager->DestroyEntity(entity);
+			_systemManager->DestroyEntity(entity);
 		}
 
 		template<typename T>

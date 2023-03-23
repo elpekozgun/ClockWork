@@ -36,7 +36,7 @@ namespace CW
 
 		template<typename T>
 		void RemoveComponent(EntityId entity)
-		{
+		{ 
 			GetComponentArray<T>()->RemoveData(entity);
 		}
 
@@ -46,13 +46,13 @@ namespace CW
 			return GetComponentArray<T>()->GetData(entity);
 		}
 
-		void EntityDestroyed(EntityId entity)
+		void DestroyEntity(EntityId entity)
 		{
 			for (auto const& kvp : _componentArrays)
 			{
-				auto const& component = kvp.second;
+				auto const& componentArray = kvp.second;
 
-				component->EntityDestroyed(entity);
+				componentArray->DestroyEntity(entity);
 			}
 		}
 

@@ -100,6 +100,8 @@ namespace CW::Core
 			glfwSwapBuffers(_window);
 
 
+			lastKey = 0;
+
 			//OnRender.Invoke((int)(1000.0f / ms));
 		}
 	}

@@ -14,6 +14,14 @@ namespace CW
 		virtual void GetInput(int input) = 0;
 
 	protected:
+
+		void RemoveEntity(EntityId entity)
+		{
+			//auto lastEntity = _entities[_entities.size() - 1];
+
+			//_entities[entity] = 
+		}
+
 		std::set<EntityId> _entities;
 		ComponentMask _systemMask;
 
