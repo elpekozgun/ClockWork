@@ -92,7 +92,9 @@ namespace CW
 	private:
 		//std::queue<EntityId> _availableEntities;
 		std::stack<EntityId> _availableEntities;
-		std::array<ComponentMask, MAX_ENTITY> _entityMasks;
+		
+		ComponentMask _entityMasks[MAX_ENTITY];
+		//std::array<ComponentMask, MAX_ENTITY> _entityMasks;
 		uint32_t _activeEntities = 0;
 	};
 }

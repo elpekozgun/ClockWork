@@ -6,6 +6,8 @@
 #include <chrono>
 #include <random>
 #include <ECS/Entity/Entity.h>
+#include <crtdbg.h>
+
 
 class EventConsumer
 {
@@ -138,7 +140,7 @@ void ECSTest()
 
 void EntityTest()
 {
-    ECS& ecs = ECS::Instance();
+    /*ECS& ecs = ECS::Instance();
     ecs.Init();
 
     ecs.RegisterComponent<Gravity>();
@@ -158,7 +160,7 @@ void EntityTest()
     auto a = ecs.GetComponentType<RigidBody>();
 
 
-    Entity parent1 = Entity::New();
+    Entity& parent1 = Entity::New();
     
     std::default_random_engine generator;
     std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
@@ -177,10 +179,10 @@ void EntityTest()
             .scale = vec3(1,1,1)
         });
 
-    Entity child11 = Entity::New(parent1);
-    Entity child12 = Entity::New(parent1);
+    Entity& child11 = Entity::New(parent1);
+    Entity& child12 = Entity::New(parent1);
 
-    Entity parent2 = Entity::New();
+    Entity& parent2 = Entity::New();
     parent2.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
     parent2.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
     parent2.AddComponent(Transform
@@ -190,9 +192,9 @@ void EntityTest()
             .scale = vec3(1,1,1)
         });
 
-    Entity child21 = Entity::New(parent2);
-    Entity child22 = Entity::New(parent2);
-    Entity child23 = Entity::New(parent2);
+    Entity& child21 = Entity::New(parent2);
+    Entity& child22 = Entity::New(parent2);
+    Entity& child23 = Entity::New(parent2);
 
     child11.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
     child11.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
@@ -260,14 +262,49 @@ void EntityTest()
 
         auto tEnd = std::chrono::high_resolution_clock::now();
         dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
-    }
+    }*/
 
+}
+
+void EntityParentChildTest()
+{
+    ECS& ecs = ECS::Instance();
+    ecs.Init();
+
+    auto parent1 = Entity::Create("parent1");
+    auto child11 = Entity::Create(parent1, "child11");
+    auto child12 = Entity::Create(parent1, "child12");
+    auto parent2 = Entity::Create("parent2");
+    auto child21 = Entity::Create(parent2, "child21");
+    auto child22 = Entity::Create(parent2, "child22");
+    auto child23 = Entity::Create(parent2, "child23");
+
+    /*int* asd = new int[3];
+
+    asd[0] = 4;
+    asd[1] = 5;
+    asd[2] = 6;*/
+
+    Entity::Destroy(child12);
+    Entity::Destroy(child11);
+    Entity::Destroy(parent1);
+    
+    
+
+    // TODO: Entities and their parents hold a reference to each other, which results in cycle dependancy
+    // either have one way relation or manually cleanup.
 }
 
 int main()
 {
-    EntityTest();
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    
+    {
+        EntityParentChildTest();
+    }
 
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+    _CrtDumpMemoryLeaks();
     //Basic();
     return 0;
 }

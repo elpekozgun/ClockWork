@@ -7,6 +7,6 @@ namespace CW
 	class SceneGraph
 	{
 	private:
-		std::vector<Entity> _sceneEntities;
+		std::vector<std::shared_ptr<Entity>> _sceneEntities;
 	};
 }

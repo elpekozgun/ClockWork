@@ -12,51 +12,131 @@ namespace CW
 
 	//TODO: fix the issue where the adress of child changes.
 
-	class CW_API Entity
+	class CW_API Entity 
 	{
+		using EntitySharedPtr = std::shared_ptr<Entity>;
+
 	public:
-		static Entity New() 
+
+		explicit Entity(EntityId id, std::string name) : _id(id), _name(name) { }
+		~Entity()
+		{
+			std::cout << "destroying" << _name << std::endl;
+		}
+
+		static EntitySharedPtr Create(std::string name = "")
 		{
 			auto entityId = ECS::Instance().CreateEntity();
-			Entity entity(entityId);
-			
-			s_lastEntity = &entity;
+
+			auto entityPtr = std::make_shared<Entity>(entityId, name);
+
+			s_lastEntity = entityPtr.get();
 			s_lastEntityId = entityId;
 
-			return entity;
-		}
+			return entityPtr;
+		} 
 
-		static Entity New(Entity& parent)
+		static EntitySharedPtr Create(const EntitySharedPtr& parent, std::string name = "")
 		{
 			auto entityId = ECS::Instance().CreateEntity();
-			Entity entity(entityId);
-			parent.AddChild(entity);
+			auto entityPtr = std::make_shared<Entity>(entityId, name);
 			
-			s_lastEntity = &entity;
+			parent->AddChild(entityPtr);
+			entityPtr->SetParent(parent);
+
+			s_lastEntity = entityPtr.get();
 			s_lastEntityId = entityId;
+
+			return entityPtr;
+		}
+
+		static void Destroy(EntitySharedPtr& entity)
+		{
+			for (int i = 0; i < entity->_children.size(); i++)
+			{
+				Destroy(entity->_children[i]);
+			}
+
+			if (entity->_parent != nullptr)
+			{
+				auto it = std::remove_if
+				(
+					entity->_parent->_children.begin(),
+					entity->_parent->_children.end(),
+					[&](auto const& ent) {  return entity->_id == ent->_id; }
+				);
+				entity->_parent->_children.erase(it, entity->_parent->_children.end());
+			}
+			entity->_children.clear();
+
+			ECS::Instance().DestroyEntity(entity->_id);
 			
-			return entity;
+			s_lastEntity->_id = entity->_id;
+			s_lastEntityId--;
+			
+			entity = nullptr;
 		}
 
-		void Destroy()
+
+		/*Entity(const Entity& entity)
 		{
-			DestroyRecursive(*this);
+			std::cout << "copy constructor called\n";
+		}*/
+		//Entity(Entity&&) = default;
+
+		//Entity& operator=(const Entity& other)
+		//{
+		//	if (this != &other)
+		//	{
+		//		_id = other._id;
+		//		_children = other._children;
+		//		_parent = other._parent;
+		//	}
+		//	return *this;
+		//}
+
+		void AddChild(EntitySharedPtr& entity)
+		{
+			auto it = std::find(_children.begin(), _children.end(), entity);
+			if (it == _children.end())
+			{
+				_children.push_back(entity);
+			}
 		}
 
-		void AddChild(Entity& entity)
+		void SetParent(const EntitySharedPtr& parent)
 		{
-			entity._parent = this;
-			_children.push_back(entity);
+			if (_parent != nullptr && _parent == parent)
+				return;
+			
+			// THIS IS AN ACCESS VIOLATION.
+			//auto inst = static_cast<EntitySharedPtr>(this);
+			
+			_parent = parent;
 		}
 
-		void DestroyChild(Entity& entity)
+		void DestroyChild(EntityId id)
 		{
-			std::remove(_children.begin(), _children.end(), entity);
+			auto it = std::find_if(_children.begin(), _children.end(), [&](auto const& e) { return e->_id == id; });
+
+			if (it != _children.end())
+			{
+				Entity::Destroy(*it);
+			}
 		}
 
-		bool operator==(const Entity& other)
+		void DestroyChild(std::string name)
 		{
-			return _id == other._id;
+			auto it = std::remove_if(_children.begin(), _children.end(), [&](auto const& e) { return e->_name == name; });
+			if (it != _children.end())
+			{
+				Entity::Destroy(*it);
+			}
+		}
+
+		inline bool operator==(const Entity& other)
+		{
+			return _id == other._id && _name == other._name && _children.size() == other._children.size();
 		}
 
 		template<typename T>
@@ -77,30 +157,14 @@ namespace CW
 			ECS::Instance().GetComponent(_id);
 		}
 
-	private:
-		explicit Entity(EntityId id) : _id(id) {}
 		
-		void DestroyRecursive(Entity& entity)
-		{
-			for (auto& child : entity._children)
-			{
-				DestroyRecursive(child);
-				entity.DestroyChild(child);
-			}
-
-			if (entity._parent != nullptr)
-			{
-				entity._parent->DestroyChild(entity);
-			}
-
-			ECS::Instance().DestroyEntity(entity._id);
-			s_lastEntity->_id = entity._id;
-			s_lastEntityId--;
-		}
-
-		EntityId _id;
-		std::vector<Entity> _children;
-		Entity* _parent = nullptr;
+	private:
+		
+		EntityId _id = -1;
+		std::string _name;
+		
+		EntitySharedPtr _parent = nullptr;
+		std::vector<EntitySharedPtr> _children {};
 
 		static Entity* s_lastEntity;
 		static EntityId s_lastEntityId;
