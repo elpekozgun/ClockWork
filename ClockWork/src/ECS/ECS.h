@@ -1,11 +1,14 @@
 #pragma once
+
+#include <memory>
+
 #include "Core/Core.h"
 #include "Core/Defines.h"
-#include <memory>
 #include "SystemManager.h"
 #include "ComponentManager.h"
 #include "EntityManager.h"
 #include "Core/Singleton.h"
+#include "Component.h"
 
 namespace CW
 {
@@ -15,7 +18,6 @@ namespace CW
 		ECS(token) {};
 		~ECS() {};
 
-	public:
 		void Init()
 		{
 			_entityManager = std::make_unique<EntityManager>();
@@ -75,7 +77,7 @@ namespace CW
 			return _componentManager->GetComponentType<T>();
 		}
 
-		template<typename T>
+		template<ISystemConcept T> 
 		std::shared_ptr<T> RegisterSystem()
 		{
 			return _systemManager->RegisterSystem<T>();
@@ -92,10 +94,8 @@ namespace CW
 			_systemManager->HandleInput(input);
 		}
 
-	private:
 		std::unique_ptr<EntityManager> _entityManager;
 		std::unique_ptr<ComponentManager> _componentManager;
 		std::unique_ptr<SystemManager> _systemManager;
-
 	};
 }

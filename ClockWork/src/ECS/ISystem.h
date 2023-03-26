@@ -5,6 +5,8 @@
 
 #include <set>
 
+
+
 namespace CW
 {
 	class CW_API ISystem
@@ -14,7 +16,6 @@ namespace CW
 		virtual void GetInput(int input) = 0;
 
 	protected:
-
 		void RemoveEntity(EntityId entity)
 		{
 			//auto lastEntity = _entities[_entities.size() - 1];
@@ -25,7 +26,12 @@ namespace CW
 		std::set<EntityId> _entities;
 		ComponentMask _systemMask;
 
+		float _updateRate = 50;
+		float _currentDelta = 0;
+
 		friend class SystemManager;
 	};
 
+	template<typename T>
+	concept ISystemConcept = std::derived_from<T, ISystem>;
 }

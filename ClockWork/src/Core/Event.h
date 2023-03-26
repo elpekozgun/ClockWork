@@ -9,77 +9,77 @@
 
 using namespace std;
 
-
-template<typename S>
-class IDelegate
+namespace CW
 {
-public:
-	virtual void operator()(S param) = 0;
-	virtual bool operator==(IDelegate<S>* other) = 0;
-};
-
-template<typename T, typename S>
-class Delegate : public IDelegate<S>
-{
-public:
-	Delegate() = default;
-	virtual ~Delegate() = default;
-
-	void Set(T* instance, void (T::* action)(S param))
+	template<typename S>
+	class IDelegate
 	{
-		_instance = instance;
-		_action = action;
-	}
+	public:
+		virtual void operator()(S param) = 0;
+		virtual bool operator==(IDelegate<S>* other) = 0;
+	};
 
-	void operator()(S param) override
+	template<typename T, typename S>
+	class Delegate : public IDelegate<S>
 	{
-		(_instance->*_action)(param);
-	}
+	public:
+		Delegate() = default;
+		virtual ~Delegate() = default;
 
-	inline bool operator==(IDelegate<S>* other) override
-	{
-		Delegate* otherDelegate = dynamic_cast<Delegate<T,S>*>(other);
-		if (otherDelegate == nullptr)
-			return false;
-		return (this->_action == otherDelegate->_action) &&
-			(this->_instance == otherDelegate->_instance);
-	}
-
-private:
-	void (T::* _action)(S param);
-	T* _instance;
-};
-
-
-template<typename S>
-class Event
-{
-public:
-	Event() = default;
-
-	void operator+=(IDelegate<S>* delegate)
-	{
-		_invocationList.insert(delegate);
-	}
-
-	void operator-=(IDelegate<S>* delegate)
-	{
-		_invocationList.erase(delegate);
-	}
-
-	void Invoke(S param) const 
-	{
-		for (const auto& invoker : _invocationList)
+		void Set(T* instance, void (T::* action)(S param))
 		{
-			(*invoker)(param);
+			_instance = instance;
+			_action = action;
 		}
-	}
 
-	IDelegate<S>* operator=(IDelegate<S>* delegate) = delete;
+		void operator()(S param) override
+		{
+			(_instance->*_action)(param);
+		}
 
-private:
-	typedef std::unordered_set<IDelegate<S>*> Delegates;
-	Delegates _invocationList;
-};
+		inline bool operator==(IDelegate<S>* other) override
+		{
+			Delegate* otherDelegate = dynamic_cast<Delegate<T, S>*>(other);
+			if (otherDelegate == nullptr)
+				return false;
+			return (this->_action == otherDelegate->_action) &&
+				(this->_instance == otherDelegate->_instance);
+		}
+
+	private:
+		void (T::* _action)(S param);
+		T* _instance;
+	};
 
 
+	template<typename S>
+	class Event
+	{
+	public:
+		Event() = default;
+
+		void operator+=(IDelegate<S>* delegate)
+		{
+			_invocationList.insert(delegate);
+		}
+
+		void operator-=(IDelegate<S>* delegate)
+		{
+			_invocationList.erase(delegate);
+		}
+
+		void Invoke(S param) const
+		{
+			for (const auto& invoker : _invocationList)
+			{
+				(*invoker)(param);
+			}
+		}
+
+		IDelegate<S>* operator=(IDelegate<S>* delegate) = delete;
+
+	private:
+		typedef std::unordered_set<IDelegate<S>*> Delegates;
+		Delegates _invocationList;
+	};
+}

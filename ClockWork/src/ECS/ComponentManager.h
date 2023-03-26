@@ -14,10 +14,12 @@ namespace CW
 		void RegisterComponent()
 		{
 			std::string typeName = typeid(T).name();
-
-			_componentTypes.insert({ typeName, _nextComponentType });
-			_componentArrays.insert({ typeName,std::make_shared<ComponentArray<T>>() });
-			_nextComponentType++;
+			if (!_componentTypes.contains(typeName))
+			{
+				_componentTypes.insert({ typeName, _nextComponentType });
+				_componentArrays.insert({ typeName, std::make_shared<ComponentArray<T>>() });
+				_nextComponentType++;
+			}
 		}
 
 		template<typename T>

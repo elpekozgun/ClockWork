@@ -1,42 +1,14 @@
-#include "ClockWork.h"
 #include <Core/Core.h>
-
 #include <memory>
 #include <thread>
 #include <chrono>
 #include <random>
-#include <ECS/Entity/Entity.h>
 #include <crtdbg.h>
 
+#include "ClockWork.h"
+#include "../Example.h"
 
-class EventConsumer
-{
-public:
-    CW::Core::Application* _app;
-
-    Delegate<EventConsumer, std::string> onPhysics;
-    Delegate<EventConsumer, int> onRender;
-
-    EventConsumer(CW::Core::Application* const app) : _app(app)
-    {
-        onPhysics.Set(this, &EventConsumer::OnPhysics);
-        onRender.Set(this, &EventConsumer::OnRender);
-
-        //app->OnPhysics += &onPhysics;
-        //app->OnRender += &onRender;
-    }
-
-private:
-    void OnPhysics(std::string param)
-    {
-        cout << param << "\n";
-    }
-
-    void OnRender(int renderTime)
-    {
-        cout << "Frame Time: " << renderTime << " hz\n";
-    }
-};
+using namespace CW;
 
 class EventTracker
 {
@@ -56,112 +28,34 @@ private:
     }
 };
 
-void Basic()
+void SampleApp()
 {
-    auto app = std::make_unique<CW::Core::Application>("game");
+    auto app = App::Create("game")->
+        AddSystem<ExampleSystem>()->
+        RegisterComponent<ExampleComponent>();
 
-    //EventConsumer e(app.get());
+    Scene scene;
 
-    app->Run(640, 480);
+    auto parent1 = scene.CreateEntity("parent1");
+    auto parent2 = scene.CreateEntity("parent2");
 
-    
+    auto child11 = scene.CreateEntity("child11", parent1);
+    auto child12 = scene.CreateEntity("child12", parent1);
+
+    scene.AddComponent(parent1, ExampleComponent{ 5, 5 });
+    scene.AddComponent(child11, ExampleComponent{ 10, 5 });
+    scene.AddComponent(child12, ExampleComponent{ 15, 5 });
+    scene.AddComponent(parent2, ExampleComponent{ 5, 10 });
+
+    app->Run(800, 600);
+
+    delete app;
 }
 
 using namespace CW;
 
-void ECSTest() 
+void RandomDistributionExample() 
 {
-    ECS& ecs = ECS::Instance();
-    ecs.Init();
-
-    ecs.RegisterComponent<GravityComponent>();
-    ecs.RegisterComponent<TransformComponent>();
-    ecs.RegisterComponent<RigidBodyComponent>();
-
-    auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
-    {
-        ComponentMask mask;
-        mask.set(ecs.GetComponentType<GravityComponent>());
-        mask.set(ecs.GetComponentType<TransformComponent>());
-        mask.set(ecs.GetComponentType<RigidBodyComponent>());
-        ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
-    }
-
-    std::vector<EntityId> entities(5);
-
-    std::default_random_engine generator;
-    std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
-    std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
-    std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
-    std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
-
-
-
-    float scale = randScale(generator);
-
-    for (auto& entity : entities)
-    {
-        entity = ecs.CreateEntity();
-
-        ecs.AddComponent(entity, GravityComponent{ vec3(0.0f, randGravity(generator), 0.0f) });
-        ecs.AddComponent(entity, RigidBodyComponent{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0)});
-        ecs.AddComponent(entity, TransformComponent
-        {  
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    }
-    
-    ecs.DestroyEntity(entities[3]);
-
-
-    float dt = 0;
-
-    bool quit = 0;
-
-    EventTracker consumer;
-
-    physicsSystem->OnUpdated += &consumer.OnEvent;
-
-
-    while (!quit)
-    {
-        auto tStart = std::chrono::high_resolution_clock::now();
-
-        physicsSystem->Update(dt);
-
-        auto tEnd = std::chrono::high_resolution_clock::now();
-        dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
-    }
-
-}
-
-void EntityTest()
-{
-    /*ECS& ecs = ECS::Instance();
-    ecs.Init();
-
-    ecs.RegisterComponent<Gravity>();
-    ecs.RegisterComponent<Transform>();
-    ecs.RegisterComponent<RigidBody>();
-    ecs.RegisterComponent<RigidBody>();
-
-    auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
-    {
-        ComponentMask mask;
-        mask.set(ecs.GetComponentType<Gravity>());
-        mask.set(ecs.GetComponentType<Transform>());
-        mask.set(ecs.GetComponentType<RigidBody>());
-        ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
-    }
-
-    auto a = ecs.GetComponentType<RigidBody>();
-
-
-    Entity& parent1 = Entity::New();
-    
     std::default_random_engine generator;
     std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
     std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
@@ -169,124 +63,56 @@ void EntityTest()
     std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
 
     float scale = randScale(generator);
-
-    parent1.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    parent1.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    parent1.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    Entity& child11 = Entity::New(parent1);
-    Entity& child12 = Entity::New(parent1);
-
-    Entity& parent2 = Entity::New();
-    parent2.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    parent2.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    parent2.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    Entity& child21 = Entity::New(parent2);
-    Entity& child22 = Entity::New(parent2);
-    Entity& child23 = Entity::New(parent2);
-
-    child11.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    child11.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    child11.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    child12.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    child12.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    child12.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    child21.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    child21.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    child21.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    child22.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    child22.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    child22.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    child23.AddComponent(Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-    child23.AddComponent(RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0) });
-    child23.AddComponent(Transform
-        {
-            .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
-            .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
-            .scale = vec3(1,1,1)
-        });
-
-    float dt = 0;
-
-    bool quit = 0;
-
-
-    child12.Destroy();
-    child22.Destroy();
-
-
-    EventTracker consumer;
-
-    physicsSystem->OnUpdated += &consumer.OnEvent;
-
-    while (!quit)
-    {
-        auto tStart = std::chrono::high_resolution_clock::now();
-
-        physicsSystem->Update(dt);
-
-        auto tEnd = std::chrono::high_resolution_clock::now();
-        dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
-    }*/
-
+    randGravity(generator);
+    randPosition(generator);
+    randRotation(generator);
 }
-
 
 void SceneTest()
 {
     ECS& ecs = ECS::Instance();
     ecs.Init();
 
+    ecs.RegisterComponent<ExampleComponent>();
+
+    auto ts = ecs.RegisterSystem<ExampleSystem>();
+
     Scene scene;
 
     auto parent1 = scene.CreateEntity("parent1");
-    //auto parent2 = scene.CreateEntity("parent2");
+    auto parent2 = scene.CreateEntity("parent2");
 
     auto child11 = scene.CreateEntity("child11", parent1);
-    //auto child12 = scene.CreateEntity("child12", parent1);
-    //auto child13 = scene.CreateEntity("child21", parent2);
-    //parent2->SetChild(child11);
+    auto child12 = scene.CreateEntity("child12", parent1);
+        
+    scene.AddComponent(parent1, ExampleComponent{ 5, 5});
+    scene.AddComponent(child11, ExampleComponent{ 10, 5 });
+    scene.AddComponent(child12, ExampleComponent{ 15, 5 });
+    scene.AddComponent(parent2, ExampleComponent{ 5, 10 });
+    
+    //EventTracker consumer;
 
+    float dt = 0;
+    while (true)
+    {
+        auto tStart = std::chrono::high_resolution_clock::now();
+
+        //std::cout << dt << "\n";
+
+        ts->Update(dt);
+
+        auto tEnd = std::chrono::high_resolution_clock::now();
+        dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
+    }
 
     scene.DestroyEntity(parent1);
-
-   
+    scene.DestroyEntity(parent2);
 }
+
+
+
+
+
 
 
 int main()
@@ -294,7 +120,8 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     
     {
-        SceneTest();
+        SampleApp();
+        //SceneTest();
     }
 
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

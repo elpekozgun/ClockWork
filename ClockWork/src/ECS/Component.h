@@ -1,5 +1,8 @@
-#include "Core/Core.h"
+#pragma once
+
 #include <glm.hpp>
+
+#include "Core/Core.h"
 
 using namespace glm;
 
