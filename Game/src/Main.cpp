@@ -74,16 +74,16 @@ void ECSTest()
     ECS& ecs = ECS::Instance();
     ecs.Init();
 
-    ecs.RegisterComponent<Gravity>();
-    ecs.RegisterComponent<Transform>();
-    ecs.RegisterComponent<RigidBody>();
+    ecs.RegisterComponent<GravityComponent>();
+    ecs.RegisterComponent<TransformComponent>();
+    ecs.RegisterComponent<RigidBodyComponent>();
 
     auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
     {
         ComponentMask mask;
-        mask.set(ecs.GetComponentType<Gravity>());
-        mask.set(ecs.GetComponentType<Transform>());
-        mask.set(ecs.GetComponentType<RigidBody>());
+        mask.set(ecs.GetComponentType<GravityComponent>());
+        mask.set(ecs.GetComponentType<TransformComponent>());
+        mask.set(ecs.GetComponentType<RigidBodyComponent>());
         ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
     }
 
@@ -103,9 +103,9 @@ void ECSTest()
     {
         entity = ecs.CreateEntity();
 
-        ecs.AddComponent(entity, Gravity{ vec3(0.0f, randGravity(generator), 0.0f) });
-        ecs.AddComponent(entity, RigidBody{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0)});
-        ecs.AddComponent(entity, Transform
+        ecs.AddComponent(entity, GravityComponent{ vec3(0.0f, randGravity(generator), 0.0f) });
+        ecs.AddComponent(entity, RigidBodyComponent{ .velocity = vec3(0,0,0), .acceleration = vec3(0,0,0)});
+        ecs.AddComponent(entity, TransformComponent
         {  
             .position = vec3(randPosition(generator), randPosition(generator), randPosition(generator)),
             .rotation = vec3(randRotation(generator), randRotation(generator),  randRotation(generator)),
@@ -268,26 +268,28 @@ void EntityTest()
 
 void EntityParentChildTest()
 {
-    ECS& ecs = ECS::Instance();
-    ecs.Init();
+    //ECS& ecs = ECS::Instance();
+    //ecs.Init();
 
-    auto parent1 = Entity::Create("parent1");
-    auto child11 = Entity::Create(parent1, "child11");
-    auto child12 = Entity::Create(parent1, "child12");
-    auto parent2 = Entity::Create("parent2");
-    auto child21 = Entity::Create(parent2, "child21");
-    auto child22 = Entity::Create(parent2, "child22");
-    auto child23 = Entity::Create(parent2, "child23");
+    //auto parent1 = Entity::Create("parent1");
+    //auto child11 = Entity::Create(parent1, "child11");
+    //auto child12 = Entity::Create(parent1, "child12");
+    //auto parent2 = Entity::Create("parent2");
+    //auto child21 = Entity::Create(parent2, "child21");
+    //auto child22 = Entity::Create(parent2, "child22");
+    //auto child23 = Entity::Create(parent2, "child23");
 
-    /*int* asd = new int[3];
+    //child21->SetParent(parent1);
 
-    asd[0] = 4;
-    asd[1] = 5;
-    asd[2] = 6;*/
+    ///*int* asd = new int[3];
 
-    Entity::Destroy(child12);
-    Entity::Destroy(child11);
-    Entity::Destroy(parent1);
+    //asd[0] = 4;
+    //asd[1] = 5;
+    //asd[2] = 6;*/
+
+    //Entity::Destroy(child12);
+    //Entity::Destroy(child11);
+    //Entity::Destroy(parent1);
     
     
 
@@ -295,12 +297,28 @@ void EntityParentChildTest()
     // either have one way relation or manually cleanup.
 }
 
+void SceneTest()
+{
+    ECS& ecs = ECS::Instance();
+    ecs.Init();
+
+    Scene scene;
+
+    auto root = scene.createEntity("root");
+    auto child1 = root->addChild("child1");
+    auto child2 = root->addChild("child2");
+    auto grandchild = child1->addChild("grandchild");
+   
+}
+
+
 int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     
     {
-        EntityParentChildTest();
+        SceneTest();
+        //EntityParentChildTest();
     }
 
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

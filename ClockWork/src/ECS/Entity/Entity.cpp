@@ -1,10 +1,10 @@
-#include "Entity.h"
+//#include "Entity.h"
 
-
-namespace CW
-{
-	Entity* Entity::s_lastEntity = nullptr;
-	EntityId Entity::s_lastEntityId = 0;
-}
+//
+//namespace CW
+//{
+//	Entity* Entity::s_lastEntity = nullptr;
+//	EntityId Entity::s_lastEntityId = 0;
+//}
 
 

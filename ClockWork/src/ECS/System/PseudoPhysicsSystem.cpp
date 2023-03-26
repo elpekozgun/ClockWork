@@ -10,9 +10,9 @@ namespace CW
 			ECS& instance = ECS::Instance();
 			for (auto& entity : _entities)
 			{
-				auto& transform = instance.GetComponent<Transform>(entity);
-				auto& rigidBody = instance.GetComponent<RigidBody>(entity);
-				const auto& gravity = instance.GetComponent<Gravity>(entity);
+				auto& transform = instance.GetComponent<TransformComponent>(entity);
+				auto& rigidBody = instance.GetComponent<RigidBodyComponent>(entity);
+				const auto& gravity = instance.GetComponent<GravityComponent>(entity);
 
 				transform.position += rigidBody.velocity * dt;
 				rigidBody.velocity += gravity._force * dt;

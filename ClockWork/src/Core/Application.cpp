@@ -62,9 +62,9 @@ namespace CW::Core
 		auto physicsSystem = ecs.RegisterSystem<PseudoPhysicsSystem>();
 		{
 			ComponentMask mask;
-			mask.set(ecs.GetComponentType<Gravity>());
-			mask.set(ecs.GetComponentType<Transform>());
-			mask.set(ecs.GetComponentType<RigidBody>());
+			mask.set(ecs.GetComponentType<GravityComponent>());
+			mask.set(ecs.GetComponentType<TransformComponent>());
+			mask.set(ecs.GetComponentType<RigidBodyComponent>());
 			ecs.SetSystemMask<PseudoPhysicsSystem>(mask);
 		}
 
