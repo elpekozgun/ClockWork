@@ -266,36 +266,6 @@ void EntityTest()
 
 }
 
-void EntityParentChildTest()
-{
-    //ECS& ecs = ECS::Instance();
-    //ecs.Init();
-
-    //auto parent1 = Entity::Create("parent1");
-    //auto child11 = Entity::Create(parent1, "child11");
-    //auto child12 = Entity::Create(parent1, "child12");
-    //auto parent2 = Entity::Create("parent2");
-    //auto child21 = Entity::Create(parent2, "child21");
-    //auto child22 = Entity::Create(parent2, "child22");
-    //auto child23 = Entity::Create(parent2, "child23");
-
-    //child21->SetParent(parent1);
-
-    ///*int* asd = new int[3];
-
-    //asd[0] = 4;
-    //asd[1] = 5;
-    //asd[2] = 6;*/
-
-    //Entity::Destroy(child12);
-    //Entity::Destroy(child11);
-    //Entity::Destroy(parent1);
-    
-    
-
-    // TODO: Entities and their parents hold a reference to each other, which results in cycle dependancy
-    // either have one way relation or manually cleanup.
-}
 
 void SceneTest()
 {
@@ -304,10 +274,17 @@ void SceneTest()
 
     Scene scene;
 
-    auto root = scene.createEntity("root");
-    auto child1 = root->addChild("child1");
-    auto child2 = root->addChild("child2");
-    auto grandchild = child1->addChild("grandchild");
+    auto parent1 = scene.CreateEntity("parent1");
+    //auto parent2 = scene.CreateEntity("parent2");
+
+    auto child11 = scene.CreateEntity("child11", parent1);
+    //auto child12 = scene.CreateEntity("child12", parent1);
+    //auto child13 = scene.CreateEntity("child21", parent2);
+    //parent2->SetChild(child11);
+
+
+    scene.DestroyEntity(parent1);
+
    
 }
 
@@ -318,11 +295,9 @@ int main()
     
     {
         SceneTest();
-        //EntityParentChildTest();
     }
 
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
     _CrtDumpMemoryLeaks();
-    //Basic();
     return 0;
 }

@@ -8,66 +8,149 @@
 
 namespace CW
 {
-    class Entity;
-    using EntityPtr = std::shared_ptr<Entity>;
-    using WeakEntityPtr = std::weak_ptr<Entity>;
-
-    class Entity : public std::enable_shared_from_this<Entity>
-    {
-    public:
-        Entity(const std::string& name, EntityPtr parent = nullptr)
-            : name(name), parent(parent) {}
-
-        const std::string& getName() const {
-            return name;
-        }
-
-        EntityPtr getParent() const {
-            return parent.lock();
-        }
-
-        EntityPtr addChild(const std::string& name) {
-            auto child = std::make_shared<Entity>(name, shared_from_this());
-            children.push_back(child);
-            return child;
-        }
-
-        void removeChild(const EntityPtr& child) {
-            auto it = std::find(children.begin(), children.end(), child);
-            if (it != children.end()) {
-                (*it)->parent.reset();
-                children.erase(it);
-            }
-        }
-
-    private:
-        std::string name;
-        WeakEntityPtr parent;
-        std::vector<EntityPtr> children;
-    };
-
-
     class Scene
     {
+        class Entity;
+
+        using EntityPtr = std::shared_ptr<Entity>;
+        using WeakEntityPtr = std::weak_ptr<Entity>;
+
     public:
-        EntityPtr createEntity(const std::string& name)
+        EntityPtr& CreateEntity(const std::string& name, EntityPtr parent = nullptr)
         {
-            auto entity = std::make_shared<Entity>(name);
+            auto id = ECS::Instance().CreateEntity();
+
+            auto entity = std::make_shared<Entity>(id,name, parent);
+            if (parent != nullptr)
+                parent->SetChild(entity);
+
             entities.push_back(entity);
             return entity;
         }
 
-        void destroyEntity(const EntityPtr& entity)
+        void DestroyEntity(EntityPtr& entity)
         {
             auto it = std::find(entities.begin(), entities.end(), entity);
             if (it != entities.end())
             {
-                (*it)->getParent().reset();
-                entities.erase(it);
+                DestroyRecursive(entity);
             }
+            entity.reset();
         }
+
+        void DestroyRecursive(EntityPtr& entity)
+        {
+            //first remove entity from its parent children.
+            if (auto parent = entity->GetParent())
+            {
+                parent->RemoveChild(entity);
+            }
+
+            // reset entity parent
+            entity->_parent = WeakEntityPtr();
+
+            // do the same for everychildren in entity.
+            while (!entity->_children.empty())
+            {
+                auto child = entity->_children.back();
+                entity->_children.pop_back();
+                DestroyRecursive(child);
+                //auto c = child.lock();
+                //DestroyRecursive(c);
+            }
+            
+            // remove entity from scene entities
+            auto itr = std::find(entities.begin(), entities.end(), entity);
+            if (itr != entities.end())
+            {
+                entities.erase(itr);
+            }
+
+            // finally destroy it
+            entity.reset();
+        }
+
     private:
         std::vector<EntityPtr> entities;
+
+        class Entity : public std::enable_shared_from_this<Entity>
+        {
+            friend class Scene;
+
+        public:
+            Entity(EntityId id, const std::string& name, const EntityPtr& parent = nullptr)
+                : _id(id),_name(name), _parent(parent) 
+            {
+                std::cout << "creating " << _id << " " << _name << "\n";
+            }
+
+            ~Entity()
+            {
+                std::cout << "destroying " << _id << " " << _name << "\n";
+            }
+
+
+            const std::string& GetName() const {
+                return _name;
+            }
+
+            EntityPtr GetParent() const {
+                return _parent.lock();
+            }
+
+            void SetParent(EntityPtr& parent)
+            {
+                _parent = parent;
+                parent->_children.push_back(shared_from_this());
+            }
+
+            void SetChild(EntityPtr& child)
+            {
+                if (child->GetParent() != nullptr)
+                {
+                    child->GetParent()->RemoveChild(child);
+                }
+                auto a = shared_from_this();
+                child->SetParent(a);
+            }
+
+            void RemoveChild(const EntityPtr& child) 
+            {
+                //auto it = std::find_if(_children.begin(), _children.end(), [&](const auto& a) { return a.lock() == child; });
+                auto it = std::find(_children.begin(), _children.end(), child);
+                if (it != _children.end()) 
+                {
+                    //auto c = it->lock();
+                    //c->_parent = WeakEntityPtr();
+                    (*it)->_parent = WeakEntityPtr();
+                    _children.erase(it);
+                }
+            }
+
+            bool operator==(const WeakEntityPtr& other)
+            {
+                auto t = other.lock();
+
+                return shared_from_this() == t;
+            }
+
+            //void DestroyChildren()
+            //{
+            //    while(!_children.empty()) 
+            //    {
+            //        auto child = _children.back();
+            //        child->DestroyChildren();
+            //        _children.pop_back();
+            //    }
+            //}
+
+        private:
+            EntityId _id;
+            std::string _name;
+            WeakEntityPtr _parent;
+            std::vector<EntityPtr> _children;
+        };
+
     };
 }
 
