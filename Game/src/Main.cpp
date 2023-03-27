@@ -7,6 +7,7 @@
 
 #include "ClockWork.h"
 #include "../Example.h"
+#include "Systems/PlayerMovement.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -41,8 +42,6 @@ void SampleApp()
 
     delete app;
 }
-
-using namespace CW;
 
 void RandomDistributionExample() 
 {
@@ -100,6 +99,24 @@ void SceneTest()
 }
 
 
+void Game()
+{
+    auto app = App::Create("game")->
+        AddSystem<PlayerController, InputComponent, TransformComponent>()->
+        AddSystem<
+
+    //auto& a = ECS::Instance();
+
+    Scene scene;
+
+    auto player = scene.CreateEntity("player");
+
+    scene.AddComponents(player, TransformComponent(), InputComponent());
+
+    app->Run(640, 480);
+
+    delete app;
+}
 
 
 

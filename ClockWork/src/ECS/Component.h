@@ -21,12 +21,12 @@ namespace CW
 		vec3 acceleration;
 	};
 
-	struct CW_API TransformComponent 
-	{
-		vec3 position;
-		vec3 rotation;
-		vec3 scale;
-	};
+	//struct CW_API TransformComponent 
+	//{
+	//	vec3 position;
+	//	vec3 rotation;
+	//	vec3 scale;
+	//};
 
 	struct CW_API RendererComponent 
 	{
