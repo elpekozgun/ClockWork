@@ -22,7 +22,7 @@ namespace CW
 		}
 
 		template<typename T>
-		void SetMask(ComponentMask mask)
+		void SetSystemMask(ComponentMask mask)
 		{
 			std::string typeName = typeid(T).name();
 			_masks.insert({ typeName, mask });
@@ -37,8 +37,6 @@ namespace CW
 
 				auto last = system->_entities.size() - 1;
 				system->_entities.erase(last);
-
-				//system->_entities.erase(entity);
 			}
 		}
 
@@ -54,7 +52,6 @@ namespace CW
 					system->_entities.insert(entity);
 				else
 					system->_entities.erase(entity);
-
 			}
 		}
 

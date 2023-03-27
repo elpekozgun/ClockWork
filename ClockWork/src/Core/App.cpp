@@ -39,12 +39,11 @@ namespace CW
 				system->Update(dt);
 			}
 
-			std::cout << 1000 / dt << "\n";
+			_window.Update();
 
 			auto tEnd = std::chrono::high_resolution_clock::now();
 			dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
 
-			_window.Update();
 		}
 	}
 

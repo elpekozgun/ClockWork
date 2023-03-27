@@ -1,6 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <bitset>
+#include <functional>
+#include <tuple>
 
 #include "Core/Core.h"
 #include "Core/Defines.h"
@@ -9,6 +12,7 @@
 #include "EntityManager.h"
 #include "Core/Singleton.h"
 #include "Component.h"
+
 
 namespace CW
 {
@@ -63,6 +67,8 @@ namespace CW
 			auto mask = _entityManager->GetMask(entity);
 			mask.set(_componentManager->GetComponentType<T>(), false);
 			_entityManager->Setmask(entity, mask);
+
+			_systemManager->EntityMaskChanged(entity, mask);
 		}
 
 		template<typename T>
@@ -77,16 +83,36 @@ namespace CW
 			return _componentManager->GetComponentType<T>();
 		}
 
-		template<ISystemConcept T> 
+		template<ISystemConcept T, typename... C>
 		std::shared_ptr<T> RegisterSystem()
 		{
-			return _systemManager->RegisterSystem<T>();
+			auto system = _systemManager->RegisterSystem<T>();
+
+			ComponentMask mask;
+			RegisterComponents<C...>(mask);
+			SetSystemMask<T>(mask);
+
+			return system;
+		}
+
+		template<typename... C>
+		void RegisterComponents(ComponentMask& mask)
+		{
+			(RegisterComponent<C>(mask), ...);
+		}
+
+		template<typename... C>
+		void RegisterComponent(ComponentMask& mask)
+		{
+			_componentManager->RegisterComponent<C...>();
+			auto a = _componentManager->GetComponentType<C...>();
+			mask.set(a, true);
 		}
 
 		template<typename T>
 		void SetSystemMask(ComponentMask mask)
 		{
-			_systemManager->SetMask<T>(mask);
+			_systemManager->SetSystemMask<T>(mask);
 		}
 
 		void HandleInput(int input)

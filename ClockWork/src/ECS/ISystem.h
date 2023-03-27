@@ -4,7 +4,7 @@
 #include "Core/KeyCode.h"
 
 #include <set>
-
+#include <typeinfo>
 
 
 namespace CW
@@ -14,6 +14,8 @@ namespace CW
 	public:
 		virtual void Update(float deltaTime) = 0;
 		virtual void GetInput(int input) = 0;
+		
+		ComponentMask _systemMask;
 
 	protected:
 		void RemoveEntity(EntityId entity)
@@ -23,12 +25,11 @@ namespace CW
 			//_entities[entity] = 
 		}
 
+
 		std::set<EntityId> _entities;
-		ComponentMask _systemMask;
 
 		float _updateRate = 50;
 		float _currentDelta = 0;
-
 		friend class SystemManager;
 	};
 

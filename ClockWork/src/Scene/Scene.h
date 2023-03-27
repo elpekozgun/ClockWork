@@ -28,6 +28,11 @@ namespace CW
             return entity;
         }
 
+        EntityPtr& CopyEntity(const EntityPtr& base)
+        {
+            return CreateEntity(base->_name, base->_parent.lock());
+        }
+
         void DestroyEntity(EntityPtr& entity)
         {
             auto it = std::find(_entities.begin(), _entities.end(), entity);
@@ -38,10 +43,10 @@ namespace CW
             entity.reset();
         }
 
-        template<typename T>
-        void AddComponent(EntityPtr& entity, T component)
+        template<typename... T>
+        void AddComponents(EntityPtr& entity, T... components)
         {
-            ECS::Instance().AddComponent(entity->_id, component);
+            (AddComponent<T>(entity, components), ...);
         }
 
         template<typename T>
@@ -108,6 +113,12 @@ namespace CW
             WeakEntityPtr _parent;
             std::vector<EntityPtr> _children;
         };
+
+        template<typename... T>
+        void AddComponent(EntityPtr& entity, T... component)
+        {
+            ECS::Instance().AddComponent(entity->_id, component...);
+        }
 
         void DestroyRecursive(EntityPtr& entity)
         {

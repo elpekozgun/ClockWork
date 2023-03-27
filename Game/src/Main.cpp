@@ -8,31 +8,18 @@
 #include "ClockWork.h"
 #include "../Example.h"
 
+#include <typeinfo>
+#include <iostream>
+
 using namespace CW;
-
-class EventTracker
-{
-public:
-    Delegate<EventTracker, float> OnEvent;
-
-    EventTracker()
-    {
-        OnEvent.Set(this, &EventTracker::OnPhysics);
-    }
-    
-
-private:
-    void OnPhysics(float time)
-    {
-        cout << "physics updated in: "<< time << " ms.\n";
-    }
-};
 
 void SampleApp()
 {
     auto app = App::Create("game")->
-        AddSystem<ExampleSystem>()->
-        RegisterComponent<ExampleComponent>();
+        AddSystem<ExampleSizeSystem, ExampleSizeComponent>()->
+        AddSystem<ExamplePositionSystem, ExamplePositionComponent>();
+
+    auto& a = ECS::Instance();
 
     Scene scene;
 
@@ -42,12 +29,15 @@ void SampleApp()
     auto child11 = scene.CreateEntity("child11", parent1);
     auto child12 = scene.CreateEntity("child12", parent1);
 
-    scene.AddComponent(parent1, ExampleComponent{ 5, 5 });
-    scene.AddComponent(child11, ExampleComponent{ 10, 5 });
-    scene.AddComponent(child12, ExampleComponent{ 15, 5 });
-    scene.AddComponent(parent2, ExampleComponent{ 5, 10 });
+    auto child13 = scene.CopyEntity(child11);
 
-    app->Run(800, 600);
+
+    scene.AddComponents(parent1, ExampleSizeComponent{ 5, 5 }, ExamplePositionComponent{ glm::vec3(1,1,1) });
+    scene.AddComponents(child11, ExampleSizeComponent{ 10, 5 }, ExamplePositionComponent{ glm::vec3(1,1,1) });
+    scene.AddComponents(child12, ExampleSizeComponent{ 15, 5 });
+    scene.AddComponents(parent2, ExampleSizeComponent{ 5, 10 });
+
+    app->Run(640,480);
 
     delete app;
 }
@@ -73,9 +63,9 @@ void SceneTest()
     ECS& ecs = ECS::Instance();
     ecs.Init();
 
-    ecs.RegisterComponent<ExampleComponent>();
+    ecs.RegisterComponent<ExampleSizeComponent>();
 
-    auto ts = ecs.RegisterSystem<ExampleSystem>();
+    auto ts = ecs.RegisterSystem<ExampleSizeSystem/*, ExampleComponent*/>();
 
     Scene scene;
 
@@ -85,10 +75,10 @@ void SceneTest()
     auto child11 = scene.CreateEntity("child11", parent1);
     auto child12 = scene.CreateEntity("child12", parent1);
         
-    scene.AddComponent(parent1, ExampleComponent{ 5, 5});
-    scene.AddComponent(child11, ExampleComponent{ 10, 5 });
-    scene.AddComponent(child12, ExampleComponent{ 15, 5 });
-    scene.AddComponent(parent2, ExampleComponent{ 5, 10 });
+    //scene.AddComponent(parent1, ExampleComponent{ 5, 5});
+    //scene.AddComponent(child11, ExampleComponent{ 10, 5 });
+    //scene.AddComponent(child12, ExampleComponent{ 15, 5 });
+    //scene.AddComponent(parent2, ExampleComponent{ 5, 10 });
     
     //EventTracker consumer;
 
@@ -120,6 +110,12 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     
     {
+        /*GravityComponent c;
+        auto& a = c.GetTypeInfo();
+
+        std::cout << a.name() << std::endl;*/
+
+
         SampleApp();
         //SceneTest();
     }

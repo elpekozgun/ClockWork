@@ -27,10 +27,6 @@
 //#include <imgui.h>
 //#include "imgui_impl_opengl3_loader.h"
 
-
-// Restructure the application class, such that it can be built with required systems for the game.
-// as in dependency injection list.
-
 namespace CW
 {
 	class CW_API App : enable_shared_from_this<App>
@@ -43,10 +39,10 @@ namespace CW
 		}
 		~App();
 
-		template<ISystemConcept T>
+		template<ISystemConcept T, typename... C>
 		App* AddSystem()
 		{
-			shared_ptr<ISystem> system = _ecs.RegisterSystem<T>();
+			shared_ptr<ISystem> system = _ecs.RegisterSystem<T,C...>();
 			_systems.push_back(system);
 			return this;
 		}

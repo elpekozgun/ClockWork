@@ -6,7 +6,6 @@
 
 namespace CW
 {
-
 	class CW_API ComponentManager
 	{
 	public:
