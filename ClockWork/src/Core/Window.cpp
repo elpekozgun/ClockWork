@@ -60,38 +60,39 @@ namespace CW
 		glfwPollEvents();
 	}
 
-	
-}
 
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	auto& input = InputState::Instance();
-
-	if (key == GLFW_KEY_UNKNOWN)
-		return;
-
-	if (action == GLFW_PRESS)
+	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		input.SetKeyDown(key);
-	}
-	else if (action == GLFW_RELEASE)
-	{
-		input.SetKeyUp(key);
-	}
-}
+		auto& input = InputState::Instance();
 
-void MouseCallBack(GLFWwindow* window, int button, int action, int mods)
-{
-	auto& input = InputState::Instance();
+		if (key == GLFW_KEY_UNKNOWN)
+			return;
 
-	if (action == GLFW_PRESS)
-	{
-		input.SetMouseDown(button);
+		if (action == GLFW_PRESS)
+		{
+			input.SetKeyDown(key);
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			input.SetKeyUp(key);
+		}
 	}
-	else if (action == GLFW_RELEASE)
+
+	void MouseCallBack(GLFWwindow* window, int button, int action, int mods)
 	{
-		input.SetMouseUp(button);
+		auto& input = InputState::Instance();
+
+		if (action == GLFW_PRESS)
+		{
+			input.SetMouseDown(button);
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			input.SetMouseUp(button);
+		}
 	}
+
+
 }
 
 

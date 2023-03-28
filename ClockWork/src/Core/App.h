@@ -42,7 +42,7 @@ namespace CW
 		template<ISystemConcept T, typename... C>
 		App* AddSystem()
 		{
-			shared_ptr<ISystem> system = _ecs.RegisterSystem<T,C...>();
+			shared_ptr<ISystem> system = ECS::Instance().RegisterSystem<T, C...>();
 			_systems.push_back(system);
 			return this;
 		}
@@ -50,7 +50,7 @@ namespace CW
 		template<typename T>
 		App* RegisterComponent()
 		{
-			_ecs.RegisterComponent<T>();
+			ECS::Instance().RegisterComponent<T>();
 			return this;
 		}
 
