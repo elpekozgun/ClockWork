@@ -1,8 +1,6 @@
 #pragma once
-#include "Core/Defines.h"
 #include "Core/Core.h"
-#include "Core/KeyCode.h"
-#include "ECS.h"
+#include "Core/Defines.h"
 
 #include <set>
 #include <typeinfo>
@@ -20,9 +18,8 @@ namespace CW
 	protected:
 		std::set<EntityId> _entities;
 
-		float _updateRate = 50;
+		float _updateRate = 16.66f;
 		float _currentDelta = 0;
-
 
 		friend class SystemManager;
 	};

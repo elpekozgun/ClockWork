@@ -1,9 +1,10 @@
 #pragma once	
-#include "core/Defines.h"
 #include <set>
 #include <unordered_map>
 #include <memory>
+
 #include "ISystem.h"
+#include "core/Defines.h"
 
 
 namespace CW

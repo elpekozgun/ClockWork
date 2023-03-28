@@ -99,7 +99,8 @@ void SceneTest()
 void Game()
 {
     auto app = App::Create("game")->
-        AddSystem<PlayerController, TransformComponent>();
+        AddSystem<PlayerController, TransformComponent>()->
+        AddSystem<RenderSystem>();
 
     Scene scene;
 

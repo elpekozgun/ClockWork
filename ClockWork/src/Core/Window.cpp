@@ -10,15 +10,14 @@ namespace CW
 		const char* glslVersion = "#version 460";
 
 		if (!glfwInit())
-		{
-			std::cout << " failure on initializing glfw " << std::endl;
+		{ 
+			std::cout << " failure on initializing glfw " << std::endl; return;
 		}
 
 		_window = glfwCreateWindow(width, height, _name.c_str(), NULL, NULL);
 		if (!_window)
 		{
-			std::cout << "failure on window creation" << std::endl;
-			return;
+			std::cout << "failure on window creation" << std::endl; return;
 		}
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -26,6 +25,7 @@ namespace CW
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
 
+		//glfwSetWindowSize(_window,CW::SCREEN_HEIGHT, CW::SCREEN_HEIGHT);
 		glfwMakeContextCurrent(_window);
 		glfwSwapInterval(0);
 		glfwSetFramebufferSizeCallback(_window, [](GLFWwindow* app, int c, int d) {glViewport(0, 0, c, d); });
@@ -35,8 +35,7 @@ namespace CW
 		glfwSetKeyCallback(_window, KeyCallback);
 		glfwSetMouseButtonCallback(_window, MouseCallBack);
 
-
-		glClearColor(_backColor[0], _backColor[1], _backColor[2], _backColor[3]);
+		
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -49,17 +48,12 @@ namespace CW
 	void Window::Update()
 	{
 		glfwPollEvents();
-
-		glClearColor(_backColor[0], _backColor[1], _backColor[2], _backColor[3]);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwSwapBuffers(_window);
 	}
 
 	void Window::Shutdown()
 	{
-		glfwPollEvents();
 	}
-
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{

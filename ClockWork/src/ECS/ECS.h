@@ -88,7 +88,7 @@ namespace CW
 			return _componentManager->GetComponentType<T>();
 		}
 
-		template<ISystemConcept T, typename... C>
+		template<typename T = ISystem, typename... C>
 		std::shared_ptr<T> RegisterSystem()
 		{
 			auto system = _systemManager->RegisterSystem<T>();

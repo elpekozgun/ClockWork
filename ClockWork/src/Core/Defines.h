@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <bitset>
-#include "glm.hpp"
+#include <chrono>
 
 namespace CW
 {
@@ -18,11 +18,9 @@ namespace CW
 	typedef ubyte ComponentType;
 	typedef std::bitset<MAX_COMPONENT> ComponentMask;
 
-	//
 	constexpr uint SCREEN_WIDTH = 1280;
 	constexpr uint SCREEN_HEIGHT = 720;
 
 	typedef std::chrono::high_resolution_clock Clock;
 	typedef std::chrono::duration<float, std::milli> MilliFloat;
-
 }

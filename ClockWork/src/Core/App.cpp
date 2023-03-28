@@ -1,6 +1,5 @@
 #include "App.h"
 
-
 namespace CW
 {
 	App::App(const std::string& name) :

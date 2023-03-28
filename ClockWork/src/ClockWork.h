@@ -6,4 +6,6 @@
 #include "Core/Event.h"
 #include "ECS/ECS.h"
 #include "Scene/Scene.h"
+#include "System/Rendering/RenderSystem.h"
+
 

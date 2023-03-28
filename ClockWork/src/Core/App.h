@@ -39,18 +39,11 @@ namespace CW
 		}
 		~App();
 		 
-		template<ISystemConcept T, typename... C>
+		template<typename T = ISystem, typename... C>
 		App* AddSystem()
 		{
 			shared_ptr<ISystem> system = ECS::Instance().RegisterSystem<T, C...>();
 			_systems.push_back(system);
-			return this;
-		}
-
-		template<typename T>
-		App* RegisterComponent()
-		{
-			ECS::Instance().RegisterComponent<T>();
 			return this;
 		}
 
