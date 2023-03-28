@@ -13,8 +13,7 @@
 #include "Core/Singleton.h"
 #include "Component.h"
 
-
-namespace CW
+namespace CW 
 {
 	class CW_API ECS final : public Singleton<ECS>
 	{
@@ -78,6 +77,12 @@ namespace CW
 		}
 
 		template<typename T>
+		void SetComponent(EntityId entity, T component)
+		{
+			_componentManager->SetComponent(entity, component);
+		}
+
+		template<typename T>
 		ComponentType GetComponentType()
 		{
 			return _componentManager->GetComponentType<T>();
@@ -101,6 +106,11 @@ namespace CW
 			(RegisterComponent<C>(mask), ...);
 		}
 
+		std::unique_ptr<EntityManager> _entityManager;
+		std::unique_ptr<ComponentManager> _componentManager;
+		std::unique_ptr<SystemManager> _systemManager;
+
+	private:
 		template<typename... C>
 		void RegisterComponent(ComponentMask& mask)
 		{
@@ -115,13 +125,5 @@ namespace CW
 			_systemManager->SetSystemMask<T>(mask);
 		}
 
-		void HandleInput(int input)
-		{
-			_systemManager->HandleInput(input);
-		}
-
-		std::unique_ptr<EntityManager> _entityManager;
-		std::unique_ptr<ComponentManager> _componentManager;
-		std::unique_ptr<SystemManager> _systemManager;
 	};
 }

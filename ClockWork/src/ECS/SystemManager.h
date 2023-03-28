@@ -55,14 +55,6 @@ namespace CW
 			}
 		}
 
-		void HandleInput(int input)
-		{
-			for (auto& system : _systems )
-			{
-				system.second->GetInput(input);
-			}
-		}
-
 	private:
 		std::unordered_map<std::string, ComponentMask> _masks;
 		std::unordered_map<std::string, std::shared_ptr<ISystem>> _systems;

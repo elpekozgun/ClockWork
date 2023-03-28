@@ -38,7 +38,7 @@ namespace CW
 			return new App(name);
 		}
 		~App();
-
+		 
 		template<ISystemConcept T, typename... C>
 		App* AddSystem()
 		{
@@ -66,10 +66,6 @@ namespace CW
 		float _backColor[4];
 		std::string _name;
 
-		//void HandleInput();
-		void Render();
-
-		ECS& _ecs =  ECS::Instance();
 		std::vector<shared_ptr<ISystem>> _systems{};
 	};
 }

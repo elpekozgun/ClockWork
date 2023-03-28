@@ -6,6 +6,8 @@
 #include "Core.h"
 #include "glad/glad.h"
 #include "../3rd/glfw/include/GLFW/glfw3.h"
+#include "Core/KeyCode.h"
+#include "InputState.h"
 
 namespace CW
 {
@@ -18,10 +20,17 @@ namespace CW
 
 		void Setup(int width, int height);
 		void Update();
+		void Shutdown();
 
 	private:
 		GLFWwindow* _window;
 		float _backColor[4];
 		std::string _name;
 	};
+
+
+
+
 }
+
+

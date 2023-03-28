@@ -2,6 +2,13 @@
 
 namespace CW
 {
+	enum class KeyState
+	{
+		Press = 0,
+		Down,
+		Release
+	};
+
 	constexpr auto KEY_SPACE = 32;
 	constexpr auto KEY_APOSTROPHE = 39; /* ' */
 	constexpr auto KEY_COMMA = 44; /* , */

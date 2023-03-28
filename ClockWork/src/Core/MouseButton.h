@@ -4,6 +4,13 @@
 
 namespace CW
 {
+	enum class MouseState
+	{
+		Click = 0,
+		Down,
+		Release
+	};
+
 	constexpr auto BUTTON_1 = 0;
 	constexpr auto BUTTON_2 = 1;
 	constexpr auto BUTTON_3 = 2;

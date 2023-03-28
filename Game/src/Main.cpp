@@ -7,7 +7,7 @@
 
 #include "ClockWork.h"
 #include "../Example.h"
-#include "Systems/PlayerMovement.h"
+#include "Systems/PlayerController.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -86,8 +86,6 @@ void SceneTest()
     {
         auto tStart = std::chrono::high_resolution_clock::now();
 
-        //std::cout << dt << "\n";
-
         ts->Update(dt);
 
         auto tEnd = std::chrono::high_resolution_clock::now();
@@ -98,20 +96,16 @@ void SceneTest()
     scene.DestroyEntity(parent2);
 }
 
-
 void Game()
 {
     auto app = App::Create("game")->
-        AddSystem<PlayerController, InputComponent, TransformComponent>()->
-        AddSystem<
-
-    //auto& a = ECS::Instance();
+        AddSystem<PlayerController, TransformComponent>();
 
     Scene scene;
 
     auto player = scene.CreateEntity("player");
 
-    scene.AddComponents(player, TransformComponent(), InputComponent());
+    scene.AddComponents(player, TransformComponent());
 
     app->Run(640, 480);
 
@@ -120,21 +114,12 @@ void Game()
 
 
 
-
-
 int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     
     {
-        /*GravityComponent c;
-        auto& a = c.GetTypeInfo();
-
-        std::cout << a.name() << std::endl;*/
-
-
-        SampleApp();
-        //SceneTest();
+        Game();
     }
 
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

@@ -16,13 +16,6 @@ namespace CW
 		glfwTerminate();
 	}
 
-	int lastKey;
-
-	void KeyWrapper(GLFWwindow* win, int key, int scancode, int action, int mods)
-	{
-		lastKey = key;
-	}
-
 	void App::Run(const unsigned int width, const unsigned int height)
 	{
 		_window.Setup(width, height);
@@ -32,42 +25,17 @@ namespace CW
 		float dt = 0;
 		while (_isRunning)
 		{
-			auto tStart = std::chrono::high_resolution_clock::now();
+			auto tStart = Clock::now();
 
 			for (const auto& system : _systems)
 			{
 				system->Update(dt);
 			}
 
+			auto tEnd = Clock::now();
+			dt = MilliFloat(tEnd - tStart).count();
+
 			_window.Update();
-
-			auto tEnd = std::chrono::high_resolution_clock::now();
-			dt = std::chrono::duration<float, std::milli>(tEnd - tStart).count();
-
 		}
 	}
-
-	void App::Render()
-	{
-
-	}
-
-	//void App::HandleInput()
-	//{
-	//	glfwPollEvents();
-
-	//	if (glfwWindowShouldClose(_window))
-	//		_isRunning = false;
-
-	//	if (glfwGetKey(_window, CW::KEY_ESCAPE))
-	//	{
-	//		glfwSetWindowShouldClose(_window, true);
-	//		_isRunning = false;
-	//	}
-
-	//	if (glfwGetKey(_window, CW::KEY_SPACE))
-	//	{
-
-	//	}
-	//}
 }

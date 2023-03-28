@@ -59,6 +59,12 @@ namespace CW
 			return _componentArray[entity];
 		}
 
+		template<typename T>
+		void SetData(EntityId entity, T data)
+		{
+			_componentArray[entity] = data;
+		}
+
 		void DestroyEntity(EntityId entity) override
 		{
 			RemoveData(entity);

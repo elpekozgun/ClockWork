@@ -37,7 +37,6 @@ public:
             _currentDelta = 0;
         }
     };
-    void GetInput(int getinput) override {};
 };
 
 class ExamplePositionSystem : public CW::ISystem
@@ -68,7 +67,6 @@ public:
             _currentDelta = 0;
         }
     };
-    void GetInput(int getinput) override {};
 };
 
 

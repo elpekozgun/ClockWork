@@ -47,6 +47,13 @@ namespace CW
 			return GetComponentArray<T>()->GetData(entity);
 		}
 
+		template<typename T>
+		void SetComponent(EntityId entity, T value)
+		{
+			GetComponentArray<T>()->SetData(entity, value);
+		}
+
+
 		void DestroyEntity(EntityId entity)
 		{
 			for (auto const& kvp : _componentArrays)

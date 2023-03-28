@@ -22,5 +22,7 @@ namespace CW
 	constexpr uint SCREEN_WIDTH = 1280;
 	constexpr uint SCREEN_HEIGHT = 720;
 
+	typedef std::chrono::high_resolution_clock Clock;
+	typedef std::chrono::duration<float, std::milli> MilliFloat;
 
 }
