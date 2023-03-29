@@ -23,7 +23,8 @@ project "ClockWork"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.Json}"
+        "%{IncludeDir.Json}",
+        "%{IncludeDir.stb}"
     }
 
     libdirs

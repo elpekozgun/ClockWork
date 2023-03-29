@@ -14,11 +14,12 @@ namespace CW
 		void Unbind();
 		void Bind();
 
+		// stride and offset are element counts, not in bytes.
 		template<typename T>
-		void LinkVBO(VBO& vbo, GLuint layout, GLuint size)
+		void LinkAttribArray(VBO& vbo, GLuint layout, GLuint count, GLenum type, GLuint stride, GLuint offset)
 		{
 			vbo.Bind();
-			glVertexAttribPointer(layout, size, GL_FLOAT, GL_FALSE, size * sizeof(T), (void*)0);
+			glVertexAttribPointer(layout, count, type, GL_FALSE, sizeof(T) * stride, (void*) (sizeof(T) *offset));
 			glEnableVertexAttribArray(layout);
 			vbo.Unbind();
 		}

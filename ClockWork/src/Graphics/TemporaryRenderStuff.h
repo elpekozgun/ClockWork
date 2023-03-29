@@ -8,13 +8,14 @@
 #include "VBO.h"
 #include "VAO.h"
 #include "EBO.h"
+#include "stb_image.h"
 
 namespace CW
 {
+	GLuint uniformId;
 	class CW_API TempRender
 	{
 	public:
-		//Shader& shaderProgram;
 		GLuint indices[9];
 
 		std::unique_ptr<Shader> shader;
@@ -25,54 +26,51 @@ namespace CW
 		TempRender()
 		{
 			indices[0] = 0;
-			indices[1] = 3;
-			indices[2] = 5;
-			indices[3] = 3;
-			indices[4] = 2;
-			indices[5] = 4;
-			indices[6] = 5;
-			indices[7] = 4;
-			indices[8] = 1;
+			indices[1] = 2;
+			indices[2] = 1;
+			indices[3] = 0;
+			indices[4] = 3;
+			indices[5] = 2;
+
 
 			GLfloat vertices[] =
 			{
-				-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-				0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-				0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f,
-				-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,
-				0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,
-				0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f
+				-0.5f, -0.5f, 0.0f , 1.0f, 0.0f, 0.0f,
+				-0.5f, 0.5f, 0.0f , 0.0f, 1.0f, 0.0f,
+				0.5f, 0.5f, 0.0f , 0.0f, 0.0f, 1.0f,
+				0.5f, -0.5f, 0.0f , 1.0f, 1.0f, 0.0f,
 			};
+			
 
-
-			auto vertexShader = Shader::CreateShaderSource(R"(res/Shader/SimpleVertex.glsl)", ShaderType::Vertex);
-			auto fragmentShader = Shader::CreateShaderSource(R"(res/Shader/SimpleFragment.glsl)", ShaderType::Fragment);
+			auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\SimpleVertex.glsl)", ShaderType::Vertex);
+			auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\SimpleFragment.glsl)", ShaderType::Fragment);
 
 			shader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
 
-			
 			vao = std::make_unique<VAO>();
 			vao->Bind();
 
 			vbo = std::make_unique<VBO>(vertices, sizeof(vertices));
 			ebo = std::make_unique<EBO>(indices, sizeof(indices));
 
-			vao->LinkVBO<float>(*vbo, 0, 3);
+			vao->LinkAttribArray<float>(* vbo, 0, 3, GL_FLOAT, 6, 0);
+			vao->LinkAttribArray<float>(*vbo, 1, 3, GL_FLOAT, 6 , 3);
 
 			vao->Unbind();
 			vbo->Unbind();
 			ebo->Unbind();
+
 		}
 
 		void Render(float dt)
 		{
-			auto tStart = CW::Clock::now();
-
-			glClearColor(0.2f * dt, 0.2f, 0.2f, 1);
+			glClearColor(0.2f, 0.2f, 0.2f, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
+
 			shader->Use();
+			shader->SetFloat("scale", 0);
 			glBindVertexArray(vao->Id);
-			glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		}
 	};
