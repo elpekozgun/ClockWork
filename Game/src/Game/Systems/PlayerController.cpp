@@ -1,6 +1,6 @@
 #include "PlayerController.h"
 
-void PlayerController::Update(float deltaTime)
+void PlayerController::Update(float dt)
 {
 	auto& input = InputState::Instance();
 	for (auto& entity : _entities)
@@ -9,25 +9,25 @@ void PlayerController::Update(float deltaTime)
 
 		if (input.IsKeyDown(CW::KEY_UP))
 		{
-			movement.y += deltaTime;
+			movement.y += dt;
 		}
 
 		if (input.IsKeyDown(CW::KEY_DOWN))
 		{
-			movement.y -= deltaTime;
+			movement.y -= dt;
 		}
 
 		if (input.IsKeyDown(CW::KEY_RIGHT))
 		{
-			movement.x += deltaTime;
+			movement.x += dt;
 		}
 
 		if (input.IsKeyDown(CW::KEY_LEFT))
 		{
-			movement.x -= deltaTime;
+			movement.x -= dt;
 		}
 
-		auto transform = CW::ECS::Instance().GetComponent<TransformComponent>(entity);
+		auto& transform = CW::ECS::Instance().GetComponent<CW::TransformComponent>(entity);
 
 		transform.Position += movement;
 
@@ -39,14 +39,10 @@ void PlayerController::Update(float deltaTime)
 				<< " position Z : " << transform.Position.z << "\n";
 		}
 		
-		CW::ECS::Instance().SetComponent(entity, transform);
+		//CW::ECS::Instance().SetComponent(entity, transform);
 
 	}
 
 }
 
-void InputSystem::Update(float deltaTime)
-{
-	
-}
 

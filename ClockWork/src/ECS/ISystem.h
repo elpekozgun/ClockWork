@@ -11,7 +11,7 @@ namespace CW
 	class CW_API ISystem
 	{
 	public:
-		virtual void Update(float deltaTime) = 0;
+		virtual void Update(float dt) = 0;
 
 		ComponentMask _systemMask;
 

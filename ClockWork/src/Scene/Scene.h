@@ -122,7 +122,10 @@ namespace CW
 
         void DestroyRecursive(EntityPtr& entity)
         {
-            //first remove entity from parent's children.
+            // first clear from ECS
+            ECS::Instance().DestroyEntity(entity->_id);
+
+            // then remove entity from parent's children.
             if (auto parent = entity->GetParent())
             {
                 parent->RemoveChild(entity);

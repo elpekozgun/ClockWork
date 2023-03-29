@@ -1,6 +1,7 @@
 #pragma once
 #include "../3rd/glfw/include/GLFW/glfw3.h"
 #include <bitset>
+#include "KeyCode.h"
 
 struct CW_API InputState
 {

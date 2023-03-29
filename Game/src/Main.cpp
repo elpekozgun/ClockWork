@@ -7,7 +7,7 @@
 
 #include "ClockWork.h"
 #include "../Example.h"
-#include "Systems/PlayerController.h"
+#include "Game/Systems/PlayerController.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -99,14 +99,31 @@ void SceneTest()
 void Game()
 {
     auto app = App::Create("game")->
-        AddSystem<PlayerController, TransformComponent>()->
+        AddSystem<PlayerController, TransformComponent, Player>()->
+        AddSystem<PhysicsSystem, TransformComponent, PhysicsComponent>()->
         AddSystem<RenderSystem>();
 
     Scene scene;
 
     auto player = scene.CreateEntity("player");
+    auto item1 = scene.CreateEntity("item1");
+    auto item2 = scene.CreateEntity("item2");
+    auto item3 = scene.CreateEntity("item3");
+    auto item4 = scene.CreateEntity("item4");
+    auto item5 = scene.CreateEntity("item5");
+    auto player2 = scene.CreateEntity("player2");
 
-    scene.AddComponents(player, TransformComponent());
+
+    scene.AddComponents(player, TransformComponent(), Player());
+    scene.AddComponents(item1, TransformComponent{glm::vec3(1, 1, 1), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3)}, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)});
+    scene.AddComponents(player2, TransformComponent(), Player());
+    scene.AddComponents(item2, TransformComponent{ glm::vec3(2, 2, 2), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{ glm::vec3(0.1f, 0, 0), glm::vec3(1, 0, 0)});
+    scene.AddComponents(item3, TransformComponent{ glm::vec3(3, 3, 3), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{glm::vec3(0.1f, 0, 0.1f), glm::vec3(1, 0, 1)});
+    scene.AddComponents(item4, TransformComponent{ glm::vec3(4, 4, 4), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{glm::vec3(0.1f, 0.2f, 0.3f), glm::vec3(-1, -1, -1)});
+    scene.AddComponents(item5, TransformComponent{ glm::vec3(5, 5, 5), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{ glm::vec3(0.3f, -0.1f, 0.2f), glm::vec3(-1, 2, -1) });
+
+    scene.DestroyEntity(item2);
+
 
     app->Run(640, 480);
 

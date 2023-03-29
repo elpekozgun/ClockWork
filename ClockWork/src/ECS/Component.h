@@ -10,6 +10,13 @@ struct CW_API IComponent;
 
 namespace CW
 {
+	struct CW_API TransformComponent
+	{
+		glm::vec3 Position;
+		glm::vec3 Rotation;
+		glm::vec3 Scale;
+	};
+
 	struct CW_API GravityComponent 
 	{
 		vec3 _force;
@@ -20,17 +27,22 @@ namespace CW
 		vec3 velocity;
 		vec3 acceleration;
 	};
-
-	//struct CW_API TransformComponent 
-	//{
-	//	vec3 position;
-	//	vec3 rotation;
-	//	vec3 scale;
-	//};
-
+	
 	struct CW_API RendererComponent 
 	{
 		
+	};
+
+	struct CW_API Player
+	{
+
+	};
+
+
+	struct CW_API PhysicsComponent
+	{
+		vec3 Acceleration;
+		vec3 Velocity;
 	};
 
 }
