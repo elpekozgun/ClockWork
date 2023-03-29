@@ -18,6 +18,7 @@ IncludeDir["GLFW"] = "%{wks.location}/ClockWork/3rd/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/ClockWork/3rd/Glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/ClockWork/3rd/ImGui"
 IncludeDir["glm"] = "%{wks.location}/ClockWork/3rd/glm"
+IncludeDir["Json"] = "%{wks.location}/ClockWork/3rd/Json"
 
 include "ClockWork"
 include "Game"

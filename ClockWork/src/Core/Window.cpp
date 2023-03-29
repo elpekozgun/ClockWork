@@ -2,6 +2,7 @@
 
 namespace CW
 {
+
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void MouseCallBack(GLFWwindow* window, int button, int action, int mods);
 
@@ -34,9 +35,6 @@ namespace CW
 
 		glfwSetKeyCallback(_window, KeyCallback);
 		glfwSetMouseButtonCallback(_window, MouseCallBack);
-
-		
-		glEnable(GL_DEPTH_TEST);
 	}
 
 	Window::~Window()
@@ -45,6 +43,7 @@ namespace CW
 		glfwTerminate();
 	}
 
+	float elapsed;
 	void Window::Update()
 	{
 		glfwPollEvents();

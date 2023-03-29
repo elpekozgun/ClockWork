@@ -1,4 +1,5 @@
 #include "App.h"
+#include "Graphics/TemporaryRenderStuff.h"
 
 namespace CW
 {
@@ -19,6 +20,8 @@ namespace CW
 	{
 		_window.Setup(width, height);
 
+		TempRender tempRender;
+
 		_isRunning = true;
 
 		float dt = 0;
@@ -26,10 +29,12 @@ namespace CW
 		{
 			auto tStart = Clock::now();
 
+
 			for (const auto& system : _systems)
 			{
 				system->Update(dt);
 			}
+			tempRender.Render(dt);
 
 			auto tEnd = Clock::now();
 			dt = MilliFloat(tEnd - tStart).count();

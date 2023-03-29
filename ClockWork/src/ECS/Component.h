@@ -28,10 +28,11 @@ namespace CW
 		vec3 acceleration;
 	};
 	
-	struct CW_API RendererComponent 
+	/*struct CW_API Renderable
 	{
-		
-	};
+		Mesh Mesh;
+		Material Material;
+	};*/
 
 	struct CW_API Player
 	{
