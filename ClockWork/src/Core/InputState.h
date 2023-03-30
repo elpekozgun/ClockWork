@@ -2,6 +2,7 @@
 #include "../3rd/glfw/include/GLFW/glfw3.h"
 #include <bitset>
 #include "KeyCode.h"
+#include "MouseButton.h"
 
 struct CW_API InputState
 {
@@ -22,9 +23,14 @@ public:
 
 	inline void Clear() { _keyboard.reset(); _mouse.reset(); }
 
+	double MouseDX = 0;
+	double MouseDY = 0;
+	bool FirstClick = true;
+
 private:
 		std::bitset<GLFW_KEY_LAST> _keyboard;
 		std::bitset<GLFW_MOUSE_BUTTON_LAST> _mouse;
+
 
 		InputState() {};
 };

@@ -23,8 +23,14 @@ namespace CW
 		void Shutdown();
 
 	private:
+		void HandleCursor();
+
 		GLFWwindow* _window;
 		std::string _name;
+
+		bool _firstClick = true;
+		double _lastX = 0;
+		double _lastY = 0;
 	};
 
 

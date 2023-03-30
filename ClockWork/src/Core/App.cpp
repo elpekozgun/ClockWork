@@ -27,8 +27,8 @@ namespace CW
 		float dt = 0;
 		while (_isRunning)
 		{
+			
 			auto tStart = Clock::now();
-
 
 			for (const auto& system : _systems)
 			{

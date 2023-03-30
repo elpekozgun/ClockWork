@@ -4,7 +4,7 @@ namespace CW
 {
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	void MouseCallBack(GLFWwindow* window, int button, int action, int mods);
+	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 	void Window::Setup(int width, int height)
 	{
@@ -36,7 +36,10 @@ namespace CW
 		glEnable(GL_DEPTH_TEST);
 
 		glfwSetKeyCallback(_window, KeyCallback);
-		glfwSetMouseButtonCallback(_window, MouseCallBack);
+		glfwSetMouseButtonCallback(_window, MouseButtonCallback);
+
+		_lastX = width / 2;
+		_lastY = height / 2;
 	}
 
 	Window::~Window()
@@ -45,11 +48,41 @@ namespace CW
 		glfwTerminate();
 	}
 
-	float elapsed;
 	void Window::Update()
 	{
 		glfwPollEvents();
+		HandleCursor();
 		glfwSwapBuffers(_window);
+	}
+
+	void Window::HandleCursor()
+	{
+		auto& input = InputState::Instance();
+
+		if (glfwGetMouseButton(_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		{
+			double xpos, ypos;
+			glfwGetCursorPos(_window, &xpos, &ypos);
+			if (_firstClick)
+			{
+				_lastX = xpos;
+				_lastY = ypos;
+				_firstClick = false;
+			}
+
+			float xoffset = xpos - _lastX;
+			float yoffset = _lastY - ypos; 
+
+			_lastX = xpos;
+			_lastY = ypos;
+
+			input.MouseDX = xoffset;
+			input.MouseDY = yoffset;
+		}
+		else if (glfwGetMouseButton(_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+		{
+			_firstClick = true;
+		}
 	}
 
 	void Window::Shutdown()
@@ -73,20 +106,24 @@ namespace CW
 		}
 	}
 
-	void MouseCallBack(GLFWwindow* window, int button, int action, int mods)
+	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
 		auto& input = InputState::Instance();
 
 		if (action == GLFW_PRESS)
 		{
+			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT))
+			{
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			}
 			input.SetMouseDown(button);
 		}
 		else if (action == GLFW_RELEASE)
 		{
 			input.SetMouseUp(button);
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
 	}
-
 
 }
 

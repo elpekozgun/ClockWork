@@ -48,11 +48,11 @@ void Game()
 
 
     scene.AddComponents(player, TransformComponent(), Player());
-    //scene.AddComponents(item1, TransformComponent{glm::vec3(1, 1, 1), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3)}, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)});
-    //scene.AddComponents(player2, TransformComponent(), Player());
-    //scene.AddComponents(item2, TransformComponent{ glm::vec3(2, 2, 2), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{ glm::vec3(0.1f, 0, 0), glm::vec3(1, 0, 0)});
-    //scene.AddComponents(item3, TransformComponent{ glm::vec3(3, 3, 3), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{glm::vec3(0.1f, 0, 0.1f), glm::vec3(1, 0, 1)});
-    //scene.AddComponents(item4, TransformComponent{ glm::vec3(4, 4, 4), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{glm::vec3(0.1f, 0.2f, 0.3f), glm::vec3(-1, -1, -1)});
+    scene.AddComponents(item1, TransformComponent{glm::vec3(1, 1, 1), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3)}, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)});
+    scene.AddComponents(player2, TransformComponent(), Player());
+    scene.AddComponents(item2, TransformComponent{ glm::vec3(2, 2, 2), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{ glm::vec3(0.1f, 0, 0), glm::vec3(1, 0, 0)});
+    scene.AddComponents(item3, TransformComponent{ glm::vec3(3, 3, 3), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{glm::vec3(0.1f, 0, 0.1f), glm::vec3(1, 0, 1)});
+    scene.AddComponents(item4, TransformComponent{ glm::vec3(4, 4, 4), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{glm::vec3(0.1f, 0.2f, 0.3f), glm::vec3(-1, -1, -1)});
     scene.AddComponents(item5, TransformComponent{ glm::vec3(5, 5, 5), glm::vec3(1, 2, 3), glm::vec3(1, 2, 3) }, PhysicsComponent{ glm::vec3(0.3f, -0.1f, 0.2f), glm::vec3(-1, 2, -1) });
 
     scene.DestroyEntity(item2);

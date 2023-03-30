@@ -40,8 +40,8 @@ namespace CW
 			camera = &(_ecs.GetComponent <CW::CameraComponent>(entity));
 
 			CameraComponent c{
-			glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0),
-				640, 480, 0.01f, 100.0f };
+			glm::vec3(-1.45f, 0.9f, -0.8f), glm::vec3(0.832167f, - 0.377841f, 0.405875f), glm::vec3(0.339601f, 0.925871f, 0.165634f),
+				640, 480, 60, 0.01f, 0.1f };
 
 			_ecs.AddComponent<CameraComponent>(entity, c);
 

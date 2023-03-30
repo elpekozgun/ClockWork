@@ -4,6 +4,9 @@
 #include "ECS/ECS.h"
 #include "Core/InputState.h"
 #include "gtc/matrix_transform.hpp"
+#include "gtx/rotate_vector.hpp"
+#include "gtx/vector_angle.hpp"
+
 
 namespace CW
 {
