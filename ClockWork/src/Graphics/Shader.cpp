@@ -55,6 +55,11 @@ namespace CW
 		glUniform1i(glGetUniformLocation(Id, name.c_str()), value);
 	}
 
+	void Shader::SetTexture(const std::string& name, GLenum textureType) const
+	{
+		glUniform1i(glGetUniformLocation(Id, name.c_str()), textureType);
+	}
+
 	void Shader::SetFloat(const std::string& name, float value) const
 	{
 		glUniform1f(glGetUniformLocation(Id, name.c_str()), value);
@@ -105,7 +110,6 @@ namespace CW
 	{
 		glUniformMatrix4fv(glGetUniformLocation(Id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 	}
-
 
 	void Shader::CheckShaderCompileError(GLuint shader)
 	{

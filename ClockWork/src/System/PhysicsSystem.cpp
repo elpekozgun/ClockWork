@@ -15,9 +15,9 @@ void CW::PhysicsSystem::Update(float dt)
 			physics.Velocity += physics.Acceleration * dt;
 			transform.Position += physics.Velocity * dt;
 
-			std::cout << "entity: " << entity <<
-				" - new velocity: " << physics.Velocity.x << ", " << physics.Velocity.y << ", " << physics.Velocity.z <<
-				" - new position: " << transform.Position.x << ", " << transform.Position.y << ", " << transform.Position.z << "\n";
+			//std::cout << "entity: " << entity <<
+			//	" - new velocity: " << physics.Velocity.x << ", " << physics.Velocity.y << ", " << physics.Velocity.z <<
+			//	" - new position: " << transform.Position.x << ", " << transform.Position.y << ", " << transform.Position.z << "\n";
 
 		}
 	}

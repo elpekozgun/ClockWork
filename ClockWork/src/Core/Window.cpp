@@ -33,6 +33,8 @@ namespace CW
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			return;
 
+		glEnable(GL_DEPTH_TEST);
+
 		glfwSetKeyCallback(_window, KeyCallback);
 		glfwSetMouseButtonCallback(_window, MouseCallBack);
 	}

@@ -31,13 +31,13 @@ void PlayerController::Update(float dt)
 
 		transform.Position += movement;
 
-		if (glm::length(movement) != 0)
-		{
-			std::cout << "entityId: " << entity
-				<< " position X : " << transform.Position.x
-				<< " position Y : " << transform.Position.y
-				<< " position Z : " << transform.Position.z << "\n";
-		}
+		//if (glm::length(movement) != 0)
+		//{
+		//	std::cout << "entityId: " << entity
+		//		<< " position X : " << transform.Position.x
+		//		<< " position Y : " << transform.Position.y
+		//		<< " position Z : " << transform.Position.z << "\n";
+		//}
 		
 		//CW::ECS::Instance().SetComponent(entity, transform);
 

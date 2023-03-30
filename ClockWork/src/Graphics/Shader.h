@@ -1,6 +1,7 @@
 #pragma once 
 #include "glad/glad.h"
 #include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
 #include <string>
 #include "Utility/Utilities.h"
 #include <vector>
@@ -30,6 +31,7 @@ namespace CW
 		void Use() const;
 		void SetBool(const std::string& name, bool value) const;
 		void SetInt(const std::string& name, int value) const;
+		void SetTexture(const std::string& name, GLenum textureType) const;
 		void SetFloat(const std::string& name, float value) const;
 		void setVec2(const std::string& name, const glm::vec2& value) const;
 		void setVec2(const std::string& name, float x, float y) const;

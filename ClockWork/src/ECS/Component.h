@@ -1,9 +1,11 @@
 #pragma once
 
 #include <glm.hpp>
+#include "gtc/matrix_transform.hpp"
 
 #include "Core/Core.h"
 #include <typeinfo>
+
 
 using namespace glm;
 struct CW_API IComponent;
@@ -28,12 +30,6 @@ namespace CW
 		vec3 acceleration;
 	};
 	
-	/*struct CW_API Renderable
-	{
-		Mesh Mesh;
-		Material Material;
-	};*/
-
 	struct CW_API Player
 	{
 
@@ -45,5 +41,32 @@ namespace CW
 		vec3 Acceleration;
 		vec3 Velocity;
 	};
+
+	struct CW_API CameraComponent
+	{
+		glm::vec3 Position;
+		glm::vec3 Forward;
+		glm::vec3 Up;
+
+		int Width;
+		int height;
+		float speed;
+		float sensitivity;
+
+		glm::mat4 CameraMatrix()
+		{
+			glm::mat4 view = glm::mat4(1);
+			glm::mat4 projection = glm::mat4(1);
+
+			view = glm::lookAt(Position, Position + Forward, Up);
+			projection = glm::perspective(glm::radians(60.0f), (float)Width / height, 0.1f, 100.0f);
+
+			auto right = glm::normalize(glm::cross(Forward, Up));
+
+			return projection * view;
+		}
+
+	};
+
 
 }
