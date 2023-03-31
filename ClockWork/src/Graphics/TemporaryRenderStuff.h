@@ -109,8 +109,8 @@ namespace CW
 				4, 6, 7
 			};
 
-			auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\SimpleVertex.glsl)", ShaderType::Vertex);
-			auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\SimpleFragment.glsl)", ShaderType::Fragment);
+			auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultVertex.glsl)", ShaderType::Vertex);
+			auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultFragment.glsl)", ShaderType::Fragment);
 
 			shader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
 
@@ -155,7 +155,16 @@ namespace CW
 			shader->Use();
 			shader->setVec4("LightColor", lightColor);
 			shader->setMat4("Model", model);
-			shader->setVec3("LightPos", lightPos);
+			
+			shader->SetFloat("Shineness", 32.0f);
+			shader->setVec3("pointLights[0].position", lightPos);
+			shader->setVec3("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
+			shader->setVec3("pointLights[0].ambient", 0.15f, 0.15f, 0.15f);
+			shader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+			shader->SetFloat("pointLights[0].Kconstant", 1.0f);
+			shader->SetFloat("pointLights[0].Klinear", 0.09f);
+			shader->SetFloat("pointLights[0].Kquad", 0.032f);
+			shader->SetBool("IsBlinnPhong", true);
 
 			diffuseTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)",
 					GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
@@ -184,7 +193,7 @@ namespace CW
 
 			shader->Use();
 			shader->setMat4("CamMat", camMat);
-			shader->setVec3("CamPos", camera->Position);
+			shader->setVec3("eyePosition", camera->Position);
 
 			vao->Bind();
 			glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
