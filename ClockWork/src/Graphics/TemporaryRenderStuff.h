@@ -22,7 +22,7 @@ namespace CW
 	{
 	public:
 		std::vector<GLuint> indices;
-		//std::vector<Texture> textures;
+		std::vector<Texture> textures;
 
 		std::unique_ptr<Shader> shader;
 		std::unique_ptr<Shader> lightShader;
@@ -32,8 +32,10 @@ namespace CW
 		std::unique_ptr<VAO> lightVao;
 		std::unique_ptr<VBO> lightVbo;
 		std::unique_ptr<EBO> lightEbo;
-		std::unique_ptr<Texture> diffuseTexture;
-		std::unique_ptr<Texture> specularTexture;
+		std::vector<unique_ptr<Texture>> Textures;
+
+		/*std::unique_ptr<Texture> diffuseTexture;
+		std::unique_ptr<Texture> specularTexture;*/
 
 		// for now we keep a reference to camera component here.
 		CW::CameraComponent* camera;
@@ -115,8 +117,10 @@ namespace CW
 			indices.push_back(15);
 			indices.push_back(14);
 
-			//textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
-			//textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+			
+
+			//textures.push_back(diffuseTex);
+			//textures.push_back(specularTex);
 
 			
 			GLfloat lightVertices[] =
@@ -204,19 +208,18 @@ namespace CW
 			shader->SetFloat("pointLights[0].Kquad", 0.032f);
 			shader->SetBool("IsBlinnPhong", true);
 
-			diffuseTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)",
-				"diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
 
-			specularTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)",
-				"specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
-			
 			// Order of samplers is important here.
 			shader->SetTexture("DiffuseMap", 0); 
 			shader->SetTexture("SpecularMap", 1);
 
+			Textures.push_back(std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+			Textures.push_back(std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+
 			lightShader->Use();
 			lightShader->setVec4("LightColor", lightColor);
 			lightShader->setMat4("Model", lightModel);
+
 		}
 
 		void Render(float dt)
@@ -225,14 +228,11 @@ namespace CW
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			auto camMat = camera->CameraMatrix();
-			//
-			//for (auto& texture : textures)
-			//{
-			//	texture.Bind();
-			//}
 
-			diffuseTexture->Bind();
-			specularTexture->Bind();
+			for (auto& texture : Textures)
+			{
+				texture->Bind();
+			}
 
 			shader->Use();
 			shader->setMat4("CamMat", camMat);

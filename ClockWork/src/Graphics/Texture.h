@@ -13,7 +13,6 @@ namespace CW
 		Texture(const std::string& path, const std::string& TextureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode);
 		~Texture();
 		
-
 		void Bind();
 		void Unbind();
 

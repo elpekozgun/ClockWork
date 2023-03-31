@@ -25,6 +25,7 @@ namespace CW
 
 			stbi_image_free(bytes);
 			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(0);
 		}
 		catch (const std::exception& e)
 		{
