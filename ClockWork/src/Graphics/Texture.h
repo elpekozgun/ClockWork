@@ -10,7 +10,7 @@ namespace CW
 	class CW_API Texture
 	{
 	public:
-		Texture(const std::string& path, GLenum TextureType, GLenum slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode);
+		Texture(const std::string& path, GLenum TextureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode);
 		~Texture();
 		
 
@@ -20,6 +20,8 @@ namespace CW
 		int Width = 0;
 		int Height = 0;
 		int ChannelCount = 0;
-		GLuint textureId;
+		int Slot = 0;
+		GLenum TextureType;
+		GLuint TextureId;
 	};
 }

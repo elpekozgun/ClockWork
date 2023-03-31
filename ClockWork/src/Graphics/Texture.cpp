@@ -2,16 +2,18 @@
 
 namespace CW
 {
-	Texture::Texture(const std::string & path, GLenum textureType, GLenum slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode)
+	Texture::Texture(const std::string & path, GLenum textureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode)
 	{
 		try
 		{
 			stbi_set_flip_vertically_on_load(true);
 			unsigned char* bytes = stbi_load(path.c_str(), &Width, &Height, &ChannelCount, 0);
 
-			glGenTextures(1, &textureId);
-			glActiveTexture(slot);
-			glBindTexture(textureType, textureId);
+			Slot = slot;
+			TextureType = textureType;
+
+			glGenTextures(1, &TextureId);
+			glBindTexture(textureType, TextureId);
 
 			glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, filterMode);
 			glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, filterMode);
@@ -32,17 +34,18 @@ namespace CW
 
 	Texture::~Texture()
 	{
-		glDeleteTextures(1, &textureId);
+		glDeleteTextures(1, &TextureId);
 	}
 
 	void Texture::Bind()
 	{
-		glBindTexture(GL_TEXTURE_2D, textureId);
+		glActiveTexture(GL_TEXTURE0 + Slot);
+		glBindTexture(TextureType, TextureId);
 	}
 
 	void Texture::Unbind()
 	{
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(TextureType, 0);
 	}
 
 }

@@ -32,6 +32,7 @@ namespace CW
 		std::unique_ptr<VBO> lightVbo;
 		std::unique_ptr<EBO> lightEbo;
 		std::unique_ptr<Texture> diffuseTexture;
+		std::unique_ptr<Texture> specularTexture;
 
 		// for now we keep a reference to camera component here.
 		CW::CameraComponent* camera;
@@ -156,16 +157,19 @@ namespace CW
 			shader->setMat4("Model", model);
 			shader->setVec3("LightPos", lightPos);
 
+			diffuseTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)",
+					GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
+
+			specularTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)",
+				GL_TEXTURE_2D, 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
+			
+			// Order of samplers is important here.
+			shader->SetTexture("DiffuseMap", 0); 
+			shader->SetTexture("SpecularMap", 1);
+
 			lightShader->Use();
 			lightShader->setVec4("LightColor", lightColor);
 			lightShader->setMat4("Model", lightModel);
-
-
-			diffuseTexture = std::make_unique<Texture>
-				(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", 
-				 GL_TEXTURE_2D,GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
-			shader->SetTexture("diffuse", 0);
-
 		}
 
 		void Render(float dt)
@@ -174,13 +178,13 @@ namespace CW
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			auto camMat = camera->CameraMatrix();
-													
+			
+			diffuseTexture->Bind();
+			specularTexture->Bind();
+
 			shader->Use();
 			shader->setMat4("CamMat", camMat);
-			//shader->setMat4("Model", model);
 			shader->setVec3("CamPos", camera->Position);
-
-			diffuseTexture->Bind();
 
 			vao->Bind();
 			glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);

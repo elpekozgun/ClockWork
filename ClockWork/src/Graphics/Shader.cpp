@@ -55,9 +55,9 @@ namespace CW
 		glUniform1i(glGetUniformLocation(Id, name.c_str()), value);
 	}
 
-	void Shader::SetTexture(const std::string& name, GLenum textureType) const
+	void Shader::SetTexture(const std::string& name, GLenum slot) const
 	{
-		glUniform1i(glGetUniformLocation(Id, name.c_str()), textureType);
+		glUniform1i(glGetUniformLocation(Id, name.c_str()), slot);
 	}
 
 	void Shader::SetFloat(const std::string& name, float value) const
