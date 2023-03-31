@@ -2,7 +2,7 @@
 
 namespace CW
 {
-	Texture::Texture(const std::string & path, GLenum textureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode)
+	Texture::Texture(const std::string & path, const std::string& textureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode)
 	{
 		try
 		{
@@ -13,18 +13,18 @@ namespace CW
 			TextureType = textureType;
 
 			glGenTextures(1, &TextureId);
-			glBindTexture(textureType, TextureId);
+			glBindTexture(GL_TEXTURE_2D, TextureId);
 
-			glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, filterMode);
-			glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, filterMode);
-			glTexParameteri(textureType, GL_TEXTURE_WRAP_S, wrapMode);
-			glTexParameteri(textureType, GL_TEXTURE_WRAP_T, wrapMode);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 
-			glTexImage2D(textureType, 0, format, Width, Height, 0, format, pixelType, (void*)bytes);
-			glGenerateMipmap(textureType);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, Width, Height, 0, format, pixelType, (void*)bytes);
+			glGenerateMipmap(GL_TEXTURE_2D);
 
 			stbi_image_free(bytes);
-			glBindTexture(textureType, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 		catch (const std::exception& e)
 		{
@@ -40,12 +40,12 @@ namespace CW
 	void Texture::Bind()
 	{
 		glActiveTexture(GL_TEXTURE0 + Slot);
-		glBindTexture(TextureType, TextureId);
+		glBindTexture(GL_TEXTURE_2D, TextureId);
 	}
 
 	void Texture::Unbind()
 	{
-		glBindTexture(TextureType, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 }

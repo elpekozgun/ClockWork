@@ -2,6 +2,9 @@
 
 #include "glad/glad.h"
 #include "Core/Core.h"
+#include "Vertex.h"
+
+#include <vector>
 
 namespace CW
 {
@@ -10,6 +13,7 @@ namespace CW
 	public:
 
 		VBO(GLfloat* vertices, GLsizeiptr size);
+		VBO(const std::vector<Vertex>& vertices);
 		~VBO();
 
 		void Bind();

@@ -21,7 +21,8 @@ namespace CW
 	class CW_API TempRender
 	{
 	public:
-		GLuint indices[18];
+		std::vector<GLuint> indices;
+		//std::vector<Texture> textures;
 
 		std::unique_ptr<Shader> shader;
 		std::unique_ptr<Shader> lightShader;
@@ -50,36 +51,73 @@ namespace CW
 
 			_ecs.AddComponent<CameraComponent>(entity, c);
 
-			GLfloat vertices[] =
-			{ //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-				-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-				-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-				 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-				 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-
-				-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-				-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-				 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-
-				-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-				 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-				 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-
-				 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-				 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-				 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
-
-				 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-				-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-				 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
+			std::vector<Vertex> vertices
+			{
+				Vertex{glm::vec3(-0.5f, 0.0f,  0.5f),  glm::vec3(0.0f, -1.0f, 0.0f),   glm::vec3(0.83f, 0.70f, 0.44f), 	 glm::vec2(0.0f, 0.0f)},      // Bottom side
+				Vertex{glm::vec3(-0.5f, 0.0f, -0.5f),  glm::vec3(0.0f, -1.0f, 0.0f),   glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(0.0f, 5.0f)},      // Bottom side
+				Vertex{glm::vec3(0.5f, 0.0f, -0.5f),   glm::vec3(0.0f, -1.0f, 0.0f),   glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(5.0f, 5.0f)},      // Bottom side
+				Vertex{glm::vec3(0.5f, 0.0f,  0.5f),   glm::vec3(0.0f, -1.0f, 0.0f),   glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(5.0f, 0.0f)},      // Bottom side
+				Vertex{glm::vec3(-0.5f, 0.0f,  0.5f),  glm::vec3(-0.8f, 0.5f,  0.0f),  glm::vec3(0.83f, 0.70f, 0.44f),   glm::vec2(0.0f, 0.0f)},      // Left Side
+				Vertex{glm::vec3(-0.5f, 0.0f, -0.5f),  glm::vec3(-0.8f, 0.5f,  0.0f),  glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(5.0f, 0.0f)},      // Left Side
+				Vertex{glm::vec3( 0.0f, 0.8f,  0.0f),  glm::vec3(-0.8f, 0.5f,  0.0f),  glm::vec3(0.92f, 0.86f, 0.76f),	 glm::vec2(2.5f, 5.0f)},      // Left Side
+				Vertex{glm::vec3(-0.5f, 0.0f, -0.5f),  glm::vec3( 0.0f, 0.5f, -0.8f),  glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(5.0f, 0.0f)},      // Non-facing side
+				Vertex{glm::vec3( 0.5f, 0.0f, -0.5f),  glm::vec3( 0.0f, 0.5f, -0.8f),  glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(0.0f, 0.0f)},      // Non-facing side
+				Vertex{glm::vec3( 0.0f, 0.8f,  0.0f),  glm::vec3( 0.0f, 0.5f, -0.8f),  glm::vec3(0.92f, 0.86f, 0.76f),	 glm::vec2(2.5f, 5.0f)},      // Non-facing side
+				Vertex{glm::vec3( 0.5f, 0.0f, -0.5f),  glm::vec3( 0.8f, 0.5f,  0.0f),  glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(0.0f, 0.0f)},      // Right side
+				Vertex{glm::vec3( 0.5f, 0.0f,  0.5f),  glm::vec3( 0.8f, 0.5f,  0.0f),  glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(5.0f, 0.0f)},      // Right side
+				Vertex{glm::vec3( 0.0f, 0.8f,  0.0f),  glm::vec3( 0.8f, 0.5f,  0.0f),  glm::vec3(0.92f, 0.86f, 0.76f),	 glm::vec2(2.5f, 5.0f)},      // Right side
+				Vertex{glm::vec3( 0.5f, 0.0f,  0.5f),  glm::vec3( 0.0f, 0.5f,  0.8f),  glm::vec3(0.83f, 0.70f, 0.44f),	 glm::vec2(5.0f, 0.0f)},      // Facing side
+				Vertex{glm::vec3(-0.5f, 0.0f,  0.5f),  glm::vec3(0.0f, 0.5f,  0.8f),   glm::vec3(0.83f, 0.70f, 0.44f), 	 glm::vec2(0.0f, 0.0f)},      // Facing side
+				Vertex{glm::vec3(0.0f, 0.8f,  0.0f),   glm::vec3(0.0f, 0.5f,  0.8f),   glm::vec3(0.92f, 0.86f, 0.76f),	 glm::vec2(2.5f, 5.0f)}      // Facing side
 			};
 
-			indices[0] = 0; indices[6] = 4;  indices[12] = 10;
-			indices[1] = 1;	indices[7] = 6;	 indices[13] = 12;
-			indices[2] = 2;	indices[8] = 5;	 indices[14] = 11;
-			indices[3] = 0;	indices[9] = 7;	 indices[15] = 13;
-			indices[4] = 2;	indices[10] = 9; indices[16] = 15;
-			indices[5] = 3;	indices[11] = 8; indices[17] = 14;
+
+			//GLfloat vertices[] =
+			//{ //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+			//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+			//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+			//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+			//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+
+			//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+			//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+
+			//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+			//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+
+			//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+			//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+
+			//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+			//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
+			//};
+
+			indices.push_back(0);  
+			indices.push_back(1);  
+			indices.push_back(2);  
+			indices.push_back(0);  
+			indices.push_back(2);  
+			indices.push_back(3);  
+			indices.push_back(4); 
+			indices.push_back(6); 
+			indices.push_back(5); 
+			indices.push_back(7); 
+			indices.push_back(9); 
+			indices.push_back(8); 
+			indices.push_back(10);
+			indices.push_back(12);
+			indices.push_back(11);
+			indices.push_back(13);
+			indices.push_back(15);
+			indices.push_back(14);
+
+			//textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+			//textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+
 			
 			GLfloat lightVertices[] =
 			{ //     COORDINATES     //
@@ -117,13 +155,13 @@ namespace CW
 			vao = std::make_unique<VAO>();
 			vao->Bind();
 
-			vbo = std::make_unique<VBO>(vertices, sizeof(vertices));
-			ebo = std::make_unique<EBO>(indices, sizeof(indices));
+			vbo = std::make_unique<VBO>(vertices);
+			ebo = std::make_unique<EBO>(indices);
 
 			vao->LinkAttribArray<float>(*vbo, 0, 3, GL_FLOAT, 11, 0);
 			vao->LinkAttribArray<float>(*vbo, 1, 3, GL_FLOAT, 11, 3);
-			vao->LinkAttribArray<float>(*vbo, 2, 2, GL_FLOAT, 11, 6);
-			vao->LinkAttribArray<float>(*vbo, 3, 3, GL_FLOAT, 11, 8);
+			vao->LinkAttribArray<float>(*vbo, 2, 3, GL_FLOAT, 11, 6);
+			vao->LinkAttribArray<float>(*vbo, 3, 2, GL_FLOAT, 11, 9);
 
 			vao->Unbind();
 			vbo->Unbind();
@@ -167,10 +205,10 @@ namespace CW
 			shader->SetBool("IsBlinnPhong", true);
 
 			diffuseTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)",
-					GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
+				"diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
 
 			specularTexture = std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)",
-				GL_TEXTURE_2D, 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
+				"specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
 			
 			// Order of samplers is important here.
 			shader->SetTexture("DiffuseMap", 0); 
@@ -187,7 +225,12 @@ namespace CW
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			auto camMat = camera->CameraMatrix();
-			
+			//
+			//for (auto& texture : textures)
+			//{
+			//	texture.Bind();
+			//}
+
 			diffuseTexture->Bind();
 			specularTexture->Bind();
 
@@ -196,7 +239,8 @@ namespace CW
 			shader->setVec3("eyePosition", camera->Position);
 
 			vao->Bind();
-			glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+			//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 			glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
 
@@ -209,7 +253,7 @@ namespace CW
 
 		~TempRender()
 		{
-			delete[] indices;
+			//delete[] indices;
 		}
 	};
 }
