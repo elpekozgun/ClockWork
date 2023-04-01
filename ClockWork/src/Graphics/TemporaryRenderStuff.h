@@ -6,15 +6,10 @@
 #include "glad/glad.h"
 #include "glm.hpp"
 #include "Core/Defines.h"
-#include "Shader.h"
-#include "VBO.h"
-#include "VAO.h"
-#include "EBO.h"
-#include "Texture.h"
-#include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "System/CameraSystem.h"
-#include "Mesh.h"
+
+#include "Model.h"
 
 namespace CW
 {
@@ -32,10 +27,13 @@ namespace CW
 		std::unique_ptr<VAO> lightVao;
 		std::unique_ptr<VBO> lightVbo;
 		std::unique_ptr<EBO> lightEbo;
-		std::unique_ptr<Mesh> mesh;
-		std::unique_ptr<Mesh> lightMesh;
+		//std::unique_ptr<Mesh> mesh;
+		//std::unique_ptr<Mesh> lightMesh;
 
 		CW::CameraComponent* camera;
+
+
+		std::unique_ptr<Model> CharacterModel;
 
 		TempRender()
 		{
@@ -89,15 +87,21 @@ namespace CW
 			indices.push_back(15);
 			indices.push_back(14);
 
-			textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "Diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
-			textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "Specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+			textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "Diffuse", 0));
+			textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "Specular", 1));
 
-			mesh = std::make_unique<Mesh>(vertices, indices, textures);
+			//mesh = std::make_unique<Mesh>(vertices, indices, textures);
 
 			auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultVertex.glsl)", ShaderType::Vertex);
 			auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultFragment.glsl)", ShaderType::Fragment);
 
 			modelShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
+
+
+			//CharacterModel = std::make_unique<Model>(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\maria\Maria WProp J J Ong.dae)");
+			CharacterModel = std::make_unique<Model>(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
+
+
 
 			//-------------------------------------------
 
@@ -133,7 +137,7 @@ namespace CW
 			auto lightFragment = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightFragment.glsl)", ShaderType::Fragment);
 			lightShader = Shader::CreateShader("shader", { lightVertex, lightFragment });
 
-			lightMesh = std::make_unique<Mesh>(LightVertices, LightIndices, std::vector<Texture>());
+			//lightMesh = std::make_unique<Mesh>(LightVertices, LightIndices, std::vector<Texture>());
 
 			glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -141,6 +145,7 @@ namespace CW
 			lightModel = glm::translate(lightModel, lightPos);
 
 			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(0.01f));
 
 			modelShader->Use();
 			modelShader->setVec4("LightColor", lightColor);
@@ -169,22 +174,34 @@ namespace CW
 			auto camMat = camera->CameraMatrix();
 
 			modelShader->Use();
+
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+			model = glm::scale(glm::vec3(0.01f));
+
+			modelShader->setMat4("Model", model);
 			modelShader->setMat4("CamMat", camMat);
 			modelShader->setVec3("eyePosition", camera->Position);
-			mesh->Draw(*modelShader, camMat, camera->Position);
+
+			CharacterModel->Draw(*modelShader, camMat, camera->Position);
+
+			/*modelShader->Use();
+			modelShader->setMat4("CamMat", camMat);
+			modelShader->setVec3("eyePosition", camera->Position);*/
+			//mesh->Draw(*modelShader, camMat, camera->Position);
 
 
-			glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
-			lightShader->Use();
-			lightShader->setMat4 ("CamMat", camMat);
-			lightMesh->Draw(*lightShader, camMat, camera->Position);
+			//glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+			//lightShader->Use();
+			//lightShader->setMat4 ("CamMat", camMat);
+			//lightMesh->Draw(*lightShader, camMat, camera->Position);
 
 		}
 
 		~TempRender()
 		{
-			mesh.reset();
-			lightMesh.reset();
+			//mesh.reset();
+			//lightMesh.reset();
 		}
 	};
 }

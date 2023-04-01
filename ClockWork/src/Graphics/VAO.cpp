@@ -22,6 +22,11 @@ namespace CW
 		glBindVertexArray(Id);
 	}
 
+	void VAO::Delete()
+	{
+		glDeleteVertexArrays(1, &Id);
+	}
+
 	void VAO::Unbind()
 	{
 		glBindVertexArray(0);
@@ -29,7 +34,6 @@ namespace CW
 
 	VAO::~VAO()
 	{
-		glDeleteVertexArrays(1, &Id);
 	}
 
 }

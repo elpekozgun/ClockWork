@@ -11,13 +11,18 @@ namespace CW
 
 	Mesh::~Mesh()
 	{
+
+	}
+
+
+	void Mesh::Delete()
+	{
 		glDeleteVertexArrays(1,&_vao.Id);
 		for (auto& texture : Textures)
 		{
 			texture.Delete();
 		}
 	}
-
 
 	void Mesh::Setup()
 	{
@@ -45,8 +50,6 @@ namespace CW
 		unsigned int specularNo = 0;
 		for (unsigned int i = 0; i < Textures.size(); i++)
 		{
-			//glActiveTexture(GL_TEXTURE0 + i); 
-			
 			int no = 0;
 			std::string name = Textures[i].TextureType;
 			if (name == "Diffuse")

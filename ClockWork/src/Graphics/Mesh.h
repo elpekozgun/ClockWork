@@ -24,6 +24,8 @@ namespace CW
 		std::vector<Texture> Textures;
 		std::vector<unsigned int> Indices;
 
+		void Delete();
+
 	private:
 		void Setup();
 		

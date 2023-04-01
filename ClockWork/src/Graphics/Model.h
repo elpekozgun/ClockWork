@@ -23,7 +23,7 @@ namespace CW
 		void LoadModel(const std::string& path);
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string name);
+		std::vector<Texture> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string name, unsigned int& slot);
 
 		std::vector<Mesh> Meshes;
 		std::vector<Texture> Textures;

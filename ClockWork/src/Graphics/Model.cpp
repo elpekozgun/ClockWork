@@ -30,9 +30,13 @@ namespace CW
 			return;
 		}
 		directory = path.substr(0, path.find_last_of('/'));
+		
+		//unsigned int pos = directory.find('\\');
+
 
 		ProcessNode(scene->mRootNode, scene);
 	}
+	
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -68,12 +72,9 @@ namespace CW
 			data.x = mesh->mNormals[i].x;
 			data.y = mesh->mNormals[i].y;
 			data.z = mesh->mNormals[i].z;
-			vertex.Position = data;
+			vertex.Normal = data;
 
-			data.x = mesh->mColors[i]->r;
-			data.y = mesh->mColors[i]->g;
-			data.z = mesh->mColors[i]->b;
-			vertex.Color = data;
+			vertex.Color = glm::vec3(0);
 
 			if (mesh->mTextureCoords[0])
 			{
@@ -105,18 +106,18 @@ namespace CW
 		{
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "Diffuse");
+			unsigned int slot = 0;
+			std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "Diffuse", slot);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Specular");
+			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Specular", slot);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
 		}
 
 		return Mesh(vertices, indices, textures);
 	}
 	
-	std::vector<Texture> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string name)
+	std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string name, unsigned int& slot)
 	{
 		std::vector<Texture> textures;
 
@@ -124,10 +125,15 @@ namespace CW
 		{
 			aiString str;
 			mat->GetTexture(type, i, &str);
-			Texture texture(str.C_Str(), name, i, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT);
+
+			auto path = directory + "/" + str.C_Str();
+
+			Texture texture(path.c_str(), name, i+(slot++));
 
 			textures.push_back(texture);
 		}
+
+		return textures;
 	}
 
 }

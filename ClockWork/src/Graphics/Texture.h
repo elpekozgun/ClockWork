@@ -10,7 +10,7 @@ namespace CW
 	class CW_API Texture
 	{
 	public:
-		Texture(const char* path, const std::string& TextureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode);
+		Texture(const char* path, const std::string& TextureType, GLuint slot);
 		
 		void Bind();
 		void Unbind();

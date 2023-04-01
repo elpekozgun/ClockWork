@@ -22,5 +22,5 @@ void main()
 	FragmentColor = inColor;
 	TexCoord = inTex;
 	
-	gl_Position = CamMat * vec4(inPos.x * (1 + scale), inPos.y * (1 + scale), inPos.z * (1 + scale), 1.0);
+	gl_Position =  CamMat * Model * vec4(inPos.x * (1 + scale), inPos.y * (1 + scale), inPos.z * (1 + scale), 1.0);
 };
