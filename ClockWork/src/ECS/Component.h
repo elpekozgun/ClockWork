@@ -2,6 +2,7 @@
 
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
+#include "Graphics/Mesh.h"
 
 #include "Core/Core.h"
 #include <typeinfo>
