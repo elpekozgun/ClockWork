@@ -1,14 +1,11 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Core/Defines.h"
-#include "glm.hpp"
-#include "Json.h"
+#include "Mesh.h"
+
 #include <vector>
 #include <string>
 #include <istream>
-
-using Json = nlohmann::json;
 
 namespace CW
 {
@@ -16,11 +13,16 @@ namespace CW
 	{
 	public:
 		Model(const char* file);
-		void Draw();
+		
+		void Draw(Shader& shader, glm::mat4 camMat, glm::vec3 camPos);
 
 	private:
+		void LoadModel(std::string path);
+
+		std::vector<Mesh> Meshes;
+		std::vector<Texture> Textures;
+
 		const char* _file;
 		std::vector<unsigned char> data;
-		Json _json;
 	};
 }

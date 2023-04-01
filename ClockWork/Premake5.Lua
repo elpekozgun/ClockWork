@@ -24,19 +24,21 @@ project "ClockWork"
         "%{IncludeDir.glm}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.Json}",
-        "%{IncludeDir.stb}"
+        "%{IncludeDir.stb}",
+        "%{IncludeDir.assimp}"
     }
 
     libdirs
     {
-        "3rd/GLFW/lib-vc2022"
-		--"vendor/assimp/lib"
+        "3rd/GLFW/lib-vc2022",
+		"3rd/assimp/lib"
     }
 
 	links 
 	{ 
 		"glfw3",
-		"opengl32.lib"
+		"opengl32.lib",
+        "assimp-vc143-mt.dll"
 	}
 
 

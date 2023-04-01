@@ -33,10 +33,10 @@ namespace CW
 		}
 	}
 
-	Texture::~Texture()
-	{
-		glDeleteTextures(1, &TextureId);
-	}
+	//Texture::~Texture()
+	//{
+	//	glDeleteTextures(1, &TextureId);
+	//}
 
 	void Texture::Bind()
 	{
@@ -49,5 +49,9 @@ namespace CW
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	void Texture::Delete()
+	{
+		glDeleteTextures(1, &TextureId);
+	}
 }
 

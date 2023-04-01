@@ -14,7 +14,7 @@
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "System/CameraSystem.h"
-
+#include "Mesh.h"
 
 namespace CW
 {
@@ -22,7 +22,6 @@ namespace CW
 	{
 	public:
 		std::vector<GLuint> indices;
-		std::vector<Texture> textures;
 
 		std::unique_ptr<Shader> shader;
 		std::unique_ptr<Shader> lightShader;
@@ -32,7 +31,9 @@ namespace CW
 		std::unique_ptr<VAO> lightVao;
 		std::unique_ptr<VBO> lightVbo;
 		std::unique_ptr<EBO> lightEbo;
-		std::vector<unique_ptr<Texture>> Textures;
+		//std::vector<unique_ptr<Texture>> Textures;
+		std::vector<Texture> textures;
+		std::unique_ptr<Mesh> mesh;
 
 		/*std::unique_ptr<Texture> diffuseTexture;
 		std::unique_ptr<Texture> specularTexture;*/
@@ -73,31 +74,6 @@ namespace CW
 				Vertex{glm::vec3(0.0f, 0.8f,  0.0f),   glm::vec3(0.0f, 0.5f,  0.8f),   glm::vec3(0.92f, 0.86f, 0.76f),	 glm::vec2(2.5f, 5.0f)}      // Facing side
 			};
 
-
-			//GLfloat vertices[] =
-			//{ //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-			//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-			//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-			//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-			//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-
-			//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-			//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-
-			//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-			//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-
-			//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-			//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
-
-			//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-			//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-			//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
-			//};
-
 			indices.push_back(0);  
 			indices.push_back(1);  
 			indices.push_back(2);  
@@ -117,10 +93,14 @@ namespace CW
 			indices.push_back(15);
 			indices.push_back(14);
 
-			
+			//Textures.push_back(std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "Diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+			//Textures.push_back(std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "Specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
 
-			//textures.push_back(diffuseTex);
-			//textures.push_back(specularTex);
+
+			textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "Diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+			textures.push_back(Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "Specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
+
+			mesh = std::make_unique<Mesh>(vertices, indices, textures);
 
 			
 			GLfloat lightVertices[] =
@@ -210,11 +190,9 @@ namespace CW
 
 
 			// Order of samplers is important here.
-			shader->SetTexture("DiffuseMap", 0); 
-			shader->SetTexture("SpecularMap", 1);
+			shader->SetTexture("Diffuse0", 0); 
+			shader->SetTexture("Specular0", 1);
 
-			Textures.push_back(std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
-			Textures.push_back(std::make_unique<Texture>(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "specular", 1, GL_RGBA, GL_UNSIGNED_BYTE, GL_NEAREST, GL_REPEAT));
 
 			lightShader->Use();
 			lightShader->setVec4("LightColor", lightColor);
@@ -229,18 +207,14 @@ namespace CW
 
 			auto camMat = camera->CameraMatrix();
 
-			for (auto& texture : Textures)
-			{
-				texture->Bind();
-			}
-
 			shader->Use();
 			shader->setMat4("CamMat", camMat);
 			shader->setVec3("eyePosition", camera->Position);
 
-			vao->Bind();
-			//glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
-			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+			mesh->Draw(*shader, camMat, camera->Position);
+
+			//vao->Bind();
+			//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 			glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
 
@@ -253,6 +227,7 @@ namespace CW
 
 		~TempRender()
 		{
+			mesh.reset();
 			//delete[] indices;
 		}
 	};

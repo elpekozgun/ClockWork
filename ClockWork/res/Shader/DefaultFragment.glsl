@@ -60,8 +60,8 @@ in vec3 FragmentColor;
 
 #define POINT_LIGHTS 1
 
-uniform sampler2D DiffuseMap;
-uniform sampler2D SpecularMap;
+uniform sampler2D Diffuse0;
+uniform sampler2D Specular0;
 
 uniform float Shineness;
 
@@ -112,8 +112,8 @@ vec3 CalculateDirectLight(DirectLight light, vec3 normal, vec3 viewDir)
 		spec = pow( max(dot(viewDir, reflectDir),0.0f),/*material.*/Shineness);
 	}
 
-	vec3 ambient = light.ambient * vec3(texture(/*material.*/DiffuseMap,TexCoord));
-	vec3 diffuse = light.diffuse * diff * vec3(texture(/*material.*/DiffuseMap, TexCoord));
+	vec3 ambient = light.ambient * vec3(texture(/*material.*/Diffuse0,TexCoord));
+	vec3 diffuse = light.diffuse * diff * vec3(texture(/*material.*/Diffuse0, TexCoord));
 	vec3 specular = light.specular * spec;// * vec3(max(texture(material.specular,TexCoord),1.0f));
 	
 	if(FragmentColor.x != 0.0f || FragmentColor.y != 0.0f || FragmentColor.z != 0)
@@ -136,9 +136,9 @@ vec3 CalculatePointLight(PointLight light, vec3 normal,vec3 fragPos, vec3 viewDi
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0f / (light.Kconstant + light.Klinear * distance + light.Kquad * distance * distance );
 
-	vec3 ambient = attenuation * light.ambient * vec3(texture(/*material.*/DiffuseMap, TexCoord));
-	vec3 diffuse = attenuation * light.diffuse * diff * vec3(texture(/*material.*/DiffuseMap, TexCoord));
-	vec3 specular = attenuation * light.specular * spec * vec3(texture(/*material.*/SpecularMap, TexCoord));
+	vec3 ambient = attenuation * light.ambient * vec3(texture(/*material.*/Diffuse0, TexCoord));
+	vec3 diffuse = attenuation * light.diffuse * diff * vec3(texture(/*material.*/Diffuse0, TexCoord));
+	vec3 specular = attenuation * light.specular * spec * vec3(texture(/*material.*/Specular0, TexCoord));
 
 	return (max(ambient + diffuse + specular,vec3(0.0f)));
 }
@@ -169,9 +169,9 @@ vec3 CalculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0f / (light.Kconstant + light.Klinear * distance + light.Kquad * distance * distance );
 
-	vec3 ambient = attenuation * light.ambient * vec3(texture(/*material.*/DiffuseMap, TexCoord));
-	vec3 diffuse = intensity * attenuation * light.diffuse * diff * vec3(texture(DiffuseMap, TexCoord));
-	vec3 specular = intensity * attenuation * light.specular * spec * vec3(texture(SpecularMap, TexCoord));
+	vec3 ambient = attenuation * light.ambient * vec3(texture(/*material.*/Diffuse0, TexCoord));
+	vec3 diffuse = intensity * attenuation * light.diffuse * diff * vec3(texture(Diffuse0, TexCoord));
+	vec3 specular = intensity * attenuation * light.specular * spec * vec3(texture(Specular0, TexCoord));
 
 	if(FragmentColor.x != 0.0f || FragmentColor.y != 0.0f || FragmentColor.z != 0)
 	{
