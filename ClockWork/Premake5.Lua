@@ -14,6 +14,7 @@ project "ClockWork"
         "3rd/Glad/src/glad.c",
         "3rd/imgui/**.cpp",
         "3rd/imgui/**.h",
+        "3rd/tinygltf/**.h"
     }
 
     includedirs
@@ -38,7 +39,7 @@ project "ClockWork"
 	{ 
 		"glfw3",
 		"opengl32.lib",
-        "assimp-vc143-mt.dll"
+        "assimp-vc143-mt"
 	}
 
 
@@ -53,7 +54,8 @@ project "ClockWork"
 		
 		postbuildcommands
 		{
-			"{COPY} %{wks.location}bin/"..outputdir.."/ClockWork/ClockWork.dll %{wks.location}/bin/"..outputdir.."/Game/"
+			"{COPY} %{wks.location}bin/"..outputdir.."/ClockWork/ClockWork.dll %{wks.location}/bin/"..outputdir.."/Game/",
+			"{COPY} %{wks.location}ClockWork/3rd/assimp/lib/assimp-vc143-mt.dll %{wks.location}/bin/"..outputdir.."/Game/"
 		}
 		
         filter "configurations:Debug"

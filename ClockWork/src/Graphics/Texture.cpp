@@ -2,12 +2,12 @@
 
 namespace CW
 {
-	Texture::Texture(const std::string & path, const std::string& textureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode)
+	Texture::Texture(const char* path, const std::string& textureType, GLuint slot, GLenum format, GLenum pixelType, GLint filterMode, GLint wrapMode)
 	{
 		try
 		{
 			stbi_set_flip_vertically_on_load(true);
-			unsigned char* bytes = stbi_load(path.c_str(), &Width, &Height, &ChannelCount, 0);
+			unsigned char* bytes = stbi_load(path, &Width, &Height, &ChannelCount, 0);
 
 			Slot = slot;
 			TextureType = textureType;

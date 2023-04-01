@@ -19,12 +19,15 @@ namespace CW
 		~Mesh();
 		void Draw(Shader& shader, glm::mat4 camMat, glm::vec3 camPos);
 
+
 		std::vector<Vertex> Vertices;
 		std::vector<Texture> Textures;
 		std::vector<unsigned int> Indices;
 
 	private:
 		void Setup();
+		
+
 		VAO _vao;
 	};
 

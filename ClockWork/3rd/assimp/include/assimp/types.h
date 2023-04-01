@@ -73,10 +73,11 @@ typedef uint32_t ai_uint32;
 
 #ifdef __cplusplus
 
+
 #ifdef ASSIMP_USE_HUNTER
 #   include <utf8.h>
 #else
-#   include "../contrib/utf8cpp/source/utf8.h"
+#   include "assimp/utf8cpp/utf8.h"
 #endif
 
 #include <cstring>

@@ -12,14 +12,14 @@ project "Game"
         "src/**.cpp",
     }
 
-    includedirs
+     includedirs
     {
-        "src",
-		"../ClockWork/src",
-		"../ClockWork/vendor",
+         "src",
+	 	"../ClockWork/src",
 		"../ClockWork/%{IncludeDir.glm}",
 		"../ClockWork/%{IncludeDir.Glad}",
-		"../ClockWork/%{IncludeDir.ImGui}"
+		--"../ClockWork/%{IncludeDir.ImGui}"
+    --     "../ClockWork/%{IncludeDir.assimp}"
     }
 
     links

@@ -7,6 +7,9 @@
 #include "ECS/ECS.h"
 #include "Scene/Scene.h"
 #include "ECS/Component.h"
+#include "glad/glad.h"
+
+#include "glm.hpp"
 
 #include "System/RenderSystem.h"
 #include "System/PhysicsSystem.h"
