@@ -68,7 +68,7 @@ uniform float Shineness;
 //uniform Material material; implement later
 //uniform DirectLight directLight;
 uniform PointLight pointLights[POINT_LIGHTS];
-//uniform SpotLight spotlight;
+uniform SpotLight spotlight;
 
 uniform vec3 eyePosition;
 bool IsBlinnPhong;
@@ -89,7 +89,7 @@ void main()
 		result += CalculatePointLight(pointLights[i], norm, FragmentPosition, viewdir);
 	}
 	
-	//result += CalculateSpotLight(spotlight, norm, FragmentPosition, viewdir);
+	result += CalculateSpotLight(spotlight, norm, FragmentPosition, viewdir);
 
 	FragColor = vec4(result,1);
 }
