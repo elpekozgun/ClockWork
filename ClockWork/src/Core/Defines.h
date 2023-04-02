@@ -23,4 +23,5 @@ namespace CW
 
 	typedef std::chrono::high_resolution_clock Clock;
 	typedef std::chrono::duration<float, std::milli> MilliFloat;
+	typedef std::chrono::duration<float, std::chrono::seconds> secondFloat;
 }

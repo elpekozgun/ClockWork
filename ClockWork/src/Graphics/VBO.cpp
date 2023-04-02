@@ -3,18 +3,18 @@
 
 namespace CW
 {
-	VBO::VBO(GLfloat* vertices, GLsizeiptr size)
-	{
-		glGenBuffers(1, &Id);
-		glBindBuffer(GL_ARRAY_BUFFER, Id);
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-	}
-
 	VBO::VBO(const std::vector<Vertex>& vertices)
 	{
 		glGenBuffers(1, &Id);
 		glBindBuffer(GL_ARRAY_BUFFER, Id);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex) , vertices.data(), GL_STATIC_DRAW);
+	}
+
+	VBO::VBO(const std::vector<glm::mat4>& matrices)
+	{
+		glGenBuffers(1, &Id);
+		glBindBuffer(GL_ARRAY_BUFFER, Id);
+		glBufferData(GL_ARRAY_BUFFER, matrices.size() * sizeof(glm::mat4), matrices.data(), GL_STATIC_DRAW);
 	}
 
 	void VBO::Bind()

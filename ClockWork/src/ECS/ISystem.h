@@ -18,7 +18,7 @@ namespace CW
 	protected:
 		std::set<EntityId> _entities;
 
-		float _updateRate = 16.66f;
+		float _updateRate = 0.01666666f;
 		float _currentDelta = 0;
 
 		friend class SystemManager;

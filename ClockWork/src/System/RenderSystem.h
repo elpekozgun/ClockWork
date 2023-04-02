@@ -8,6 +8,8 @@
 #include "gtx/quaternion.hpp"
 #include "glm.hpp"
 
+#include <map>
+
 
 /*
 * TODO:
@@ -25,7 +27,7 @@
 
 	the drawbacks here are:
 	1- 100 different models could share 5 shaders in total.
-	2- 50 of them could share the same mesh.
+	2- 50 of them could share the same mesh. - done.
 
 	designing a rendersystem to point a different memory block for the same data is insufficient,
 	but for simplicity and to make it work initally ill just treat each renderable separately.
@@ -41,5 +43,7 @@ namespace CW
 
 	private:
 		void Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera);
+		void RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera);
+		glm::mat4 MatrixFromTransform(TransformComponent& component);
 	};
 }

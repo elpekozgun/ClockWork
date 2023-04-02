@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Graphics/Mesh.h"
+#include "gtc/matrix_transform.hpp"
+#include "gtc/quaternion.hpp"
+#include "gtx/quaternion.hpp"
+#include "glm.hpp"
+
 #include <typeinfo>
 
-
 using namespace glm;
-struct CW_API IComponent;
 
 namespace CW
 {
@@ -14,6 +17,18 @@ namespace CW
 		glm::vec3 Position;
 		glm::vec3 Rotation;
 		glm::vec3 Scale;
+
+		glm::mat4 GetMatrix()
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, Position);
+			glm::quat rotation = glm::quat(glm::vec3(Rotation.x, Rotation.y, Rotation.z));
+			glm::mat quatMatrix = glm::toMat4(rotation);
+			model *= quatMatrix;
+			model = glm::scale(model, Scale);
+			return model;
+		}
+
 	};
 
 	struct CW_API GravityComponent 
@@ -30,6 +45,7 @@ namespace CW
 	struct CW_API Player
 	{
 		float moveSpeed;
+		float turnspeed;
 	};
 
 
@@ -42,7 +58,7 @@ namespace CW
 	struct CW_API RenderableComponent
 	{
 		std::vector<unsigned int> MeshIds;
-		//std::vector<MeshComponent> Meshes;
+		bool Instanced;
 	};
 
 

@@ -5,44 +5,49 @@ void PlayerController::Update(float dt)
 	auto& input = InputState::Instance();
 	for (auto& entity : _entities)
 	{
-		glm::vec3 movement(0,0,0);
 		auto& player = CW::ECS::Instance().GetComponent<CW::Player>(entity);
 		auto& transform = CW::ECS::Instance().GetComponent<CW::TransformComponent>(entity);
 
-		if (input.IsKeyDown(CW::KEY_UP))
+		float horizontal = 0.0f;
+		float vertical = 0.0f;
+
+		if (input.IsKeyDown(CW::KEY_W))
 		{
-			movement.y += dt;
+			vertical = 1.0f;
 		}
 
-		if (input.IsKeyDown(CW::KEY_DOWN))
+		if (input.IsKeyDown(CW::KEY_S))
 		{
-			movement.y -= dt;
+			vertical = -1.0f;
 		}
 
-		if (input.IsKeyDown(CW::KEY_RIGHT))
+		if (input.IsKeyDown(CW::KEY_D))
 		{
-			movement.x += dt;
+			horizontal = 1.0f;
 		}
 
-		if (input.IsKeyDown(CW::KEY_LEFT))
+		if (input.IsKeyDown(CW::KEY_A))
 		{
-			movement.x -= dt;
+			horizontal = -1.0f;
 		}
 
-		transform.Position += movement * player.moveSpeed;
+		// move character
+		glm::vec3 direction = glm::vec3(horizontal, 0, vertical);
 
-		//if (glm::length(movement) != 0)
-		//{
-		//	std::cout << "entityId: " << entity
-		//		<< " position X : " << transform.Position.x
-		//		<< " position Y : " << transform.Position.y
-		//		<< " position Z : " << transform.Position.z << "\n";
-		//}
+		glm::quat rotation = glm::quat(glm::vec3(transform.Rotation.x, transform.Rotation.y, transform.Rotation.z));
+		glm::mat4 rotationMatrix = glm::toMat4(rotation);
 		
-		//CW::ECS::Instance().SetComponent(entity, transform);
+		glm::vec3 forward = glm::normalize(glm::vec3(rotationMatrix[2]));
+
+		glm::vec3 movement = forward * direction.z * player.moveSpeed;
+		glm::vec3 strafe = glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0))) * direction.x * player.moveSpeed;
+
+		transform.Position += (movement + strafe) * dt;
+
+		// rotate character
+		transform.Rotation.y -= horizontal * player.turnspeed * dt; //forward.y + horizontal * player.turnspeed * dt;
 
 	}
-
 }
 
 

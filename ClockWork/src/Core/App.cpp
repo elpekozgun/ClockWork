@@ -26,8 +26,8 @@ namespace CW
 
 		_isRunning = true;
 
-		int dtCount = 0;
-		int interval = 1000;
+		float dtCount = 0.0f;
+		float interval = 1.0f;
 
 		float dt = 0;
 		while (_isRunning)
@@ -41,11 +41,11 @@ namespace CW
 			//tempRender.Render(dt);
 
 			auto tEnd = Clock::now();
-			dt = MilliFloat(tEnd - tStart).count();
+			dt = MilliFloat(tEnd - tStart).count() / 1000.0f;
 			dtCount += dt;
 			if (dtCount >= interval)
 			{
-				std::cout << "fps:" << 1000 / dt << "\n";
+				std::cout << "fps:" << 1.0f / dt << "\n";
 				dtCount = 0;
 			}
 

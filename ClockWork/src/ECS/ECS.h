@@ -116,9 +116,15 @@ namespace CW
 		}
 
 		template<typename T>
-		uint AddAsset(T asset)
+		uint AddAsset(T& asset)
 		{
 			return _assetManager->AddAsset<T>(asset);
+		}
+
+		template<typename T = MeshComponent>
+		void MakeMeshInstanced(unsigned int id, std::vector<glm::mat4>& transforms)
+		{
+			_assetManager->MakeInstanced<T>(id, transforms);
 		}
 
 

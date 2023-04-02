@@ -12,8 +12,8 @@ namespace CW
 	{
 	public:
 
-		VBO(GLfloat* vertices, GLsizeiptr size);
 		VBO(const std::vector<Vertex>& vertices);
+		VBO(const std::vector<glm::mat4>& matrices);
 		~VBO();
 
 		void Bind();

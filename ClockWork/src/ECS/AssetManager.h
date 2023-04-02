@@ -3,6 +3,7 @@
 
 
 #include "ECS/ECS.h"
+#include "Component.h"
 
 #include <unordered_map>
 #include <set>
@@ -21,7 +22,7 @@ namespace CW
 	class AssetArray : public IAssetArray
 	{
 	public:
-		uint AddData(T asset)
+		uint AddData(T& asset)
 		{
 			_assetData[_size] = asset;                                         
 			_size++; 
@@ -63,7 +64,7 @@ namespace CW
 	public:
 
 		template<typename T>
-		uint AddAsset(T asset)
+		uint AddAsset(T& asset)
 		{
 			std::string typeName = typeid(T).name();
 
@@ -79,6 +80,23 @@ namespace CW
 		T& GetAsset(uint id)
 		{
 			return GetAssetArray<T>()->GetData(id);
+		}
+
+		template<typename T = MeshComponent>
+		void MakeInstanced(unsigned int meshId, std::vector<glm::mat4>& transforms)
+		{
+			MeshComponent& mesh = GetAsset<MeshComponent>(meshId);
+
+			mesh.Vao.Bind();
+
+			VBO instanceVBO(transforms);
+
+			instanceVBO.Bind();
+			mesh.Vao.AddInstanceBuffers(instanceVBO);
+			mesh.Vao.Unbind();
+			instanceVBO.Unbind();
+
+			//mesh.MakeInstanced(transforms);
 		}
 
 

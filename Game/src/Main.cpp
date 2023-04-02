@@ -157,7 +157,7 @@ void Game()
     camera->Width = 1920;
     camera->height = 1080;
     camera->FoV = 60;
-    camera->speed = 0.01f;
+    camera->speed = 5.0f;
     camera->sensitivity = 0.1f;
 
     Scene scene;
@@ -199,7 +199,6 @@ void Game()
     for (auto& mesh : meshComponents)
     {
         mesh.Shader = mariaShader;
-
         mariaAssets.push_back(ECS::Instance().AddAsset(mesh));
     }
 
@@ -210,36 +209,44 @@ void Game()
     auto lightId = ECS::Instance().AddAsset(lights[0]);
 
 
-    RenderableComponent renderableMaria{ mariaAssets };
-    RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} };
-    RenderableComponent renderableLight{ std::vector<unsigned int>{lightId} };
-
-
-//    RenderableComponent renderableMaria{ meshComponents };
-//    RenderableComponent renderableGround{ std::vector<MeshComponent>{MakeGround()} };
-//    RenderableComponent renderableLight{ std::vector<MeshComponent>{makeLight()} };
+    RenderableComponent renderableMaria{ mariaAssets , true};
+    RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
+    RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
 
     auto light1 = scene.CreateEntity("light");
     auto ground1 = scene.CreateEntity("ground");
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> randPosition(-40.0f, 40.0f);
-    std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
-    std::uniform_real_distribution<float> randAcceleration(-0.0001f, 0.0001);
-    std::uniform_real_distribution<float> randVelocity(-0.0001f, 0.0001f);
-    
-    for (unsigned int i = 0; i < 7000; i++)
+    std::uniform_real_distribution<float> randRotation(0.0f, 359.0f);
+    std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
+    std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
+
+
+    std::vector<glm::mat4> transforms;
+    for (unsigned int i = 0; i < 4000; i++)
     {
+        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
+
+        transforms.push_back(transform.GetMatrix());
         auto maria = scene.CreateEntity("maria1");
-        scene.AddComponents
+        scene.AddComponents 
         (
             maria, 
-            TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) }, 
-            Player{0.01f},
+            transform, 
+            Player{5.0f, 5.0f},
             renderableMaria, 
             PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
         );
     }
+
+
+    // instanced rendering performance still slow..
+    for (auto& meshId : renderableMaria.MeshIds)
+    {
+        ECS::Instance().MakeMeshInstanced(meshId, transforms);
+    }
+    
 
     scene.AddComponents(light1, TransformComponent{glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1)}, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
     scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);

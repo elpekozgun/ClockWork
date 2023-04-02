@@ -13,19 +13,19 @@ namespace CW
 
 		auto right = glm::normalize(glm::cross(camera.Forward, camera.Up));
 
-		if (input.IsKeyDown(CW::KEY_W))
+		if (input.IsKeyDown(CW::KEY_UP))
 		{
 			camera.Position += camera.speed * camera.Forward * dt ;
 		}
-		if (input.IsKeyDown(CW::KEY_A))
+		if (input.IsKeyDown(CW::KEY_LEFT))
 		{
 			camera.Position -= camera.speed * right * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_S))
+		if (input.IsKeyDown(CW::KEY_DOWN))
 		{
 			camera.Position -= camera.speed * camera.Forward * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_D))
+		if (input.IsKeyDown(CW::KEY_RIGHT))
 		{
 			camera.Position += camera.speed * right * dt;
 		}
