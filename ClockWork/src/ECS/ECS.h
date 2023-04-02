@@ -10,6 +10,7 @@
 #include "SystemManager.h"
 #include "ComponentManager.h"
 #include "EntityManager.h"
+#include "AssetManager.h"
 #include "Core/Singleton.h"
 #include "Component.h"
 
@@ -26,6 +27,7 @@ namespace CW
 			_entityManager = std::make_unique<EntityManager>();
 			_componentManager = std::make_unique<ComponentManager>();
 			_systemManager = std::make_unique<SystemManager>();
+			_assetManager = std::make_unique<AssetManager>();
 		}
 
 		EntityId CreateEntity()
@@ -75,6 +77,7 @@ namespace CW
 		{
 			return _componentManager->GetComponent<T>(entity);
 		}
+		
 
 		template<typename T>
 		void SetComponent(EntityId entity, T component)
@@ -106,9 +109,24 @@ namespace CW
 			(RegisterComponent<C>(mask), ...);
 		}
 
-		std::unique_ptr<EntityManager> _entityManager;
-		std::unique_ptr<ComponentManager> _componentManager;
-		std::unique_ptr<SystemManager> _systemManager;
+		template<typename T>
+		T& GetAsset(uint assetId)
+		{
+			return _assetManager->GetAsset<T>(assetId);
+		}
+
+		template<typename T>
+		uint AddAsset(T asset)
+		{
+			return _assetManager->AddAsset<T>(asset);
+		}
+
+
+		CameraComponent& GetSingleton_Camera()
+		{
+			return _camera;
+		}
+
 
 	private:
 		template<typename... C>
@@ -125,5 +143,11 @@ namespace CW
 			_systemManager->SetSystemMask<T>(mask);
 		}
 
+		std::unique_ptr<EntityManager> _entityManager;
+		std::unique_ptr<ComponentManager> _componentManager;
+		std::unique_ptr<SystemManager> _systemManager;
+		std::unique_ptr<AssetManager> _assetManager;
+
+		CameraComponent _camera;
 	};
 }

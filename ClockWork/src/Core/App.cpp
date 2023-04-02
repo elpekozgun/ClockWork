@@ -6,6 +6,8 @@ namespace CW
 	App::App(const std::string& name) :
 		_name(name), _backColor{ 0.15f, 0.15f, 0.15f, 1.0f }, _window(name)
 	{
+		_window.Setup(1920, 1080);
+
 		ECS::Instance().Init();
 		_isRunning = false;
 	}
@@ -18,26 +20,34 @@ namespace CW
 
 	void App::Run(const unsigned int width, const unsigned int height)
 	{
-		_window.Setup(width, height);
+		//_window.Setup(width, height);
 
-		TempRender tempRender;
+		//TempRender tempRender;
 
 		_isRunning = true;
+
+		int dtCount = 0;
+		int interval = 1000;
 
 		float dt = 0;
 		while (_isRunning)
 		{
-			
 			auto tStart = Clock::now();
 
 			for (const auto& system : _systems)
 			{
 				system->Update(dt);
 			}
-			tempRender.Render(dt);
+			//tempRender.Render(dt);
 
 			auto tEnd = Clock::now();
 			dt = MilliFloat(tEnd - tStart).count();
+			dtCount += dt;
+			if (dtCount >= interval)
+			{
+				std::cout << "fps:" << 1000 / dt << "\n";
+				dtCount = 0;
+			}
 
 			_window.Update();
 		}

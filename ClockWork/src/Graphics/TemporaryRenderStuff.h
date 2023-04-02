@@ -37,19 +37,21 @@ namespace CW
 		{
 			ECS& _ecs = ECS::Instance();
 
-			auto entity = _ecs.CreateEntity();
-			camera = &(_ecs.GetComponent <CW::CameraComponent>(entity));
+			camera = &_ecs.GetSingleton_Camera();
 
-			CameraComponent c{
-			glm::vec3(-1.45f, 0.9f, -0.8f), glm::vec3(0.832167f, -0.377841f, 0.405875f), glm::vec3(0.339601f, 0.925871f, 0.165634f),
-				640, 480, 60, 0.01f, 0.1f };
-
-			_ecs.AddComponent<CameraComponent>(entity, c);
+			camera->Position = glm::vec3(-1.45f, 0.9f, -0.8f);
+			camera->Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
+			camera->Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
+			camera->Width = 640;
+			camera->height = 480;
+			camera->FoV = 60;
+			camera->speed = 0.01f;
+			camera->sensitivity = 0.1f;
 
 			auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultVertex.glsl)", ShaderType::Vertex);
 			auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultFragment.glsl)", ShaderType::Fragment);
 
-			modelShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
+			modelShader = std::make_unique<Shader>(Shader::CreateShader("shader", { vertexShader, fragmentShader }));
 
 			std::vector<Vertex> vertices =
 			{
@@ -106,7 +108,7 @@ namespace CW
 
 			auto lightVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightVertex.glsl)", ShaderType::Vertex);
 			auto lightFragment = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightFragment.glsl)", ShaderType::Fragment);
-			lightShader = Shader::CreateShader("shader", { lightVertex, lightFragment });
+			lightShader = std::make_unique<Shader>(Shader::CreateShader("shader", { lightVertex, lightFragment }));
 
 			lightMesh = std::make_unique<Mesh>(LightVertices, LightIndices, std::vector<Texture>());
 

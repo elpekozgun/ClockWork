@@ -2,7 +2,6 @@
 
 namespace CW
 {
-
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
@@ -29,7 +28,10 @@ namespace CW
 		//glfwSetWindowSize(_window,CW::SCREEN_HEIGHT, CW::SCREEN_HEIGHT);
 		glfwMakeContextCurrent(_window);
 		glfwSwapInterval(0);
-		glfwSetFramebufferSizeCallback(_window, [](GLFWwindow* app, int c, int d) {glViewport(0, 0, c, d); });
+		glfwSetFramebufferSizeCallback(_window, [](GLFWwindow* app, int c, int d) 
+		{
+			glViewport(0, 0, c, d);
+		});
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			return;
 

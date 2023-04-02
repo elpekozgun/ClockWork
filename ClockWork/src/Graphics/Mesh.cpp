@@ -14,7 +14,6 @@ namespace CW
 
 	}
 
-
 	void Mesh::Delete()
 	{
 		glDeleteVertexArrays(1,&_vao.Id);

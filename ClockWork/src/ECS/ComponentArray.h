@@ -7,8 +7,6 @@ namespace CW
 {
 	// Each component array contains 2 maps, from entity to index, and index to entity, its 3x memory compsumption
 	// but 
-
-
 	class IComponentArray
 	{
 	public:

@@ -20,7 +20,7 @@ namespace CW
 		return id;
 	}
 
-	std::unique_ptr<Shader> Shader::CreateShader(const std::string& name, std::vector<GLuint> shaderIds)
+	Shader Shader::CreateShader(const std::string& name, std::vector<GLuint> shaderIds)
 	{
 		int id = glCreateProgram();
 
@@ -37,7 +37,7 @@ namespace CW
 			glDeleteShader(shaderId);
 		}
 
-		return std::make_unique<Shader>(name, id);
+		return Shader(name, id);
 	}
 
 	void Shader::Use() const
@@ -137,10 +137,8 @@ namespace CW
 		}
 	}
 
-
-	Shader::~Shader()
+	void Shader::Delete()
 	{
 		glDeleteProgram(Id);
 	}
-
 }

@@ -1,10 +1,6 @@
 #pragma once
 
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
 #include "Graphics/Mesh.h"
-
-#include "Core/Core.h"
 #include <typeinfo>
 
 
@@ -33,7 +29,7 @@ namespace CW
 	
 	struct CW_API Player
 	{
-
+		float moveSpeed;
 	};
 
 
@@ -42,6 +38,13 @@ namespace CW
 		vec3 Acceleration;
 		vec3 Velocity;
 	};
+
+	struct CW_API RenderableComponent
+	{
+		std::vector<unsigned int> MeshIds;
+		//std::vector<MeshComponent> Meshes;
+	};
+
 
 	struct CW_API CameraComponent
 	{
@@ -57,6 +60,7 @@ namespace CW
 		float Yaw;
 		float Pitch;
 
+		// TODO: move this to system
 		glm::mat4 CameraMatrix()
 		{
 			glm::mat4 view = glm::mat4(1);

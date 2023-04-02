@@ -5,7 +5,7 @@ void CW::PhysicsSystem::Update(float dt)
 	auto& input = InputState::Instance();
 	auto& ecs = ECS::Instance();
 
-	if (input.IsKeyDown(CW::KEY_A))
+	//if (input.IsKeyDown(CW::KEY_A))
 	{
 		for (auto& entity : _entities)
 		{

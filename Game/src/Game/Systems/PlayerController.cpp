@@ -6,6 +6,8 @@ void PlayerController::Update(float dt)
 	for (auto& entity : _entities)
 	{
 		glm::vec3 movement(0,0,0);
+		auto& player = CW::ECS::Instance().GetComponent<CW::Player>(entity);
+		auto& transform = CW::ECS::Instance().GetComponent<CW::TransformComponent>(entity);
 
 		if (input.IsKeyDown(CW::KEY_UP))
 		{
@@ -27,9 +29,7 @@ void PlayerController::Update(float dt)
 			movement.x -= dt;
 		}
 
-		auto& transform = CW::ECS::Instance().GetComponent<CW::TransformComponent>(entity);
-
-		transform.Position += movement;
+		transform.Position += movement * player.moveSpeed;
 
 		//if (glm::length(movement) != 0)
 		//{

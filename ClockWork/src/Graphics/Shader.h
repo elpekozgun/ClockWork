@@ -23,10 +23,12 @@ namespace CW
 	{
 	public:
 		Shader(std::string name, GLuint id);
-		~Shader();
+		Shader() {};
+
+		void Delete();
 
 		static GLuint CreateShaderSource(const char* path, ShaderType type);
-		static std::unique_ptr<Shader> CreateShader(const std::string& name, std::vector<GLuint> shaderIds);
+		static Shader CreateShader(const std::string& name, std::vector<GLuint> shaderIds);
 
 		void Use() const;
 		void SetBool(const std::string& name, bool value) const;

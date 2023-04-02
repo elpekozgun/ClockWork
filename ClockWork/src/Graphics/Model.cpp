@@ -42,7 +42,8 @@ namespace CW
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			Meshes.push_back(ProcessMesh(mesh, scene));
+			//Meshes.push_back(ProcessMesh(mesh, scene));
+			MeshComponents.push_back(CreateMeshComponent(mesh, scene));
 		}
 
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -136,4 +137,94 @@ namespace CW
 		return textures;
 	}
 
+	MeshComponent Model::CreateMeshComponent(aiMesh* mesh, const aiScene* scene)
+	{
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
+
+		// vertices
+		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+		{
+			Vertex vertex;
+
+			glm::vec3 data;
+			data.x = mesh->mVertices[i].x;
+			data.y = mesh->mVertices[i].y;
+			data.z = mesh->mVertices[i].z;
+			vertex.Position = data;
+
+			data.x = mesh->mNormals[i].x;
+			data.y = mesh->mNormals[i].y;
+			data.z = mesh->mNormals[i].z;
+			vertex.Normal = data;
+
+			vertex.Color = glm::vec3(0);
+
+			if (mesh->mTextureCoords[0])
+			{
+				glm::vec3 data;
+				data.x = mesh->mTextureCoords[0][i].x;
+				data.y = mesh->mTextureCoords[0][i].y;
+				vertex.UV = data;
+			}
+			else
+			{
+				vertex.UV = glm::vec2(0);
+			}
+
+			vertices.push_back(vertex);
+		}
+
+		// indices
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; j++)
+			{
+				indices.push_back(face.mIndices[j]);
+			}
+		}
+
+		// textures
+		if (mesh->mMaterialIndex >= 0)
+		{
+			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+			unsigned int slot = 0;
+			std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "Diffuse", slot);
+			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Specular", slot);
+			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+		}
+
+		MeshComponent meshComponent;
+
+		meshComponent.Vertices = vertices;
+		meshComponent.Indices = indices;
+		meshComponent.Textures = textures;
+		
+		VAO vao;
+		vao.Bind();
+
+		EBO ebo(indices);
+		VBO vbo(vertices);
+
+		unsigned int stride = sizeof(Vertex) / sizeof(float);
+
+		vao.LinkAttribArray<float>(vbo, 0, 3, GL_FLOAT, stride, 0);
+		vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
+		vao.LinkAttribArray<float>(vbo, 2, 3, GL_FLOAT, stride, 6);
+		vao.LinkAttribArray<float>(vbo, 3, 2, GL_FLOAT, stride, 9);
+
+		vao.Unbind();
+		vbo.Unbind();
+		ebo.Unbind();
+
+		meshComponent.Vao = vao;
+
+		return meshComponent;
+		//return Mesh(vertices, indices, textures);
+	}
 }
