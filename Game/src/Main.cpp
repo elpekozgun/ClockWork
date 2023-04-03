@@ -149,18 +149,22 @@ void Game()
         AddSystem<CameraSystem, CameraComponent>()->
         AddSystem<RenderSystem, RenderableComponent, TransformComponent>();
 
-    auto camera = &ECS::Instance().GetSingleton_Camera();
+    auto& ecs = app->GetECS();
 
-    camera->Position = glm::vec3(-1.45f, 0.9f, -0.8f);
-    camera->Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
-    camera->Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
-    camera->Width = 1920;
-    camera->height = 1080;
-    camera->FoV = 60;
-    camera->speed = 5.0f;
-    camera->sensitivity = 0.1f;
+    auto& camera = ecs.GetSingleton_Camera();
 
-    Scene scene;
+    camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
+    camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
+    camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
+    camera.Width = 1920;
+    camera.height = 1080;
+    camera.FoV = 60;
+    camera.speed = 5.0f;
+    camera.sensitivity = 0.1f;
+    camera.Near = 0.5f;
+    camera.Far = 50.0f;
+
+    Scene scene(ecs);
 
     Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
 
@@ -199,15 +203,15 @@ void Game()
     for (auto& mesh : meshComponents)
     {
         mesh.Shader = mariaShader;
-        auto asset = ECS::Instance().AddAsset(mesh);
+        auto asset = ecs.AddAsset(mesh);
         mariaAssets.push_back(asset);
     }
 
     auto grounds = std::vector<MeshComponent>{MakeGround()};
-    unsigned int groundId = ECS::Instance().AddAsset(grounds[0]);
+    unsigned int groundId = ecs.AddAsset(grounds[0]);
 
     auto lights = std::vector<MeshComponent>{ makeLight() };
-    auto lightId = ECS::Instance().AddAsset(lights[0]);
+    auto lightId = ecs.AddAsset(lights[0]);
 
 
     RenderableComponent renderableMaria{ mariaAssets , true};
@@ -225,7 +229,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 5000; i++)
+    for (unsigned int i = 0; i < 500; i++)
     {
         auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
 
@@ -241,10 +245,24 @@ void Game()
         );
     }
 
+    auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());
+
+    auto ents = renderSystem->_entities;
+    for (auto& ent : ents)
+    {
+        auto a = ecs.GetComponent<TransformComponent>(ent);
+        auto b = ecs.GetComponent<RenderableComponent>(ent);
+
+
+        renderSystem->RenderTuples.push_back({ a,b });
+    }
+    
+
+
     //instanced rendering performance still slow..
     for (auto& meshId : renderableMaria.MeshIds)
     {
-        ECS::Instance().MakeMeshInstanced(meshId, transforms);
+        ecs.MakeMeshInstanced(meshId, transforms);
     }
 
     scene.AddComponents(light1, TransformComponent{glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1)}, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);

@@ -73,8 +73,10 @@ namespace CW
 		float FoV;
 		float speed;
 		float sensitivity;
-		float Yaw;
-		float Pitch;
+		float Yaw = 0;
+		float Pitch = 0;
+		float Near;
+		float Far;
 
 		// TODO: move this to system
 		glm::mat4 CameraMatrix()
@@ -83,7 +85,7 @@ namespace CW
 			glm::mat4 projection = glm::mat4(1);
 
 			view = glm::lookAt(Position, Position + Forward, Up);
-			projection = glm::perspective(glm::radians(FoV), (float)Width / height, 0.1f, 100.0f);
+			projection = glm::perspective(glm::radians(FoV), (float)Width / height, Near, Far);
 
 			auto right = glm::normalize(glm::cross(Forward, Up));
 
@@ -96,7 +98,7 @@ namespace CW
 			glm::mat4 projection = glm::mat4(1);
 
 			view = glm::lookAt(Position, Position + Forward, Up);
-			projection = glm::perspective(glm::radians(FoV), (float)Width / height, 0.1f, 100.0f);
+			projection = glm::perspective(glm::radians(FoV), (float)Width / height, Near, Far);
 
 			auto right = glm::normalize(glm::cross(Forward, Up));
 

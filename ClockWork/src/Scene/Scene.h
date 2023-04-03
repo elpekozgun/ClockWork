@@ -11,14 +11,18 @@ namespace CW
 {
     class Scene
     {
+
         class Entity;
         using EntityPtr = std::shared_ptr<Entity>;
         using WeakEntityPtr = std::weak_ptr<Entity>;
 
     public:
+        Scene(ECS& ecs) : _ecs(ecs) {}
+
+
         EntityPtr& CreateEntity(const std::string& name, EntityPtr parent = nullptr)
         {
-            auto id = ECS::Instance().CreateEntity();
+            auto id = _ecs.CreateEntity();
 
             auto entity = std::make_shared<Entity>(id,name, parent);
             if (parent != nullptr)
@@ -52,7 +56,7 @@ namespace CW
         template<typename T>
         void RemoveComponent(EntityPtr& entity, T component)
         {
-            ECS::Instance().RemoveComponent(entity->_id, component);
+            _ecs.RemoveComponent(entity->_id, component);
         }
 
         void Clear()
@@ -117,13 +121,13 @@ namespace CW
         template<typename... T>
         void AddComponent(EntityPtr& entity, T... component)
         {
-            ECS::Instance().AddComponent(entity->_id, component...);
+            _ecs.AddComponent(entity->_id, component...);
         }
 
         void DestroyRecursive(EntityPtr& entity)
         {
             // first clear from ECS
-            ECS::Instance().DestroyEntity(entity->_id);
+            _ecs.DestroyEntity(entity->_id);
 
             // then remove entity from parent's children.
             if (auto parent = entity->GetParent())
@@ -153,5 +157,6 @@ namespace CW
         }
 
         std::vector<EntityPtr> _entities;
+        ECS& _ecs;
     };
 }

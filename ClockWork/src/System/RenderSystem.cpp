@@ -44,23 +44,27 @@ namespace CW
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
-		auto& ecs = ECS::Instance();
+		//auto& ecs = ECS::Instance();
 		
 		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
 		int tricount = 0;
 
-		auto& camera = ecs.GetSingleton_Camera();
+		auto& camera = _ecs->GetSingleton_Camera();
 		for (auto& entity : _entities)
+		//for (auto& tuple : RenderTuples)
 		{
-			auto& renderable = ecs.GetComponent<RenderableComponent>(entity);
-			auto& transform = ecs.GetComponent<TransformComponent>(entity);
+			//auto& renderable = tuple.second;
+			//auto& transform = tuple.first;
+
+			auto& renderable = _ecs->GetComponent<RenderableComponent>(entity);
+			auto& transform = _ecs->GetComponent<TransformComponent>(entity);
 
 			for (auto& meshId : renderable.MeshIds)
 			{
 				//if (renderable.Instanced)
 				if (instanced)
 				{
-					auto& mesh = ecs.GetAsset<MeshComponent>(meshId);
+					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
 
 					if (frustum)
 					{
@@ -72,7 +76,6 @@ namespace CW
 						{
 							instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
 						}
-
 					}
 					else
 					{
@@ -92,7 +95,7 @@ namespace CW
 				}
 				else
 				{
-					auto& mesh = ecs.GetAsset<MeshComponent>(meshId);
+					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
 
 					if (frustum)
 					{
@@ -113,18 +116,20 @@ namespace CW
 			}
 		}
 
-		if (pagedInstanced)
+		if (instanced)
 		{
-			for (auto& translations : totalTranslations)
+			if (pagedInstanced)
 			{
-				RenderInstanced(translations, camera);
+				for (auto& translations : totalTranslations)
+				{
+					RenderInstanced(translations, camera);
+				}
+			}
+			else
+			{
+				RenderInstanced(instanceTranslations, camera);
 			}
 		}
-		else
-		{
-			RenderInstanced(instanceTranslations, camera);
-		}
-		
 		
 
 		cap += dt;
@@ -180,18 +185,14 @@ namespace CW
 	// maybe we can do a paged instancing instead of pushing all at once for complex geometry??
 	void RenderSystem::RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera)
 	{
-		auto& ecs = ECS::Instance();
-
 		for (auto& pair : transformMap)
 		{
 			auto meshId = pair.first;
 			auto transforms = pair.second;
 
-			auto& mesh = ecs.GetAsset<MeshComponent>(meshId);
+			auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
 
 			mesh.Shader.Use();
-
-
 			mesh.Shader.SetBool("instanced", true);
 
 			glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -246,7 +247,7 @@ namespace CW
 		glm::mat4 projection = glm::mat4(1);
 
 		view = glm::lookAt(camera.Position, camera.Position + camera.Forward, camera.Up);
-		projection = glm::perspective(glm::radians(camera.FoV), (float)camera.Width / camera.height, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.FoV), (float)camera.Width / camera.height, camera.Near, camera.Far);
 
 		auto right = glm::normalize(glm::cross(camera.Forward, camera.Up));
 

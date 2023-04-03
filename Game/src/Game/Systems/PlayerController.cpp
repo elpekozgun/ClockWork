@@ -5,8 +5,8 @@ void PlayerController::Update(float dt)
 	auto& input = InputState::Instance();
 	for (auto& entity : _entities)
 	{
-		auto& player = CW::ECS::Instance().GetComponent<CW::Player>(entity);
-		auto& transform = CW::ECS::Instance().GetComponent<CW::TransformComponent>(entity);
+		auto& player = _ecs->GetComponent<CW::Player>(entity);
+		auto& transform = _ecs->GetComponent<CW::TransformComponent>(entity);
 
 		float horizontal = 0.0f;
 		float vertical = 0.0f;

@@ -3,14 +3,13 @@
 void CW::PhysicsSystem::Update(float dt)
 {
 	auto& input = InputState::Instance();
-	auto& ecs = ECS::Instance();
 
 	std::vector<EntityId> toBeDestroyed;
 
 	for (auto& entity : _entities)
 	{
-		auto& physics = ecs.GetComponent<PhysicsComponent>(entity);
-		auto& transform = ecs.GetComponent<TransformComponent>(entity);
+		auto& physics = _ecs->GetComponent<PhysicsComponent>(entity);
+		auto& transform = _ecs->GetComponent<TransformComponent>(entity);
 
 		physics.Velocity += physics.Acceleration * dt;
 		transform.Position += physics.Velocity * dt;

@@ -35,18 +35,15 @@ namespace CW
 
 		TempRender()
 		{
-			ECS& _ecs = ECS::Instance();
-
-			camera = &_ecs.GetSingleton_Camera();
-
-			camera->Position = glm::vec3(-1.45f, 0.9f, -0.8f);
-			camera->Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
-			camera->Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
-			camera->Width = 640;
-			camera->height = 480;
-			camera->FoV = 60;
-			camera->speed = 0.01f;
-			camera->sensitivity = 0.1f;
+			CameraComponent camera;
+			camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
+			camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
+			camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
+			camera.Width = 640;
+			camera.height = 480;
+			camera.FoV = 60;
+			camera.speed = 0.01f;
+			camera.sensitivity = 0.1f;
 
 			auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultVertex.glsl)", ShaderType::Vertex);
 			auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultFragment.glsl)", ShaderType::Fragment);

@@ -42,6 +42,8 @@ namespace CW
 	public:
 		virtual void Update(float deltaTime) override;
 
+		std::vector<std::pair<TransformComponent, RenderableComponent>> RenderTuples;
+
 	private:
 		void Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera);
 		void RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera);
@@ -49,12 +51,13 @@ namespace CW
 		glm::mat4 CameraMat(CameraComponent& camera);
 
 		// for testing and profiling.	
-		unsigned int MaxTri = 5000000;
+		unsigned int MaxTri = 4000000;
 		bool pagedInstanced = false;
 		bool instanced = false;
 		bool frustum = false;
 		unsigned int drawCall = 0;
 		float cap;
 		
+
 	};
 }

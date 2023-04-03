@@ -8,7 +8,7 @@ namespace CW
 	{
 		_window.Setup(1920, 1080);
 
-		ECS::Instance().Init();
+		_ecs.Init();
 		_isRunning = false;
 	}
 

@@ -34,7 +34,6 @@ namespace CW
 	public:
 		static App* Create(const std::string& name = "")
 		{
-			ECS::Instance().Init();
 			return new App(name);
 		}
 		~App();
@@ -42,13 +41,17 @@ namespace CW
 		template<typename T = ISystem, typename... C>
 		App* AddSystem()
 		{
-			shared_ptr<ISystem> system = ECS::Instance().RegisterSystem<T, C...>();
+			shared_ptr<ISystem> system = _ecs.RegisterSystem<T, C...>();
 			_systems.push_back(system);
 			return this;
 		}
 
 		void Run(const unsigned int height, const unsigned int width);
 
+		ECS& GetECS()
+		{
+			return _ecs;
+		}
 
 	private:
 		explicit App(const std::string& name);
@@ -58,6 +61,8 @@ namespace CW
 		bool _isRunning;
 		float _backColor[4];
 		std::string _name;
+
+		ECS _ecs;
 
 		std::vector<shared_ptr<ISystem>> _systems{};
 	};

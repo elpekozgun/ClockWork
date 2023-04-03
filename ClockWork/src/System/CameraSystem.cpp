@@ -7,9 +7,8 @@ namespace CW
 	{
 		// convert to singleton input.
 		auto& input = InputState::Instance();
-		auto& ecs = ECS::Instance();
 
-		auto& camera = ecs.GetSingleton_Camera();
+		auto& camera = _ecs->GetSingleton_Camera();
 
 		auto right = glm::normalize(glm::cross(camera.Forward, camera.Up));
 
@@ -39,6 +38,7 @@ namespace CW
 		}
 		if (input.IsMouseDown(CW::BUTTON_RIGHT))
 		{
+
 			float xOffset = input.MouseDX * camera.sensitivity;
 			float yOffset = input.MouseDY * camera.sensitivity;
 

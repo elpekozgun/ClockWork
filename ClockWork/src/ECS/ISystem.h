@@ -1,22 +1,22 @@
 #pragma once
 #include "Core/Core.h"
 #include "Core/Defines.h"
-
 #include <set>
-#include <typeinfo>
-
 
 namespace CW
 {
+	class ECS;
+
 	class CW_API ISystem
 	{
 	public:
 		virtual void Update(float dt) = 0;
 
 		ComponentMask _systemMask;
+		ECS* _ecs = nullptr;
 
-	protected:
 		std::set<EntityId> _entities;
+	protected:
 
 		float _updateRate = 0.01666666f;
 		float _currentDelta = 0;

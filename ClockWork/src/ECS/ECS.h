@@ -7,19 +7,19 @@
 
 #include "Core/Core.h"
 #include "Core/Defines.h"
+#include "Component.h"
 #include "SystemManager.h"
 #include "ComponentManager.h"
 #include "EntityManager.h"
 #include "AssetManager.h"
-#include "Core/Singleton.h"
-#include "Component.h"
+//#include "Core/Singleton.h"
 
 namespace CW 
 {
-	class CW_API ECS final : public Singleton<ECS>
+	class ECS 
 	{
 	public:
-		ECS(token) {};
+		ECS() { }
 		~ECS() {};
 
 		void Init()
@@ -94,13 +94,19 @@ namespace CW
 		template<typename T = ISystem, typename... C>
 		std::shared_ptr<T> RegisterSystem()
 		{
-			auto system = _systemManager->RegisterSystem<T>();
-
+			std::shared_ptr<T> system = _systemManager->RegisterSystem<T>();
 			ComponentMask mask;
 			RegisterComponents<C...>(mask);
 			SetSystemMask<T>(mask);
-
+			std::shared_ptr<ISystem> baseSystem = std::dynamic_pointer_cast<ISystem>(system);
+			baseSystem->_ecs = this;
 			return system;
+		}
+
+		template<typename T>
+		std::shared_ptr<ISystem> GetSystem()
+		{
+			return _systemManager->GetSystem<T>();
 		}
 
 		template<typename... C>

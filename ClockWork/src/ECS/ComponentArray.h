@@ -65,3 +65,36 @@ namespace CW
 		uint _size;
 	};
 };
+
+
+/* TODO: instead of single component arrays, per system create an archetype, or whatever the hell you wanna call
+cache it at the begining of update method, and process the data sequentially. dont forget store them as reference values,
+or pointers so that you can reflect the modifications in other systems using the same component.
+
+
+#include <vector>
+#include <tuple>
+
+template<typename... ComponentTypes>
+class Archetype
+{
+public:
+	using Entity = std::tuple<ComponentTypes&...>;
+
+	void AddEntity(Entity entity)
+	{
+		entities_.push_back(entity);
+	}
+
+	std::vector<Entity>& GetEntities()
+	{
+		return entities_;
+	}
+
+private:
+	std::vector<Entity> entities_;
+};
+
+*/
+
+

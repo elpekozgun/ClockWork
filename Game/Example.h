@@ -24,10 +24,9 @@ public:
         _currentDelta += dt;
         if (_currentDelta >= _updateRate)
         {
-            CW::ECS& instance = CW::ECS::Instance();
             for (auto& entity : _entities)
             {
-                auto& example = instance.GetComponent<ExampleSizeComponent>(entity);
+                auto& example = _ecs->GetComponent<ExampleSizeComponent>(entity);
 
                 example.width += dt;
                 example.height += dt;
@@ -52,10 +51,9 @@ public:
         _currentDelta += dt;
         if (_currentDelta >= _updateRate)
         {
-            CW::ECS& instance = CW::ECS::Instance();
             for (auto& entity : _entities)
             {
-                auto& examplePos = instance.GetComponent<ExamplePositionComponent>(entity);
+                auto& examplePos = _ecs->GetComponent<ExamplePositionComponent>(entity);
 
                 examplePos.Position += glm::vec3(dt);
 

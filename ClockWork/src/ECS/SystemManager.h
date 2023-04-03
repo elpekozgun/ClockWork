@@ -12,7 +12,7 @@ namespace CW
 	class CW_API SystemManager
 	{
 	public:
-		template<typename T>
+		template<typename T = ISystem>
 		std::shared_ptr<T> RegisterSystem()
 		{
 			std::string typeName = typeid(T).name();
@@ -37,6 +37,14 @@ namespace CW
 				system->_entities.erase(entity);
 			}
 		}
+
+		template<typename T>
+		std::shared_ptr<ISystem> GetSystem()
+		{
+			std::string typeName = typeid(T).name();
+			return _systems[typeName];
+		}
+
 
 		void EntityMaskChanged(EntityId entity, ComponentMask entityMask)
 		{
