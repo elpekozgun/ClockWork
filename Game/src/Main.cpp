@@ -60,8 +60,8 @@ MeshComponent MakeGround()
     groundMesh.Textures = textures;
     groundMesh.Setup();
 
-    auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultVertex.glsl)", ShaderType::Vertex);
-    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultFragment.glsl)", ShaderType::Fragment);
+    auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
+    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
     groundMesh.Shader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
@@ -164,8 +164,8 @@ void Game()
 
     Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
 
-    auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultVertex.glsl)", ShaderType::Vertex);
-    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultFragment.glsl)", ShaderType::Fragment);
+    auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
+    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
     auto mariaShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
     
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -210,7 +210,7 @@ void Game()
     auto lightId = ECS::Instance().AddAsset(lights[0]);
 
 
-    RenderableComponent renderableMaria{ mariaAssets , false};
+    RenderableComponent renderableMaria{ mariaAssets , true};
     RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
 
@@ -225,7 +225,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 3000; i++)
+    for (unsigned int i = 0; i < 5000; i++)
     {
         auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
 
@@ -246,7 +246,6 @@ void Game()
     {
         ECS::Instance().MakeMeshInstanced(meshId, transforms);
     }
-    
 
     scene.AddComponents(light1, TransformComponent{glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1)}, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
     scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);

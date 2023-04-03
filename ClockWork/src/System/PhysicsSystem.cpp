@@ -15,9 +15,9 @@ void CW::PhysicsSystem::Update(float dt)
 		physics.Velocity += physics.Acceleration * dt;
 		transform.Position += physics.Velocity * dt;
 
-		if (abs(transform.Position.x) > 40.0f || abs(transform.Position.z) > 40.0f)
-		{
-			ecs.DestroyEntity(entity); // weird stuff happening maybe destroy entities at the end of the frame?
-		}
+		//if (abs(transform.Position.x) > 40.0f || abs(transform.Position.z) > 40.0f)
+		//{
+		//	ecs.DestroyEntity(entity); // weird stuff happening maybe destroy entities at the end of the frame?
+		//}
 	}
 }

@@ -48,5 +48,13 @@ namespace CW
 		glm::mat4 MatrixFromTransform(TransformComponent& component);
 		glm::mat4 CameraMat(CameraComponent& camera);
 
+		// for testing and profiling.	
+		unsigned int MaxTri = 5000000;
+		bool pagedInstanced = false;
+		bool instanced = false;
+		bool frustum = false;
+		unsigned int drawCall = 0;
+		float cap;
+		
 	};
 }

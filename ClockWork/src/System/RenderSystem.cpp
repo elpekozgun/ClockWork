@@ -1,18 +1,55 @@
 #include "RenderSystem.h"
+#include <Core/InputState.h>
 
 
 namespace CW
 {
-	void CW::RenderSystem::Update(float deltaTime)
+	void CW::RenderSystem::Update(float dt)
 	{
+		drawCall = 0;
+		auto& input = InputState::Instance();
+		if (input.IsKeyDown(CW::KEY_1))
+		{
+			std::cout << "instanced on \n";
+			instanced = true;
+		}
+		if (input.IsKeyDown(CW::KEY_2))
+		{
+			std::cout << "instanced off \n";
+			instanced = false;
+		}
+		if (input.IsKeyDown(CW::KEY_3))
+		{
+			std::cout << "paged on \n";
+			pagedInstanced = false;
+		}
+		if (input.IsKeyDown(CW::KEY_4))
+		{
+			std::cout << "paged off \n";
+			pagedInstanced = false;
+		}
+		if (input.IsKeyDown(CW::KEY_5))
+		{
+			std::cout << "frustum on \n";
+			frustum = true;
+		}
+		if (input.IsKeyDown(CW::KEY_6))
+		{
+			std::cout << "frustum off \n";
+			frustum = false;
+		}
+
+
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
 		auto& ecs = ECS::Instance();
 		
-		auto& camera = ecs.GetSingleton_Camera();
+		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
+		int tricount = 0;
 
+		auto& camera = ecs.GetSingleton_Camera();
 		for (auto& entity : _entities)
 		{
 			auto& renderable = ecs.GetComponent<RenderableComponent>(entity);
@@ -20,20 +57,82 @@ namespace CW
 
 			for (auto& meshId : renderable.MeshIds)
 			{
-				if (renderable.Instanced)
+				//if (renderable.Instanced)
+				if (instanced)
 				{
-					instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+					auto& mesh = ecs.GetAsset<MeshComponent>(meshId);
+
+					if (frustum)
+					{
+						glm::vec4 clipPos = camera.CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+
+						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.z) <= clipPos.w)
+						{
+							instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+						}
+
+					}
+					else
+					{
+						instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+					}
+
+					if (pagedInstanced)
+					{
+						tricount += mesh.Indices.size() / 3;
+						if (tricount >= MaxTri)
+						{
+							totalTranslations.push_back(instanceTranslations);
+							instanceTranslations.clear();
+							tricount = 0;
+						}
+					}
 				}
 				else
 				{
 					auto& mesh = ecs.GetAsset<MeshComponent>(meshId);
-					Render(mesh, transform, camera);
+
+					if (frustum)
+					{
+						glm::vec4 clipPos = camera.CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+
+						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.z) <= clipPos.w)
+						{
+							Render(mesh, transform, camera);
+						}
+					}
+					else
+					{
+						Render(mesh, transform, camera);
+					}
 				}
 			}
 		}
 
+		if (pagedInstanced)
+		{
+			for (auto& translations : totalTranslations)
+			{
+				RenderInstanced(translations, camera);
+			}
+		}
+		else
+		{
+			RenderInstanced(instanceTranslations, camera);
+		}
+		
+		
 
-		RenderInstanced(instanceTranslations, camera);
+		cap += dt;
+		if (cap >= 1.0f)
+		{
+			std::cout << drawCall << "\n";
+			cap = 0;
+		}
 	}
 
 	void RenderSystem::Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera)
@@ -73,6 +172,7 @@ namespace CW
 
 		mesh.Vao.Bind();
 		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);
+		drawCall++;
 	}
 
 	// on mesh with 46k tris it doesnt increase the performance in release mode, 
@@ -125,6 +225,7 @@ namespace CW
 			glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(glm::mat4), transforms.data(), GL_STATIC_DRAW);
 
 			glDrawElementsInstanced(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0, transforms.size());
+			drawCall++;
 		}
 	}
 

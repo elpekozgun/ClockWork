@@ -90,6 +90,25 @@ namespace CW
 			return projection * view;
 		}
 
+		glm::mat4 ViewProj()
+		{
+			glm::mat4 view = glm::mat4(1);
+			glm::mat4 projection = glm::mat4(1);
+
+			view = glm::lookAt(Position, Position + Forward, Up);
+			projection = glm::perspective(glm::radians(FoV), (float)Width / height, 0.1f, 100.0f);
+
+			auto right = glm::normalize(glm::cross(Forward, Up));
+
+			return view * projection;
+		}
+
+		glm::mat4 ViewMatrix()
+		{
+			glm::mat4 view = glm::mat4(1);
+			return glm::lookAt(Position, Position + Forward, Up);
+		}
+
 	};
 
 
