@@ -93,6 +93,7 @@ void main()
 
 	FragColor = vec4(result,1);
 	//FragColor = texture(Diffuse0,TexCoord);
+	//FragColor = vec4(vec3(gl_FragCoord.z),1);
 }
 
 vec3 CalculateDirectLight(DirectLight light, vec3 normal, vec3 viewDir)

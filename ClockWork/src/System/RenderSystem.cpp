@@ -39,9 +39,14 @@ namespace CW
 			frustum = false;
 		}
 
+		glEnable(GL_DEPTH_TEST /*| GL_STENCIL_TEST*/);
+		//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
+
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
 
 		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
 		//auto& ecs = ECS::Instance();
@@ -142,6 +147,9 @@ namespace CW
 
 	void RenderSystem::Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera)
 	{
+		//glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		//glStencilMask(0xFF);
+
 		mesh.Shader.Use();
 
 		glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -177,6 +185,17 @@ namespace CW
 
 		mesh.Vao.Bind();
 		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);
+
+		//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		//glStencilMask(0x00);
+		//glDisable(GL_DEPTH_TEST);
+
+		//// use outline shader here.
+
+		//glStencilMask(0xFF);
+		//glStencilFunc(GL_ALWAYS, 0, 0xFF);
+		//glEnable(GL_DEPTH_TEST);
+
 		drawCall++;
 	}
 

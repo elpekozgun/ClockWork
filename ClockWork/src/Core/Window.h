@@ -21,6 +21,10 @@ namespace CW
 		void Setup(int width, int height);
 		void Update();
 		void Shutdown();
+		void SetTitle(const char* title)
+		{
+			glfwSetWindowTitle(_window, title);
+		}
 
 	private:
 		void HandleCursor();

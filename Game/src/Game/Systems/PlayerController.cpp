@@ -36,7 +36,7 @@ void PlayerController::Update(float dt)
 
 		glm::quat rotation = glm::quat(glm::vec3(transform.Rotation.x, transform.Rotation.y, transform.Rotation.z));
 		glm::mat4 rotationMatrix = glm::toMat4(rotation);
-		
+
 		glm::vec3 forward = glm::normalize(glm::vec3(rotationMatrix[2]));
 
 		glm::vec3 movement = forward * direction.z * player.moveSpeed;
@@ -45,7 +45,7 @@ void PlayerController::Update(float dt)
 		transform.Position += (movement + strafe) * dt;
 
 		// rotate character
-		transform.Rotation.y -= horizontal * player.turnspeed * dt; 
+		transform.Rotation.y -= horizontal * player.turnspeed * dt;
 
 	}
 }

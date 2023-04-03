@@ -26,27 +26,30 @@ namespace CW
 
 		_isRunning = true;
 
-		float dtCount = 0.0f;
-		float interval = 1.0f;
 
-		float dt = 0;
+		double prevTime = 0.0;
+		double currentTime = 0.0;
+		int frameCount = 0;
+		double dt;
+
 		while (_isRunning)
 		{
-			auto tStart = Clock::now();
+			currentTime = glfwGetTime();
+			dt = currentTime - prevTime;
+			frameCount++;
+			if (dt >= 1.0 / 5.0)
+			{
+				std::string FPS = std::to_string((1.0 / dt) * frameCount);
+				std::string ms = std::to_string(dt / frameCount * 1000);
+				std::string title = _name + " - FPS: " + FPS + " / ms: " + ms + " / dt: " + std::to_string(dt);
+				_window.SetTitle(title.c_str());
+				prevTime = currentTime;
+				frameCount = 0;
+			}
 
 			for (const auto& system : _systems)
 			{
 				system->Update(dt);
-			}
-			//tempRender.Render(dt);
-
-			auto tEnd = Clock::now();
-			dt = MilliFloat(tEnd - tStart).count() / 1000.0f;
-			dtCount += dt;
-			if (dtCount >= interval)
-			{
-				std::cout << "fps:" << 1.0f / dt << "\n";
-				dtCount = 0;
 			}
 
 			_window.Update();
