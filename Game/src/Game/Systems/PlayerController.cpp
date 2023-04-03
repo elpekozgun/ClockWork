@@ -45,7 +45,7 @@ void PlayerController::Update(float dt)
 		transform.Position += (movement + strafe) * dt;
 
 		// rotate character
-		transform.Rotation.y -= horizontal * player.turnspeed * dt; //forward.y + horizontal * player.turnspeed * dt;
+		transform.Rotation.y -= horizontal * player.turnspeed * dt; 
 
 	}
 }

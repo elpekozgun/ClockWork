@@ -18,16 +18,11 @@ namespace CW
 			auto& renderable = ecs.GetComponent<RenderableComponent>(entity);
 			auto& transform = ecs.GetComponent<TransformComponent>(entity);
 
-			// TODO: enqueue the items that can be instanced into a container,
-			// while traversing below loop add those transformations to the container,
-			// after the traversal is over render them instanced all at once.
-
 			for (auto& meshId : renderable.MeshIds)
 			{
 				if (renderable.Instanced)
 				{
 					instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
-					//instanceTranslations[meshId].push_back(transform.GetMatrix());
 				}
 				else
 				{
@@ -36,6 +31,7 @@ namespace CW
 				}
 			}
 		}
+
 
 		RenderInstanced(instanceTranslations, camera);
 	}
@@ -46,9 +42,8 @@ namespace CW
 
 		glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-		auto camMat = camera.CameraMatrix();
-
-		glm::mat4 model = transform.GetMatrix();
+		glm::mat4 model = MatrixFromTransform(transform);  //transform.GetMatrix();
+		auto camMat = CameraMat(camera);
 
 		mesh.Shader.SetBool("instanced", false);
 
@@ -80,7 +75,9 @@ namespace CW
 		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);
 	}
 
-	// havent increased performance, on the contrary dropped huge.
+	// on mesh with 46k tris it doesnt increase the performance in release mode, 
+	// however on 30k elements of quads it boosts 3x speed. (10fps to 30fps)
+	// maybe we can do a paged instancing instead of pushing all at once for complex geometry??
 	void RenderSystem::RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera)
 	{
 		auto& ecs = ECS::Instance();
@@ -141,4 +138,18 @@ namespace CW
 		model = glm::scale(model, transform.Scale);
 		return model;
 	}
+
+	glm::mat4 RenderSystem::CameraMat(CameraComponent& camera)
+	{
+		glm::mat4 view = glm::mat4(1);
+		glm::mat4 projection = glm::mat4(1);
+
+		view = glm::lookAt(camera.Position, camera.Position + camera.Forward, camera.Up);
+		projection = glm::perspective(glm::radians(camera.FoV), (float)camera.Width / camera.height, 0.1f, 100.0f);
+
+		auto right = glm::normalize(glm::cross(camera.Forward, camera.Up));
+
+		return projection * view;
+	}
+
 }

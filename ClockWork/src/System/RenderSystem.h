@@ -9,6 +9,7 @@
 #include "glm.hpp"
 
 #include <map>
+#include <execution>
 
 
 /*
@@ -45,5 +46,7 @@ namespace CW
 		void Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera);
 		void RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera);
 		glm::mat4 MatrixFromTransform(TransformComponent& component);
+		glm::mat4 CameraMat(CameraComponent& camera);
+
 	};
 }

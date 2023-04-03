@@ -210,7 +210,7 @@ void Game()
     auto lightId = ECS::Instance().AddAsset(lights[0]);
 
 
-    RenderableComponent renderableMaria{ mariaAssets , true};
+    RenderableComponent renderableMaria{ mariaAssets , false};
     RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
 
@@ -227,7 +227,7 @@ void Game()
     std::vector<glm::mat4> transforms;
     for (unsigned int i = 0; i < 3000; i++)
     {
-        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(1.0f) };
+        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
 
         transforms.push_back(transform.GetMatrix());
         auto maria = scene.CreateEntity("maria1");
