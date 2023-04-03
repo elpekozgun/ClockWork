@@ -16,13 +16,14 @@ namespace CW
 	{
 		MeshComponent()
 		{
-			std::cout << "mesh\n";
+			//std::cout << "mesh\n";
 		}
 
 		std::vector<Vertex> Vertices;
 		std::vector<Texture> Textures;
 		std::vector<unsigned int> Indices;
 		VAO Vao;
+		unsigned int instanceVbo;
 		Shader Shader;
 
 		void Setup()

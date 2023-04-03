@@ -199,7 +199,8 @@ void Game()
     for (auto& mesh : meshComponents)
     {
         mesh.Shader = mariaShader;
-        mariaAssets.push_back(ECS::Instance().AddAsset(mesh));
+        auto asset = ECS::Instance().AddAsset(mesh);
+        mariaAssets.push_back(asset);
     }
 
     auto grounds = std::vector<MeshComponent>{MakeGround()};
@@ -224,9 +225,9 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 4000; i++)
+    for (unsigned int i = 0; i < 3000; i++)
     {
-        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
+        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(1.0f) };
 
         transforms.push_back(transform.GetMatrix());
         auto maria = scene.CreateEntity("maria1");
@@ -240,8 +241,7 @@ void Game()
         );
     }
 
-
-    // instanced rendering performance still slow..
+    //instanced rendering performance still slow..
     for (auto& meshId : renderableMaria.MeshIds)
     {
         ECS::Instance().MakeMeshInstanced(meshId, transforms);

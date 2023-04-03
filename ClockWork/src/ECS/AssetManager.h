@@ -68,7 +68,7 @@ namespace CW
 		{
 			std::string typeName = typeid(T).name();
 
-			if (!_assetArrays.contains(typeName))
+			if (_assetArrays.find(typeName) == _assetArrays.end())
 			{
 				_assetArrays.insert({ typeName, std::make_shared<AssetArray<T>>() });
 			}
@@ -96,7 +96,7 @@ namespace CW
 			mesh.Vao.Unbind();
 			instanceVBO.Unbind();
 
-			//mesh.MakeInstanced(transforms);
+			mesh.instanceVbo = instanceVBO.Id;
 		}
 
 

@@ -25,16 +25,16 @@ void main()
 	FragmentColor = inColor;
 	TexCoord = inTex;
 
-	//if(instanced)
-	//{
+	if(instanced)
+	{
 		FragmentNormal = mat3(transpose(inverse(inInstancedTransform))) * inNormal;
 		FragmentPosition = vec3(inInstancedTransform * vec4(inPos,1));
 		gl_Position =  CamMat * inInstancedTransform * vec4(inPos, 1.0);
-	//}
-	//else
+	}
+	else
 	{
-//		FragmentNormal = mat3(transpose(inverse(Model))) * inNormal;
-//		FragmentPosition = vec3(Model * vec4(inPos,1));
-//		gl_Position =  CamMat * Model * vec4(inPos, 1.0);
+		FragmentNormal = mat3(transpose(inverse(Model))) * inNormal;
+		FragmentPosition = vec3(Model * vec4(inPos,1));
+     	gl_Position =  CamMat * Model * vec4(inPos, 1.0);
 	}
 };

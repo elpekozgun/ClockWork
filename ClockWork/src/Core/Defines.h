@@ -11,7 +11,7 @@ namespace CW
 	typedef std::uint64_t ulonglong;
 
 	//ecs types
-	constexpr uint MAX_ENTITY = 10000;
+	constexpr uint MAX_ENTITY = 30000;
 	constexpr unsigned short MAX_COMPONENT = 1250;
 
 	typedef uint EntityId;

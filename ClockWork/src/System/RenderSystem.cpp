@@ -27,6 +27,7 @@ namespace CW
 				if (renderable.Instanced)
 				{
 					instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+					//instanceTranslations[meshId].push_back(transform.GetMatrix());
 				}
 				else
 				{
@@ -47,9 +48,9 @@ namespace CW
 
 		auto camMat = camera.CameraMatrix();
 
-		glm::mat4 model = MatrixFromTransform(transform);
+		glm::mat4 model = transform.GetMatrix();
 
-		mesh.Shader.SetBool("instanced", true);
+		mesh.Shader.SetBool("instanced", false);
 
 		mesh.Shader.setVec3("spotlight.position", camera.Position);
 		mesh.Shader.setVec3("spotlight.direction", camera.Forward);
@@ -91,9 +92,10 @@ namespace CW
 
 			auto& mesh = ecs.GetAsset<MeshComponent>(meshId);
 
-			mesh.Vao.Bind();
 			mesh.Shader.Use();
-			mesh.Shader.SetBool("instanced", false);
+
+
+			mesh.Shader.SetBool("instanced", true);
 
 			glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			auto camMat = camera.CameraMatrix();
@@ -120,6 +122,10 @@ namespace CW
 
 				mesh.Textures[i].Bind();
 			}
+
+			mesh.Vao.Bind();
+			glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceVbo);
+			glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(glm::mat4), transforms.data(), GL_STATIC_DRAW);
 
 			glDrawElementsInstanced(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0, transforms.size());
 		}
