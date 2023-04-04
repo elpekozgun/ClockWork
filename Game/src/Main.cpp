@@ -220,7 +220,7 @@ void Game()
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
     
 
-    Model sponzaModel(R"(C:/Users/user/Desktop/sponza/source/sponza.fbx)");
+    Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
 
 
     std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
@@ -242,20 +242,20 @@ void Game()
     }
 
 
-    auto grounds = std::vector<MeshComponent>{MakeGround()};
-    unsigned int groundId = ecs.AddAsset(grounds[0]);
+    //auto grounds = std::vector<MeshComponent>{MakeGround()};
+    //unsigned int groundId = ecs.AddAsset(grounds[0]);
 
     auto lights = std::vector<MeshComponent>{ makeLight() };
     auto lightId = ecs.AddAsset(lights[0]);
 
 
     RenderableComponent renderableMaria{ mariaAssets , true};
-    RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
+    //RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
     RenderableComponent renderableSponza { sponzaAssets, false };
 
     auto light1 = scene.CreateEntity("light");
-    auto ground1 = scene.CreateEntity("ground");
+    //auto ground1 = scene.CreateEntity("ground");
     auto sponza = scene.CreateEntity("sponza");
 
     std::default_random_engine generator;
@@ -266,7 +266,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 100; i++)
+    for (unsigned int i = 0; i < 500; i++)
     {
         auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
 
@@ -282,7 +282,7 @@ void Game()
         );
     }
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
-    scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);
+    //scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);
     scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
 
@@ -297,10 +297,10 @@ void Game()
 
 
     //instanced rendering performance still slow..
-    //for (auto& meshId : renderableMaria.MeshIds)
-    //{
-    //    ecs.MakeMeshInstanced(meshId, transforms);
-    //}
+    for (auto& meshId : renderableMaria.MeshIds)
+    {
+        ecs.MakeMeshInstanced(meshId, transforms);
+    }
 
 
     app->Run(1920, 1080);

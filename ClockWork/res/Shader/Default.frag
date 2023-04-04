@@ -66,7 +66,7 @@ uniform sampler2D Specular0;
 uniform float Shineness;
 
 //uniform Material material; implement later
-//uniform DirectLight directLight;
+uniform DirectLight directLight;
 uniform PointLight pointLights[POINT_LIGHTS];
 uniform SpotLight spotlight;
 
@@ -82,7 +82,7 @@ void main()
 
 	vec3 result = vec3(0.0f);
 
-	//result += CalculateDirectLight(directLight, norm, viewdir);
+	result += CalculateDirectLight(directLight, norm, viewdir);
 	
 	for	(int i = 0; i < POINT_LIGHTS; i++)
 	{

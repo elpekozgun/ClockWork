@@ -4,7 +4,6 @@
 
 namespace CW
 {
-	// this runs super slow???
 	void CW::RenderSystem::Update(float dt)
 	{
 		drawCall = 0;
@@ -16,21 +15,20 @@ namespace CW
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
 
 		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
-
 		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
 		int tricount = 0;
 
 		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
+		auto skybox = _ecs->GetSingletonComponent<SkyboxComponent>();
+
 		for (auto& entity : _entities)
 		{
-			
 			auto& renderable = _ecs->GetComponent<RenderableComponent>(entity);
 			auto& transform = _ecs->GetComponent<TransformComponent>(entity);
 
 			for (auto& meshId : renderable.MeshIds)
 			{
-				//if (renderable.Instanced)
-				if (instanced)
+				if (instanced && renderable.Instanced)
 				{
 					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
 
@@ -86,17 +84,26 @@ namespace CW
 
 		if (instanced)
 		{
-			if (pagedInstanced)
-			{
-				for (auto& translations : totalTranslations)
-				{
-					RenderInstanced(translations, *camera);
-				}
-			}
-			else
-			{
-				RenderInstanced(instanceTranslations, *camera);
-			}
+			RenderInstanced(instanceTranslations, *camera);
+		}
+
+		if (drawSkybox)
+		{
+			glDepthFunc(GL_LEQUAL);
+			skybox->Shader.Use();
+
+			// both matrices same but wtf???
+			//auto what = glm::mat4(glm::mat3(cameraMat));
+			glm::mat4 modifiedCamMat = glm::mat4(glm::mat3(camera->View()));
+			modifiedCamMat = camera->Projection() * modifiedCamMat;
+			skybox->Shader.setMat4("CamMat", modifiedCamMat);
+
+			// skybox cube
+			skybox->Vao.Bind();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDepthFunc(GL_LESS);
 		}
 
 		cap += dt;
@@ -107,6 +114,7 @@ namespace CW
 		}
 	}
 
+	// this runs super slow, seems like constructing meshcomponents map is costly rather than updating in place.
 	void CW::RenderSystem::UpdateSlow(float dt)
 	{
 		drawCall = 0;
@@ -137,7 +145,7 @@ namespace CW
 
 			for (auto& meshId : renderable.MeshIds)
 			{
-				if (meshComponents.find(meshId) == meshComponents.end())
+				if (!meshComponents.contains(meshId))
 				{
 					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
 
@@ -364,9 +372,7 @@ namespace CW
 
 	void RenderSystem::Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera)
 	{
-		//glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		//glStencilMask(0xFF);
-
+		auto skybox = _ecs->GetSingletonComponent<SkyboxComponent>();
 		mesh.Shader.Use();
 
 		glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -403,15 +409,7 @@ namespace CW
 		mesh.Vao.Bind();
 		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);
 
-		//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		//glStencilMask(0x00);
-		//glDisable(GL_DEPTH_TEST);
 
-		//// use outline shader here.
-
-		//glStencilMask(0xFF);
-		//glStencilFunc(GL_ALWAYS, 0, 0xFF);
-		//glEnable(GL_DEPTH_TEST);
 
 		drawCall++;
 	}
@@ -515,33 +513,39 @@ namespace CW
 		auto& input = InputState::Instance();
 		if (input.IsKeyDown(CW::KEY_1))
 		{
-			std::cout << "instanced on \n";
-			instanced = true;
+			frustum = !frustum;
+			std::cout << "frustum ";
+			if (frustum)
+				std::cout << " on\n";
+			else
+				std::cout << " off\n";
 		}
 		if (input.IsKeyDown(CW::KEY_2))
 		{
-			std::cout << "instanced off \n";
-			instanced = false;
+			instanced = !instanced;
+			std::cout << "instanced ";
+			if (instanced)
+				std::cout << " on\n";
+			else
+				std::cout << " off\n";
 		}
 		if (input.IsKeyDown(CW::KEY_3))
 		{
-			std::cout << "paged on \n";
-			pagedInstanced = false;
+			pagedInstanced = !pagedInstanced;
+			std::cout << "pagedInstanced ";
+			if (pagedInstanced)
+				std::cout << " on\n";
+			else
+				std::cout << " off\n";
 		}
 		if (input.IsKeyDown(CW::KEY_4))
 		{
-			std::cout << "paged off \n";
-			pagedInstanced = false;
-		}
-		if (input.IsKeyDown(CW::KEY_5))
-		{
-			std::cout << "frustum on \n";
-			frustum = true;
-		}
-		if (input.IsKeyDown(CW::KEY_6))
-		{
-			std::cout << "frustum off \n";
-			frustum = false;
+			drawSkybox = !drawSkybox;
+			std::cout << "drawSkybox ";
+			if (drawSkybox)
+				std::cout << " on\n";
+			else
+				std::cout << " off\n";
 		}
 	}
 }

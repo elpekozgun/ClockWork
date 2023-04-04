@@ -59,6 +59,7 @@ namespace CW
 		// for testing and profiling.	
 		unsigned int MaxTri = 4000000;
 		bool pagedInstanced = false;
+		bool drawSkybox = false;
 		bool instanced = false;
 		bool frustum = false;
 		unsigned int drawCall = 0;
