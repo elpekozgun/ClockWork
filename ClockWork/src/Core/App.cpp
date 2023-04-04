@@ -37,7 +37,7 @@ namespace CW
 			currentTime = glfwGetTime();
 			dt = currentTime - prevTime;
 			frameCount++;
-			if (dt >= 1.0 / 5.0)
+			if (dt >= 1.0 / 60.0)
 			{
 				std::string FPS = std::to_string((1.0 / dt) * frameCount);
 				std::string ms = std::to_string(dt / frameCount * 1000);

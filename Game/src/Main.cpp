@@ -162,11 +162,12 @@ void Game()
     camera.speed = 5.0f;
     camera.sensitivity = 0.1f;
     camera.Near = 0.5f;
-    camera.Far = 50.0f;
+    camera.Far = 500.0f;
 
     Scene scene(ecs);
 
     Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
+    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
     auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
@@ -240,7 +241,7 @@ void Game()
             maria, 
             transform, 
             Player{5.0f, 5.0f},
-            renderableMaria, 
+            renderableMaria,
             PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
         );
     }

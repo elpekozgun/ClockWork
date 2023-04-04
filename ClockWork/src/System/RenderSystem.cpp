@@ -4,40 +4,124 @@
 
 namespace CW
 {
+	void CW::RenderSystem::Update2(float dt)
+	{
+		drawCall = 0;
+		SwitchState();
+
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
+		
+		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
+		int tricount = 0;
+
+		auto& camera = _ecs->GetSingleton_Camera();
+		auto cameraMat = camera.CameraMatrix();
+
+		std::unordered_map<int, MeshComponent> meshComponents;
+
+		std::map<unsigned int, std::vector<glm::mat4>> instanceRenderables;
+		for (auto& entity : _entities)
+		{
+			auto& transform = _ecs->GetComponent<TransformComponent>(entity);
+			auto& renderable = _ecs->GetComponent<RenderableComponent>(entity);
+
+			auto transformMat = MatrixFromTransform(transform);
+
+			for (auto& meshId : renderable.MeshIds)
+			{
+				if (meshComponents.find(meshId) == meshComponents.end())
+				{
+					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
+
+					mesh.Shader.Use();
+					mesh.Shader.SetBool("instanced", false);
+					mesh.Shader.setVec3("spotlight.position", camera.Position);
+					mesh.Shader.setVec3("spotlight.direction", camera.Forward);
+					mesh.Shader.setMat4("CamMat", cameraMat);
+					mesh.Shader.setVec3("eyePosition", camera.Position);
+
+					unsigned int diffuseNo = 0;
+					unsigned int specularNo = 0;
+					for (unsigned int i = 0; i < mesh.Textures.size(); i++)
+					{
+						int no = 0;
+						std::string name = mesh.Textures[i].TextureType;
+						if (name == "Diffuse")
+							no = diffuseNo++;
+						else if (name == "Specular")
+							no = specularNo++;
+
+						std::string fullName = name + std::to_string(no);
+
+						mesh.Shader.SetTexture(fullName, i);
+
+						mesh.Textures[i].Bind();
+					}
+
+					meshComponents[meshId] = mesh;
+				}
+			}
+
+
+			for (auto& meshId : renderable.MeshIds)
+			{
+				auto& mesh = meshComponents[meshId];
+				if (frustum)
+				{
+					glm::vec4 clipPos = cameraMat * transformMat * glm::vec4(mesh.Vertices[0].Position, 1);
+
+					if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+						std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+						std::abs(clipPos.z) <= clipPos.w)
+					{
+						if (instanced)
+						{
+							instanceTranslations[meshId].push_back(transformMat);
+						}
+						else
+						{
+							Render(mesh, transformMat);
+						}
+					}
+				}
+				else
+				{
+					if (instanced)
+					{
+						instanceTranslations[meshId].push_back(transformMat);
+					}
+					else
+					{
+						Render(mesh, transformMat);
+					}
+				}
+			}
+		}
+
+		if (instanced)
+		{
+			for (auto& pair : meshComponents)
+			{
+				RenderInstanced(pair.second, instanceTranslations);
+			}
+		}
+	
+		cap += dt;
+		if (cap >= 1.0f)
+		{
+			std::cout << drawCall << "\n";
+			cap = 0;
+		}
+	}
+
 	void CW::RenderSystem::Update(float dt)
 	{
 		drawCall = 0;
-		auto& input = InputState::Instance();
-		if (input.IsKeyDown(CW::KEY_1))
-		{
-			std::cout << "instanced on \n";
-			instanced = true;
-		}
-		if (input.IsKeyDown(CW::KEY_2))
-		{
-			std::cout << "instanced off \n";
-			instanced = false;
-		}
-		if (input.IsKeyDown(CW::KEY_3))
-		{
-			std::cout << "paged on \n";
-			pagedInstanced = false;
-		}
-		if (input.IsKeyDown(CW::KEY_4))
-		{
-			std::cout << "paged off \n";
-			pagedInstanced = false;
-		}
-		if (input.IsKeyDown(CW::KEY_5))
-		{
-			std::cout << "frustum on \n";
-			frustum = true;
-		}
-		if (input.IsKeyDown(CW::KEY_6))
-		{
-			std::cout << "frustum off \n";
-			frustum = false;
-		}
+		SwitchState();
 
 		glEnable(GL_DEPTH_TEST /*| GL_STENCIL_TEST*/);
 		//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -50,13 +134,13 @@ namespace CW
 
 		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
 		//auto& ecs = ECS::Instance();
-		
+
 		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
 		int tricount = 0;
 
 		auto& camera = _ecs->GetSingleton_Camera();
 		for (auto& entity : _entities)
-		//for (auto& tuple : RenderTuples)
+			//for (auto& tuple : RenderTuples)
 		{
 			//auto& renderable = tuple.second;
 			//auto& transform = tuple.first;
@@ -135,7 +219,6 @@ namespace CW
 				RenderInstanced(instanceTranslations, camera);
 			}
 		}
-		
 
 		cap += dt;
 		if (cap >= 1.0f)
@@ -143,6 +226,18 @@ namespace CW
 			std::cout << drawCall << "\n";
 			cap = 0;
 		}
+	}
+
+	void RenderSystem::Render(MeshComponent& mesh,glm::mat4& modelMat)
+	{
+		mesh.Shader.Use();
+		mesh.Shader.setMat4("Model", modelMat);
+
+
+		mesh.Vao.Bind();
+		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);
+
+		drawCall++;
 	}
 
 	void RenderSystem::Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera)
@@ -199,6 +294,7 @@ namespace CW
 		drawCall++;
 	}
 
+
 	// on mesh with 46k tris it doesnt increase the performance in release mode, 
 	// however on 30k elements of quads it boosts 3x speed. (10fps to 30fps)
 	// maybe we can do a paged instancing instead of pushing all at once for complex geometry??
@@ -249,6 +345,25 @@ namespace CW
 		}
 	}
 
+	void RenderSystem::RenderInstanced(MeshComponent& mesh, std::map<unsigned int, std::vector<glm::mat4>>& transformMap)
+	{
+		for (auto& pair : transformMap)
+		{
+			auto& transforms = pair.second;
+
+			mesh.Shader.Use();
+			mesh.Shader.SetBool("instanced", true);
+
+			mesh.Vao.Bind();
+			glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceVbo);
+			glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(glm::mat4), transforms.data(), GL_STATIC_DRAW);
+
+			glDrawElementsInstanced(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0, transforms.size());
+			drawCall++;
+		}
+	}
+
+
 	glm::mat4 RenderSystem::MatrixFromTransform(TransformComponent& transform	)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
@@ -273,4 +388,38 @@ namespace CW
 		return projection * view;
 	}
 
+	void RenderSystem::SwitchState()
+	{
+		auto& input = InputState::Instance();
+		if (input.IsKeyDown(CW::KEY_1))
+		{
+			std::cout << "instanced on \n";
+			instanced = true;
+		}
+		if (input.IsKeyDown(CW::KEY_2))
+		{
+			std::cout << "instanced off \n";
+			instanced = false;
+		}
+		if (input.IsKeyDown(CW::KEY_3))
+		{
+			std::cout << "paged on \n";
+			pagedInstanced = false;
+		}
+		if (input.IsKeyDown(CW::KEY_4))
+		{
+			std::cout << "paged off \n";
+			pagedInstanced = false;
+		}
+		if (input.IsKeyDown(CW::KEY_5))
+		{
+			std::cout << "frustum on \n";
+			frustum = true;
+		}
+		if (input.IsKeyDown(CW::KEY_6))
+		{
+			std::cout << "frustum off \n";
+			frustum = false;
+		}
+	}
 }
