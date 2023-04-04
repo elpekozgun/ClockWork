@@ -12,6 +12,9 @@ using namespace glm;
 
 namespace CW
 {
+	struct CW_API SingletonComponent { };
+
+
 	struct CW_API TransformComponent
 	{
 		glm::vec3 Position;
@@ -61,8 +64,20 @@ namespace CW
 		bool Instanced;
 	};
 
+	struct CW_API SkyboxComponent : SingletonComponent
+	{
+		SkyboxComponent()
+		{
+			std::cout << "skybox created\n";
+		}
 
-	struct CW_API CameraComponent
+		std::vector<float> Vertices;
+		Shader Shader;
+		VAO Vao;
+		unsigned int TextureId;
+	};
+
+	struct CW_API CameraComponent : SingletonComponent
 	{
 		glm::vec3 Position;
 		glm::vec3 Forward;
@@ -92,25 +107,85 @@ namespace CW
 			return projection * view;
 		}
 
-		glm::mat4 ViewProj()
+		glm::mat4 Projection()
 		{
-			glm::mat4 view = glm::mat4(1);
 			glm::mat4 projection = glm::mat4(1);
-
-			view = glm::lookAt(Position, Position + Forward, Up);
 			projection = glm::perspective(glm::radians(FoV), (float)Width / height, Near, Far);
-
-			auto right = glm::normalize(glm::cross(Forward, Up));
-
-			return view * projection;
+			return projection;
 		}
 
-		glm::mat4 ViewMatrix()
+		glm::mat4 View()
 		{
 			glm::mat4 view = glm::mat4(1);
 			return glm::lookAt(Position, Position + Forward, Up);
 		}
 
+	};
+
+	struct CW_API MeshComponent
+	{
+		MeshComponent()
+		{
+			//std::cout << "mesh\n";
+		}
+
+		std::vector<Vertex> Vertices;
+		std::vector<Texture> Textures;
+		std::vector<unsigned int> Indices;
+		VAO Vao;
+		unsigned int instanceVbo;
+		Shader Shader;
+
+		void Setup()
+		{
+			Vao.Bind();
+
+			EBO ebo(Indices);
+			VBO vbo(Vertices);
+
+			unsigned int stride = sizeof(Vertex) / sizeof(float);
+
+			Vao.LinkAttribArray<float>(vbo, 0, 3, GL_FLOAT, stride, 0);
+			Vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
+			Vao.LinkAttribArray<float>(vbo, 2, 3, GL_FLOAT, stride, 6);
+			Vao.LinkAttribArray<float>(vbo, 3, 2, GL_FLOAT, stride, 9);
+
+			Vao.Unbind();
+			vbo.Unbind();
+			ebo.Unbind();
+		}
+
+		void MakeInstanced(std::vector<glm::mat4>& transforms)
+		{
+			Vao.Bind();
+
+			VBO instanceVBO(transforms);
+
+
+			unsigned int stride = sizeof(glm::mat4) / sizeof(float);
+
+			instanceVBO.Bind();
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+
+			glEnableVertexAttribArray(5);
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(1 * sizeof(glm::vec4)));
+
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+			glVertexAttribDivisor(7, 1);
+
+			Vao.Unbind();
+			instanceVBO.Unbind();
+		}
 	};
 
 

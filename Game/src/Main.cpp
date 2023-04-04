@@ -10,8 +10,7 @@
 #include "ClockWork.h"
 #include "../Example.h"
 #include "Game/Systems/PlayerController.h"
-
-
+#include <Graphics/Skybox.h>
 
 
 
@@ -151,7 +150,7 @@ void Game()
 
     auto& ecs = app->GetECS();
 
-    auto& camera = ecs.GetSingleton_Camera();
+    CameraComponent camera;
 
     camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
     camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
@@ -164,6 +163,9 @@ void Game()
     camera.Near = 0.5f;
     camera.Far = 500.0f;
 
+    ecs.RegisterSingletonComponent<CameraComponent>(camera);
+
+
     Scene scene(ecs);
 
     Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
@@ -171,42 +173,74 @@ void Game()
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
     auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
-    auto mariaShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
+    auto defaultShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
     
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
 
-    mariaShader.Use();
+    defaultShader.Use();
 
-    mariaShader.setVec4("LightColor", lightColor);
-    mariaShader.SetFloat("Shineness", 32.0f);
-    mariaShader.setVec3("spotlight.ambient", 0.2f, 0.2f, 0.2f);
-    mariaShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f);
-    mariaShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
-    mariaShader.SetFloat("spotlight.cutOff", cos(glm::radians(20.5f)));
-    mariaShader.SetFloat("spotlight.outerCutOff", cos(glm::radians(26.0f)));
-    mariaShader.SetFloat("spotlight.Kconstant", 1.0f);
-    mariaShader.SetFloat("spotlight.Klinear", 0.027f);
-    mariaShader.SetFloat("spotlight.Kquad", 0.0028f);
+    defaultShader.setVec4("LightColor", lightColor);
+    defaultShader.SetFloat("Shineness", 32.0f);
+    defaultShader.setVec3("spotlight.ambient", 0.2f, 0.2f, 0.2f);
+    defaultShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f);
+    defaultShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
+    defaultShader.SetFloat("spotlight.cutOff", cos(glm::radians(20.5f)));
+    defaultShader.SetFloat("spotlight.outerCutOff", cos(glm::radians(26.0f)));
+    defaultShader.SetFloat("spotlight.Kconstant", 1.0f);
+    defaultShader.SetFloat("spotlight.Klinear", 0.027f);
+    defaultShader.SetFloat("spotlight.Kquad", 0.0028f);
     
-    mariaShader.setVec3("pointLights[0].position", lightPos);
-    mariaShader.setVec3("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
-    mariaShader.setVec3("pointLights[0].ambient", 0.15f, 0.15f, 0.15f);
-    mariaShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    mariaShader.SetFloat("pointLights[0].Kconstant", 1.0f);
-    mariaShader.SetFloat("pointLights[0].Klinear", 0.09f);
-    mariaShader.SetFloat("pointLights[0].Kquad", 0.032f);
-    mariaShader.SetBool("IsBlinnPhong", true);
+    defaultShader.setVec3("pointLights[0].position", lightPos);
+    defaultShader.setVec3("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
+    defaultShader.setVec3("pointLights[0].ambient", 0.15f, 0.15f, 0.15f);
+    defaultShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    defaultShader.SetFloat("pointLights[0].Kconstant", 1.0f);
+    defaultShader.SetFloat("pointLights[0].Klinear", 0.09f);
+    defaultShader.SetFloat("pointLights[0].Kquad", 0.032f);
+    defaultShader.SetBool("IsBlinnPhong", true);
+
+
+    auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
+    auto skyboxFrag = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
+    auto skyboxShader = Shader::CreateShader("skybox", { skyboxVertex, skyboxFrag});
+
+    std::vector<std::string> faces
+    {
+        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\right.jpg)",
+        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\left.jpg)",
+        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\top.jpg)",
+        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\bottom.jpg)",
+        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\front.jpg)",
+        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\back.jpg)"
+    };
+
+    Skybox skybox;
+    auto skyboxComponent = skybox.Load(faces, skyboxShader);
+    ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
+    
+
+    Model sponzaModel(R"(C:/Users/user/Desktop/sponza/source/sponza.fbx)");
+
 
     std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
-   
     std::vector<unsigned int> mariaAssets;
     for (auto& mesh : meshComponents)
     {
-        mesh.Shader = mariaShader;
+        mesh.Shader = defaultShader;
         auto asset = ecs.AddAsset(mesh);
         mariaAssets.push_back(asset);
     }
+
+    std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
+    std::vector<unsigned int> sponzaAssets;
+    for (auto& mesh : sponzaMeshComponents)
+    {
+        mesh.Shader = defaultShader;
+        auto asset = ecs.AddAsset(mesh);
+        sponzaAssets.push_back(asset);
+    }
+
 
     auto grounds = std::vector<MeshComponent>{MakeGround()};
     unsigned int groundId = ecs.AddAsset(grounds[0]);
@@ -218,9 +252,11 @@ void Game()
     RenderableComponent renderableMaria{ mariaAssets , true};
     RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
+    RenderableComponent renderableSponza { sponzaAssets, false };
 
     auto light1 = scene.CreateEntity("light");
     auto ground1 = scene.CreateEntity("ground");
+    auto sponza = scene.CreateEntity("sponza");
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> randPosition(-40.0f, 40.0f);
@@ -230,7 +266,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 3000; i++)
+    for (unsigned int i = 0; i < 100; i++)
     {
         auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
 
@@ -245,29 +281,27 @@ void Game()
             PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
         );
     }
-
-    auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());
-
-    auto ents = renderSystem->_entities;
-    for (auto& ent : ents)
-    {
-        auto a = ecs.GetComponent<TransformComponent>(ent);
-        auto b = ecs.GetComponent<RenderableComponent>(ent);
-
-
-        renderSystem->RenderTuples.push_back({ a,b });
-    }
+    scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
+    scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);
+    scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
+
+    //auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());
+    //auto ents = renderSystem->_entities;
+    //for (auto& ent : ents)
+    //{
+    //    auto a = ecs.GetComponent<TransformComponent>(ent);
+    //    auto b = ecs.GetComponent<RenderableComponent>(ent);
+    //    renderSystem->RenderTuples.push_back({ a,b });
+    //}
 
 
     //instanced rendering performance still slow..
-    for (auto& meshId : renderableMaria.MeshIds)
-    {
-        ecs.MakeMeshInstanced(meshId, transforms);
-    }
+    //for (auto& meshId : renderableMaria.MeshIds)
+    //{
+    //    ecs.MakeMeshInstanced(meshId, transforms);
+    //}
 
-    scene.AddComponents(light1, TransformComponent{glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1)}, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
-    scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);
 
     app->Run(1920, 1080);
 

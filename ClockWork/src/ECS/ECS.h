@@ -12,7 +12,6 @@
 #include "ComponentManager.h"
 #include "EntityManager.h"
 #include "AssetManager.h"
-//#include "Core/Singleton.h"
 
 namespace CW 
 {
@@ -133,12 +132,31 @@ namespace CW
 			_assetManager->MakeInstanced<T>(id, transforms);
 		}
 
-
-		CameraComponent& GetSingleton_Camera()
+		template<typename T = SingletonComponent>
+		void RegisterSingletonComponent(T& component)
 		{
-			return _camera;
+			std::string typeName = typeid(T).name();
+
+			auto it = _singletonComponents.find(typeName);
+			if (it == _singletonComponents.end()) 
+			{
+				_singletonComponents.emplace(typeName, std::make_unique<T>(component));
+			}
 		}
 
+		template<typename T = SingletonComponent>
+		T* GetSingletonComponent()
+		{
+			std::string typeName = typeid(T).name();
+			auto it = _singletonComponents.find(typeName);
+			if (it != _singletonComponents.end())
+			{
+				return reinterpret_cast<T*>(it->second.get());
+			}
+		}
+
+
+		std::unordered_map<std::string, std::unique_ptr<SingletonComponent>> _singletonComponents;
 
 	private:
 		template<typename... C>
@@ -159,7 +177,5 @@ namespace CW
 		std::unique_ptr<ComponentManager> _componentManager;
 		std::unique_ptr<SystemManager> _systemManager;
 		std::unique_ptr<AssetManager> _assetManager;
-
-		CameraComponent _camera;
 	};
 }

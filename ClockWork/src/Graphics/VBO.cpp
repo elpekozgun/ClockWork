@@ -9,6 +9,13 @@ namespace CW
 		glBindBuffer(GL_ARRAY_BUFFER, Id);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex) , vertices.data(), GL_STATIC_DRAW);
 	}
+	
+	VBO::VBO(const std::vector <float> & vertices)
+	{
+		glGenBuffers(1, &Id);
+		glBindBuffer(GL_ARRAY_BUFFER, Id);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+	}
 
 	VBO::VBO(const std::vector<glm::mat4>& matrices)
 	{

@@ -4,7 +4,110 @@
 
 namespace CW
 {
-	void CW::RenderSystem::Update2(float dt)
+	// this runs super slow???
+	void CW::RenderSystem::Update(float dt)
+	{
+		drawCall = 0;
+		SwitchState();
+
+		glEnable(GL_DEPTH_TEST);
+
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
+
+		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
+
+		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
+		int tricount = 0;
+
+		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
+		for (auto& entity : _entities)
+		{
+			
+			auto& renderable = _ecs->GetComponent<RenderableComponent>(entity);
+			auto& transform = _ecs->GetComponent<TransformComponent>(entity);
+
+			for (auto& meshId : renderable.MeshIds)
+			{
+				//if (renderable.Instanced)
+				if (instanced)
+				{
+					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
+
+					if (frustum)
+					{
+						glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+
+						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.z) <= clipPos.w)
+						{
+							instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+						}
+					}
+					else
+					{
+						instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+					}
+
+					if (pagedInstanced)
+					{
+						tricount += mesh.Indices.size() / 3;
+						if (tricount >= MaxTri)
+						{
+							totalTranslations.push_back(instanceTranslations);
+							instanceTranslations.clear();
+							tricount = 0;
+						}
+					}
+				}
+				else
+				{
+					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
+
+					if (frustum)
+					{
+						glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+
+						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.z) <= clipPos.w)
+						{
+							Render(mesh, transform, *camera);
+						}
+					}
+					else
+					{
+						Render(mesh, transform, *camera);
+					}
+				}
+			}
+		}
+
+		if (instanced)
+		{
+			if (pagedInstanced)
+			{
+				for (auto& translations : totalTranslations)
+				{
+					RenderInstanced(translations, *camera);
+				}
+			}
+			else
+			{
+				RenderInstanced(instanceTranslations, *camera);
+			}
+		}
+
+		cap += dt;
+		if (cap >= 1.0f)
+		{
+			std::cout << drawCall << "\n";
+			cap = 0;
+		}
+	}
+
+	void CW::RenderSystem::UpdateSlow(float dt)
 	{
 		drawCall = 0;
 		SwitchState();
@@ -18,8 +121,9 @@ namespace CW
 		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
 		int tricount = 0;
 
-		auto& camera = _ecs->GetSingleton_Camera();
-		auto cameraMat = camera.CameraMatrix();
+		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
+		auto cameraMat = camera->CameraMatrix();
+		auto skybox = _ecs->GetSingletonComponent<SkyboxComponent>();
 
 		std::unordered_map<int, MeshComponent> meshComponents;
 
@@ -39,10 +143,10 @@ namespace CW
 
 					mesh.Shader.Use();
 					mesh.Shader.SetBool("instanced", false);
-					mesh.Shader.setVec3("spotlight.position", camera.Position);
-					mesh.Shader.setVec3("spotlight.direction", camera.Forward);
+					mesh.Shader.setVec3("spotlight.position", camera->Position);
+					mesh.Shader.setVec3("spotlight.direction", camera->Forward);
 					mesh.Shader.setMat4("CamMat", cameraMat);
-					mesh.Shader.setVec3("eyePosition", camera.Position);
+					mesh.Shader.setVec3("eyePosition", camera->Position);
 
 					unsigned int diffuseNo = 0;
 					unsigned int specularNo = 0;
@@ -109,6 +213,24 @@ namespace CW
 				RenderInstanced(pair.second, instanceTranslations);
 			}
 		}
+		
+		//glDepthFunc(GL_LEQUAL);  
+		//skybox->Shader.Use();
+
+		//// both matrices same but wtf???
+		////auto what = glm::mat4(glm::mat3(cameraMat));
+		//glm::mat4 modifiedCamMat = glm::mat4(glm::mat3(camera->View()));
+		//modifiedCamMat = camera->Projection() * modifiedCamMat;
+		//skybox->Shader.setMat4("CamMat", modifiedCamMat);
+		//
+		//// skybox cube
+		//skybox->Vao.Bind();
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDepthFunc(GL_LESS);
+
+
 	
 		cap += dt;
 		if (cap >= 1.0f)
@@ -118,7 +240,7 @@ namespace CW
 		}
 	}
 
-	void CW::RenderSystem::Update(float dt)
+	void CW::RenderSystem::Update2(float dt)
 	{
 		drawCall = 0;
 		SwitchState();
@@ -138,7 +260,7 @@ namespace CW
 		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
 		int tricount = 0;
 
-		auto& camera = _ecs->GetSingleton_Camera();
+		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
 		for (auto& entity : _entities)
 			//for (auto& tuple : RenderTuples)
 		{
@@ -157,7 +279,7 @@ namespace CW
 
 					if (frustum)
 					{
-						glm::vec4 clipPos = camera.CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+						glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
 
 						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
 							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
@@ -188,18 +310,18 @@ namespace CW
 
 					if (frustum)
 					{
-						glm::vec4 clipPos = camera.CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+						glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
 
 						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
 							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
 							std::abs(clipPos.z) <= clipPos.w)
 						{
-							Render(mesh, transform, camera);
+							Render(mesh, transform, *camera);
 						}
 					}
 					else
 					{
-						Render(mesh, transform, camera);
+						Render(mesh, transform, *camera);
 					}
 				}
 			}
@@ -211,12 +333,12 @@ namespace CW
 			{
 				for (auto& translations : totalTranslations)
 				{
-					RenderInstanced(translations, camera);
+					RenderInstanced(translations, *camera);
 				}
 			}
 			else
 			{
-				RenderInstanced(instanceTranslations, camera);
+				RenderInstanced(instanceTranslations, *camera);
 			}
 		}
 

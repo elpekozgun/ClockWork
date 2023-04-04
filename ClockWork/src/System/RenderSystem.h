@@ -42,6 +42,7 @@ namespace CW
 	public:
 		virtual void Update(float deltaTime) override;
 		void Update2(float deltaTime);
+		void UpdateSlow(float deltaTime);
 
 		std::vector<std::pair<TransformComponent, RenderableComponent>> RenderTuples;
 
