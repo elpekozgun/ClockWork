@@ -8,6 +8,9 @@ struct CW_API Vertex
 {
 	glm::vec3 Position;
 	glm::vec3 Normal;
-	glm::vec3 Color;
 	glm::vec2 UV;
+	glm::vec3 Tangent;
+	glm::vec3 Bitangent; // we might not need this at all, as we can compute it on shader.
+	// do a benchmark on both, because it will increase the size of mesh data in componentArray which
+	// needs to be retrieved
 };

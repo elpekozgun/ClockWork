@@ -417,6 +417,7 @@ namespace CW
 
 		unsigned int diffuseNo = 0;
 		unsigned int specularNo = 0;
+		unsigned int normalNo = 0;
 		for (unsigned int i = 0; i < mesh.Textures.size(); i++)
 		{
 			int no = 0;
@@ -425,6 +426,8 @@ namespace CW
 				no = diffuseNo++;
 			else if (name == "Specular")
 				no = specularNo++;
+			else if (name == "Normal")
+				no = normalNo++;
 
 			std::string fullName = name + std::to_string(no);
 

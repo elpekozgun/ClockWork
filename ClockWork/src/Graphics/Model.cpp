@@ -22,7 +22,7 @@ namespace CW
 		// aiProcess_OptimizeMeshes -> Smaller meshes into bigger ones to reduce draw calls.
 
 		Assimp::Importer importer;				  // convert faces to triangles   // flip UVS for opengl
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
@@ -75,7 +75,15 @@ namespace CW
 			data.z = mesh->mNormals[i].z;
 			vertex.Normal = data;
 
-			vertex.Color = glm::vec3(0);
+			data.x = mesh->mTangents[i].x;
+			data.y = mesh->mTangents[i].y;
+			data.z = mesh->mTangents[i].z;
+			vertex.Tangent = data;
+
+			data.x = mesh->mBitangents[i].x;
+			data.y = mesh->mBitangents[i].y;
+			data.z = mesh->mBitangents[i].z;
+			vertex.Bitangent = data;
 
 			if (mesh->mTextureCoords[0])
 			{
@@ -159,7 +167,15 @@ namespace CW
 			data.z = mesh->mNormals[i].z;
 			vertex.Normal = data;
 
-			vertex.Color = glm::vec3(0);
+			data.x = mesh->mTangents[i].x;
+			data.y = mesh->mTangents[i].y;
+			data.z = mesh->mTangents[i].z;
+			vertex.Tangent = data;
+
+			data.x = mesh->mBitangents[i].x;
+			data.y = mesh->mBitangents[i].y;
+			data.z = mesh->mBitangents[i].z;
+			vertex.Bitangent = data;
 
 			if (mesh->mTextureCoords[0])
 			{
@@ -196,6 +212,9 @@ namespace CW
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
 			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Specular", slot);
+			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+			std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Normal", slot);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 

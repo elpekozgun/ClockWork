@@ -153,8 +153,9 @@ namespace CW
 
 			Vao.LinkAttribArray<float>(vbo, 0, 3, GL_FLOAT, stride, 0);
 			Vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
-			Vao.LinkAttribArray<float>(vbo, 2, 3, GL_FLOAT, stride, 6);
-			Vao.LinkAttribArray<float>(vbo, 3, 2, GL_FLOAT, stride, 9);
+			Vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
+			Vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
+			Vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
 
 			Vao.Unbind();
 			vbo.Unbind();
@@ -190,23 +191,23 @@ namespace CW
 			unsigned int stride = sizeof(glm::mat4) / sizeof(float);
 
 			instanceVBO.Bind();
-			glEnableVertexAttribArray(4);
-			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-
 			glEnableVertexAttribArray(5);
-			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(1 * sizeof(glm::vec4)));
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
 
 			glEnableVertexAttribArray(6);
-			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(1 * sizeof(glm::vec4)));
 
 			glEnableVertexAttribArray(7);
-			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+
+			glEnableVertexAttribArray(8);
+			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
 
 
-			glVertexAttribDivisor(4, 1);
 			glVertexAttribDivisor(5, 1);
 			glVertexAttribDivisor(6, 1);
 			glVertexAttribDivisor(7, 1);
+			glVertexAttribDivisor(8, 1);
 
 			Vao.Unbind();
 			instanceVBO.Unbind();

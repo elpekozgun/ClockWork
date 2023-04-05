@@ -11,6 +11,8 @@ void CW::PhysicsSystem::Update(float dt)
 		auto& physics = _ecs->GetComponent<PhysicsComponent>(entity);
 		auto& transform = _ecs->GetComponent<TransformComponent>(entity);
 
+		//physics.Acceleration -= glm::vec3(0,0.00981f,0);
+		 
 		physics.Velocity += physics.Acceleration * dt;
 		transform.Position += physics.Velocity * dt;
 
