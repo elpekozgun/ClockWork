@@ -200,6 +200,11 @@ void Game()
     defaultShader.SetFloat("pointLights[0].Kquad", 0.032f);
     defaultShader.SetBool("IsBlinnPhong", true);
 
+    defaultShader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
+    defaultShader.setVec3("directLight.ambient", 0.05f, 0.05f, 0.05f);
+    defaultShader.setVec3("directLight.diffuse", 0.5f, 0.5f, 0.5f);
+    defaultShader.setVec3("directLight.specular", 1.0f, 1.0f, 1.0f);
+
 
     auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
     auto skyboxFrag = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
@@ -220,7 +225,7 @@ void Game()
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
     
 
-    Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
+    //Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
 
 
     std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
@@ -232,14 +237,14 @@ void Game()
         mariaAssets.push_back(asset);
     }
 
-    std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
-    std::vector<unsigned int> sponzaAssets;
-    for (auto& mesh : sponzaMeshComponents)
-    {
-        mesh.Shader = defaultShader;
-        auto asset = ecs.AddAsset(mesh);
-        sponzaAssets.push_back(asset);
-    }
+    //std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
+    //std::vector<unsigned int> sponzaAssets;
+    //for (auto& mesh : sponzaMeshComponents)
+    //{
+    //    mesh.Shader = defaultShader;
+    //    auto asset = ecs.AddAsset(mesh);
+    //    sponzaAssets.push_back(asset);
+    //}
 
 
     //auto grounds = std::vector<MeshComponent>{MakeGround()};
@@ -252,7 +257,7 @@ void Game()
     RenderableComponent renderableMaria{ mariaAssets , true};
     //RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
-    RenderableComponent renderableSponza { sponzaAssets, false };
+    //RenderableComponent renderableSponza { sponzaAssets, false };
 
     auto light1 = scene.CreateEntity("light");
     //auto ground1 = scene.CreateEntity("ground");
@@ -266,7 +271,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 500; i++)
+    for (unsigned int i = 0; i < 6500; i++)
     {
         auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
 
@@ -283,7 +288,7 @@ void Game()
     }
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
     //scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);
-    scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
+    //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
 
     //auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());

@@ -1,10 +1,15 @@
 #pragma once
 
-#include "Graphics/Mesh.h"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/quaternion.hpp"
 #include "gtx/quaternion.hpp"
 #include "glm.hpp"
+#include "Graphics/AABB.h"
+#include "Graphics/Shader.h"
+#include "Graphics/VAO.h"
+#include "Graphics/EBO.h"
+#include "Graphics/Texture.h"
+
 
 #include <typeinfo>
 
@@ -135,6 +140,7 @@ namespace CW
 		VAO Vao;
 		unsigned int instanceVbo;
 		Shader Shader;
+		AABB AABB;
 
 		void Setup()
 		{
@@ -153,6 +159,25 @@ namespace CW
 			Vao.Unbind();
 			vbo.Unbind();
 			ebo.Unbind();
+
+			float minX = std::numeric_limits<float>::max();
+			float minY = minX;
+			float minZ = minX;
+			
+			float maxX = std::numeric_limits<float>::min();
+			float maxY = maxX;
+			float maxZ = maxX;
+
+			for (const Vertex& vertex : Vertices)
+			{
+				maxX = std::max(maxX, vertex.Position.x);
+				minX = std::min(minX, vertex.Position.x);
+				maxY = std::max(maxY, vertex.Position.y);
+				minY = std::min(minY, vertex.Position.y);
+				maxZ = std::max(maxZ, vertex.Position.z);
+				minZ = std::min(minZ, vertex.Position.z);
+			}
+			AABB = { maxX,minX,maxY,minY,maxZ,minZ };
 		}
 
 		void MakeInstanced(std::vector<glm::mat4>& transforms)

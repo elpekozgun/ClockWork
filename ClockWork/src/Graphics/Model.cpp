@@ -222,6 +222,25 @@ namespace CW
 		vbo.Unbind();
 		ebo.Unbind();
 
+		float minX = std::numeric_limits<float>::max();
+		float minY = minX;
+		float minZ = minX;
+
+		float maxX = std::numeric_limits<float>::min();
+		float maxY = maxX;
+		float maxZ = maxX;
+
+		for (const Vertex& vertex : vertices)
+		{
+			maxX = std::max(maxX, vertex.Position.x);
+			minX = std::min(minX, vertex.Position.x);
+			maxY = std::max(maxY, vertex.Position.y);
+			minY = std::min(minY, vertex.Position.y);
+			maxZ = std::max(maxZ, vertex.Position.z);
+			minZ = std::min(minZ, vertex.Position.z);
+		}
+		meshComponent.AABB = { maxX,minX,maxY,minY,maxZ,minZ };
+
 		meshComponent.Vao = vao;
 
 		return meshComponent;

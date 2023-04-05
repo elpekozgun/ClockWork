@@ -6,9 +6,9 @@ namespace CW
 	App::App(const std::string& name) :
 		_name(name), _backColor{ 0.15f, 0.15f, 0.15f, 1.0f }, _window(name)
 	{
+		_ecs.Init();
 		_window.Setup(1920, 1080);
 
-		_ecs.Init();
 		_isRunning = false;
 	}
 

@@ -54,12 +54,15 @@ namespace CW
 		glm::mat4 MatrixFromTransform(TransformComponent& component);
 		glm::mat4 CameraMat(CameraComponent& camera);
 		void SwitchState();
-		
 
+		bool IsInFrustum(glm::vec3& camPosition, glm::mat4& mvp, AABB& boundingbox, unsigned int& depth);
+		
+		unsigned int maxOctreeDepth = 32;
 		// for testing and profiling.	
 		unsigned int MaxTri = 4000000;
+		bool directionalLight = true;
 		bool pagedInstanced = false;
-		bool drawSkybox = false;
+		bool drawSkybox = true;
 		bool instanced = false;
 		bool frustum = false;
 		unsigned int drawCall = 0;

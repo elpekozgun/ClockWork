@@ -2,7 +2,7 @@
 
 #include "ECS/ISystem.h"
 #include "ECS/ECS.h"
-#include "Core/InputState.h"
+#include "Core/Input.h"
 #include "gtc/matrix_transform.hpp"
 #include "gtx/rotate_vector.hpp"
 #include "gtx/vector_angle.hpp"

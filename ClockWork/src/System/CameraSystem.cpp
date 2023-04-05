@@ -6,39 +6,38 @@ namespace CW
 	void CameraSystem::Update(float dt)
 	{
 		// convert to singleton input.
-		auto& input = InputState::Instance();
+		auto& input = Input::Instance();
 
 		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
 
 		auto right = glm::normalize(glm::cross(camera->Forward, camera->Up));
 
-		if (input.IsKeyDown(CW::KEY_UP))
+		if (input.GetKeyDown(CW::KEY_UP))
 		{
-			camera->Position += camera->speed * camera->Forward * dt ;
+			camera->Position += camera->speed * camera->Forward * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_LEFT))
+		if (input.GetKeyDown(CW::KEY_LEFT))
 		{
 			camera->Position -= camera->speed * right * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_DOWN))
+		if (input.GetKeyDown(CW::KEY_DOWN))
 		{
 			camera->Position -= camera->speed * camera->Forward * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_RIGHT))
+		if (input.GetKeyDown(CW::KEY_RIGHT))
 		{
 			camera->Position += camera->speed * right * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_SPACE))
+		if (input.GetKeyDown(CW::KEY_SPACE))
 		{
 			camera->Position += camera->speed * camera->Up * dt;
 		}
-		if (input.IsKeyDown(CW::KEY_LEFT_SHIFT))
+		if (input.GetKeyDown(CW::KEY_LEFT_SHIFT))
 		{
 			camera->Position -= camera->speed * camera->Up * dt;
 		}
-		if (input.IsMouseDown(CW::BUTTON_RIGHT))
+		if (input.GetMouseDown(CW::BUTTON_RIGHT))
 		{
-
 			float xOffset = input.MouseDX * camera->sensitivity;
 			float yOffset = input.MouseDY * camera->sensitivity;
 

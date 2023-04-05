@@ -2,7 +2,7 @@
 #pragma once
 #include "ECS/ISystem.h"
 #include "ECS/ECS.h"
-#include "Core/InputState.h"
+#include "Core/Input.h"
 
 namespace CW
 {

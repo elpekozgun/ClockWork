@@ -7,7 +7,7 @@
 #include "glad/glad.h"
 #include "../3rd/glfw/include/GLFW/glfw3.h"
 #include "Core/KeyCode.h"
-#include "InputState.h"
+#include "Input.h"
 #include "Defines.h"
 
 namespace CW

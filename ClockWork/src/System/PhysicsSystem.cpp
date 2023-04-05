@@ -2,7 +2,7 @@
 
 void CW::PhysicsSystem::Update(float dt)
 {
-	auto& input = InputState::Instance();
+	auto& input = Input::Instance();
 
 	std::vector<EntityId> toBeDestroyed;
 

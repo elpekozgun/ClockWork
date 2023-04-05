@@ -1,5 +1,5 @@
 #include "RenderSystem.h"
-#include <Core/InputState.h>
+#include <Core/Input.h>
 
 
 namespace CW
@@ -26,6 +26,8 @@ namespace CW
 			auto& renderable = _ecs->GetComponent<RenderableComponent>(entity);
 			auto& transform = _ecs->GetComponent<TransformComponent>(entity);
 
+			auto transformMatrix = MatrixFromTransform(transform);
+
 			for (auto& meshId : renderable.MeshIds)
 			{
 				if (instanced && renderable.Instanced)
@@ -34,18 +36,18 @@ namespace CW
 
 					if (frustum)
 					{
-						glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+						glm::vec4 clipPos = camera->CameraMatrix() * transformMatrix * glm::vec4(mesh.Vertices[0].Position, 1);
 
 						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
 							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
 							std::abs(clipPos.z) <= clipPos.w)
 						{
-							instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+							instanceTranslations[meshId].push_back(transformMatrix);
 						}
 					}
 					else
 					{
-						instanceTranslations[meshId].push_back(MatrixFromTransform(transform));
+						instanceTranslations[meshId].push_back(transformMatrix);
 					}
 
 					if (pagedInstanced)
@@ -65,11 +67,10 @@ namespace CW
 
 					if (frustum)
 					{
-						glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
-
-						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
-							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
-							std::abs(clipPos.z) <= clipPos.w)
+						unsigned int depth = 0;
+						glm::mat4 mat = camera->CameraMatrix() * transform.GetMatrix();
+						//glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
+						if (IsInFrustum(camera->Position, mat, mesh.AABB, depth))
 						{
 							Render(mesh, transform, *camera);
 						}
@@ -84,7 +85,17 @@ namespace CW
 
 		if (instanced)
 		{
-			RenderInstanced(instanceTranslations, *camera);
+			if (pagedInstanced)
+			{
+				for (auto& translations : totalTranslations) 
+				{
+					RenderInstanced(translations, *camera);
+				}
+			}
+			else
+			{
+				RenderInstanced(instanceTranslations, *camera);
+			}
 		}
 
 		if (drawSkybox)
@@ -388,6 +399,22 @@ namespace CW
 		mesh.Shader.setMat4("CamMat", camMat);
 		mesh.Shader.setVec3("eyePosition", camera.Position);
 
+		if (directionalLight)
+		{
+			mesh.Shader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
+			mesh.Shader.setVec3("directLight.ambient", 0.05f, 0.05f, 0.05f);
+			mesh.Shader.setVec3("directLight.diffuse", 0.5f, 0.5f, 0.5f);
+			mesh.Shader.setVec3("directLight.specular", 1.0f, 1.0f, 1.0f);
+		}
+		else
+		{
+			mesh.Shader.setVec3("directLight.direction", 0.0f, 0.0f, 0.0f);
+			mesh.Shader.setVec3("directLight.ambient", 0.00f, 0.00f, 0.0f);
+			mesh.Shader.setVec3("directLight.diffuse", 0.0f, 0.0f, 0.0f);
+			mesh.Shader.setVec3("directLight.specular", 0.0f, 0.0f, 0.0f);
+		}
+		
+
 		unsigned int diffuseNo = 0;
 		unsigned int specularNo = 0;
 		for (unsigned int i = 0; i < mesh.Textures.size(); i++)
@@ -510,8 +537,8 @@ namespace CW
 
 	void RenderSystem::SwitchState()
 	{
-		auto& input = InputState::Instance();
-		if (input.IsKeyDown(CW::KEY_1))
+		auto& input = Input::Instance();
+		if (input.GetKeyPressed(CW::KEY_1))
 		{
 			frustum = !frustum;
 			std::cout << "frustum ";
@@ -520,7 +547,7 @@ namespace CW
 			else
 				std::cout << " off\n";
 		}
-		if (input.IsKeyDown(CW::KEY_2))
+		if (input.GetKeyPressed(CW::KEY_2))
 		{
 			instanced = !instanced;
 			std::cout << "instanced ";
@@ -529,7 +556,7 @@ namespace CW
 			else
 				std::cout << " off\n";
 		}
-		if (input.IsKeyDown(CW::KEY_3))
+		if (input.GetKeyPressed(CW::KEY_3))
 		{
 			pagedInstanced = !pagedInstanced;
 			std::cout << "pagedInstanced ";
@@ -538,7 +565,7 @@ namespace CW
 			else
 				std::cout << " off\n";
 		}
-		if (input.IsKeyDown(CW::KEY_4))
+		if (input.GetKeyPressed(CW::KEY_4))
 		{
 			drawSkybox = !drawSkybox;
 			std::cout << "drawSkybox ";
@@ -547,5 +574,96 @@ namespace CW
 			else
 				std::cout << " off\n";
 		}
+		if (input.GetKeyPressed(CW::KEY_5))
+		{
+			directionalLight = !directionalLight;
+			std::cout << "directionalLight ";
+			if (directionalLight)
+				std::cout << " on\n";
+			else
+				std::cout << " off\n";
+		}
+	}
+
+
+	// lets make this recursively traverse as an octree.
+	bool RenderSystem::IsInFrustum(glm::vec3& camPosition, glm::mat4& mvp, AABB& aabb, unsigned int& depth) 
+	{
+		//glm::vec3 min = glm::vec3(aabb.minX, aabb.minY, aabb.minZ);
+		//glm::vec3 max = glm::vec3(aabb.maxX, aabb.maxY, aabb.maxZ);
+
+		//min = glm::vec3(mvp * glm::vec4(min, 1));
+		//max = glm::vec3(mvp * glm::vec4(max,1));
+
+		//if (camPosition.x < max.x && camPosition.x > min.x && camPosition.y < max.y && camPosition.y > min.y && camPosition.z < max.z && camPosition.z > min.z)
+		//{
+		//	return true;
+		//}
+
+		//if (depth == maxOctreeDepth)
+		//{
+		//	return false;
+		//}
+		//depth++;
+
+		std::array<glm::vec3, 8> aabbVertices = {
+		glm::vec3(aabb.minX, aabb.minY, aabb.minZ),
+		glm::vec3(aabb.maxX, aabb.minY, aabb.minZ),
+		glm::vec3(aabb.minX, aabb.maxY, aabb.minZ),
+		glm::vec3(aabb.maxX, aabb.maxY, aabb.minZ),
+		glm::vec3(aabb.minX, aabb.minY, aabb.maxZ),
+		glm::vec3(aabb.maxX, aabb.minY, aabb.maxZ),
+		glm::vec3(aabb.minX, aabb.maxY, aabb.maxZ),
+		glm::vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
+		};
+
+		for (unsigned int i = 0; i < 8; i++)
+		{
+			glm::vec4 clipPos = mvp * glm::vec4(aabbVertices[i], 1);
+			if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+				std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+				std::abs(clipPos.z) <= clipPos.w)
+			{
+				return true;
+			}
+		}
+
+		/*float midx = (aabb.maxX + aabb.minX) * 0.5f;
+		float midy = (aabb.maxY + aabb.minY) * 0.5f;
+		float midz = (aabb.maxZ + aabb.minZ) * 0.5f;
+
+		AABB leftTopFront{ midx, aabb.minX, aabb.maxY, midy, aabb.maxZ, midz};
+		if (IsInFrustum(camPosition, mvp, leftTopFront, depth))
+			return true;
+
+		AABB leftBottomFront{ midx, aabb.minX, midy, aabb.minY, aabb.maxZ, midz };
+		if (IsInFrustum(camPosition, mvp, leftBottomFront, depth))
+			return true;
+
+		AABB rightTopFront{ aabb.maxX, midx, aabb.maxY, midy , aabb.maxZ, midz };
+		if (IsInFrustum(camPosition, mvp, rightTopFront, depth))
+			return true;
+
+		AABB rightBottomFront { aabb.maxX, midx, midy, aabb.minY, aabb.maxZ, midz};
+		if (IsInFrustum(camPosition, mvp, rightBottomFront, depth))
+			return true;
+
+		AABB leftTopBack{ midx, aabb.minX, aabb.maxY, midy, midz, aabb.minZ };
+		if (IsInFrustum(camPosition, mvp, leftTopBack, depth))
+			return true;
+
+		AABB leftBottomBack{ midx, aabb.minX, midy, aabb.minY, midz, aabb.minZ };
+		if (IsInFrustum(camPosition, mvp, leftBottomBack, depth))
+			return true;
+
+		AABB rightTopBack{ aabb.maxX, midx, aabb.maxY, midy , midz, aabb.minZ };
+		if(IsInFrustum(camPosition, mvp, rightTopBack, depth))
+			return true;
+
+		AABB rightBottomBack{ aabb.maxX, midx, midy, aabb.minY, midz, aabb.minZ };
+		if (IsInFrustum(camPosition, mvp, rightBottomBack, depth))
+			return true; */
+
+		return false;
 	}
 }

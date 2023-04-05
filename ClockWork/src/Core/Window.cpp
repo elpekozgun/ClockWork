@@ -58,7 +58,7 @@ namespace CW
 
 	void Window::HandleCursor()
 	{
-		auto& input = InputState::Instance();
+		auto& input = Input::Instance();
 
 		if (glfwGetMouseButton(_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 		{
@@ -92,7 +92,7 @@ namespace CW
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		auto& input = InputState::Instance();
+		auto& input = Input::Instance();
 
 		if (key == GLFW_KEY_UNKNOWN)
 			return;
@@ -100,6 +100,7 @@ namespace CW
 		if (action == GLFW_PRESS)
 		{
 			input.SetKeyDown(key);
+			input.SetKeyPressed(key);
 		}
 		else if (action == GLFW_RELEASE)
 		{
@@ -109,7 +110,7 @@ namespace CW
 
 	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
-		auto& input = InputState::Instance();
+		auto& input = Input::Instance();
 
 		if (action == GLFW_PRESS)
 		{
@@ -118,6 +119,7 @@ namespace CW
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 			}
 			input.SetMouseDown(button);
+			//input.SetMouseClicked(button);
 		}
 		else if (action == GLFW_RELEASE)
 		{

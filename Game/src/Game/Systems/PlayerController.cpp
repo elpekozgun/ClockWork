@@ -2,7 +2,7 @@
 
 void PlayerController::Update(float dt)
 {
-	auto& input = InputState::Instance();
+	auto& input = Input::Instance();
 	for (auto& entity : _entities)
 	{
 		auto& player = _ecs->GetComponent<CW::Player>(entity);
@@ -11,22 +11,22 @@ void PlayerController::Update(float dt)
 		float horizontal = 0.0f;
 		float vertical = 0.0f;
 
-		if (input.IsKeyDown(CW::KEY_W))
+		if (input.GetKeyDown(CW::KEY_W))
 		{
 			vertical = 1.0f;
 		}
 
-		if (input.IsKeyDown(CW::KEY_S))
+		if (input.GetKeyDown(CW::KEY_S))
 		{
 			vertical = -1.0f;
 		}
 
-		if (input.IsKeyDown(CW::KEY_D))
+		if (input.GetKeyDown(CW::KEY_D))
 		{
 			horizontal = 1.0f;
 		}
 
-		if (input.IsKeyDown(CW::KEY_A))
+		if (input.GetKeyDown(CW::KEY_A))
 		{
 			horizontal = -1.0f;
 		}
