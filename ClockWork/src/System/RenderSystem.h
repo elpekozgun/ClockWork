@@ -67,7 +67,7 @@ namespace CW
 		bool frustum = false;
 		unsigned int drawCall = 0;
 		float cap;
-		
+		float normalScale = 1;
 
 	};
 }

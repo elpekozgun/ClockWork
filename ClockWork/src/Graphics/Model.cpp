@@ -22,7 +22,7 @@ namespace CW
 		// aiProcess_OptimizeMeshes -> Smaller meshes into bigger ones to reduce draw calls.
 
 		Assimp::Importer importer;				  // convert faces to triangles   // flip UVS for opengl
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
@@ -214,8 +214,8 @@ namespace CW
 			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Specular", slot);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-			std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "Normal", slot);
-			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+			std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, "Normal", slot);
+			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 		}
 
 		MeshComponent meshComponent;
@@ -234,8 +234,10 @@ namespace CW
 
 		vao.LinkAttribArray<float>(vbo, 0, 3, GL_FLOAT, stride, 0);
 		vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
-		vao.LinkAttribArray<float>(vbo, 2, 3, GL_FLOAT, stride, 6);
-		vao.LinkAttribArray<float>(vbo, 3, 2, GL_FLOAT, stride, 9);
+		vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
+		vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
+		vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
+		
 
 		vao.Unbind();
 		vbo.Unbind();

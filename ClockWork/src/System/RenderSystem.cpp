@@ -4,6 +4,7 @@
 
 namespace CW
 {
+
 	void CW::RenderSystem::Update(float dt)
 	{
 		drawCall = 0;
@@ -399,6 +400,8 @@ namespace CW
 		mesh.Shader.setMat4("CamMat", camMat);
 		mesh.Shader.setVec3("eyePosition", camera.Position);
 
+		mesh.Shader.SetFloat("normalScale", std::clamp(normalScale, -2.0f, 2.0f));
+
 		if (directionalLight)
 		{
 			mesh.Shader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
@@ -413,7 +416,6 @@ namespace CW
 			mesh.Shader.setVec3("directLight.diffuse", 0.0f, 0.0f, 0.0f);
 			mesh.Shader.setVec3("directLight.specular", 0.0f, 0.0f, 0.0f);
 		}
-		
 
 		unsigned int diffuseNo = 0;
 		unsigned int specularNo = 0;
@@ -586,8 +588,17 @@ namespace CW
 			else
 				std::cout << " off\n";
 		}
+		if (input.GetKeyPressed(CW::KEY_6))
+		{
+			normalScale += 0.05f;
+			std::cout << "normal scale " << normalScale << "\n";
+		}
+		if (input.GetKeyPressed(CW::KEY_7))
+		{
+			normalScale -= 0.05f;
+			std::cout << "normal scale " << normalScale << "\n";
+		}
 	}
-
 
 	// lets make this recursively traverse as an octree.
 	bool RenderSystem::IsInFrustum(glm::vec3& camPosition, glm::mat4& mvp, AABB& aabb, unsigned int& depth) 

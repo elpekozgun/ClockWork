@@ -1,5 +1,4 @@
 #include "App.h"
-#include "Graphics/TemporaryRenderStuff.h"
 
 namespace CW
 {

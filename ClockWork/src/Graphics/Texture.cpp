@@ -9,27 +9,18 @@ namespace CW
 			//stbi_set_flip_vertically_on_load(true);
 			unsigned char* bytes = stbi_load(path, &Width, &Height, &ChannelCount, 0);
 
-			GLenum internalFormat = GL_RGBA;
 			GLenum format = GL_RGBA;
 
-			if (TextureType == "Normal")
+			if (ChannelCount == 1) 
 			{
-				internalFormat = GL_RGB;
-				format = GL_RGBA;
-			}
-			else if (ChannelCount == 1) 
-			{
-				internalFormat = GL_SRGB;
 				format = GL_RED;
 			}
 			else if (ChannelCount == 3)
 			{
-				internalFormat = GL_SRGB;
 				format = GL_RGB;
 			}
 			else if (ChannelCount == 4)
 			{
-				internalFormat = GL_SRGB_ALPHA;
 				format = GL_RGBA;
 			}
 

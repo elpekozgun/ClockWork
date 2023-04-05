@@ -53,12 +53,13 @@ vec3 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 vec3 CalculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 // -------------------------------------
 
-in FS_IN
+in VS_OUT
 {
-	mat3 TBN;
-	vec3 FragmentPosition;
 	vec2 TexCoord;
+	vec3 FragmentPosition;
+	mat3 TBN;
 } fs_in;
+
 
 #define POINT_LIGHTS 1
 
@@ -66,22 +67,28 @@ uniform sampler2D Diffuse0;
 uniform sampler2D Specular0;
 uniform sampler2D Normal0;
 
+uniform float Shineness;
 
 //uniform Material material; implement later
 uniform DirectLight directLight;
 uniform PointLight pointLights[POINT_LIGHTS];
 uniform SpotLight spotlight;
 
-uniform float Shineness;
-
 uniform vec3 eyePosition;
 bool IsBlinnPhong;
 
 out vec4 FragColor;
 
+uniform float normalScale;
+
 void main()
 {
-	vec3 norm = normalize(fs_in.TBN * texture(Normal0,fs_in.TexCoord).xyz * 2 - 1);
+	vec3 norm = texture(Normal0,fs_in.TexCoord).xyz;
+	norm = norm * 2.0 - 1.0;
+	norm = normalize(fs_in.TBN * norm);
+	norm *= normalScale;
+
+	//vec3 norm = normalize(fs_in.FragmentNormal);
 	vec3 viewdir = normalize(eyePosition - fs_in.FragmentPosition);
 
 	vec3 result = vec3(0.0f);
@@ -121,8 +128,7 @@ vec3 CalculateDirectLight(DirectLight light, vec3 normal, vec3 viewDir)
 	vec3 ambient = light.ambient * vec3(texture(/*material.*/Diffuse0,fs_in.TexCoord));
 	vec3 diffuse = light.diffuse * diff * vec3(texture(/*material.*/Diffuse0, fs_in.TexCoord));
 	vec3 specular = light.specular * spec;// * vec3(max(texture(material.specular,TexCoord),1.0f));
-
-
+	
 	return (max(ambient + diffuse + specular,vec3(0.0f)));
 }
 

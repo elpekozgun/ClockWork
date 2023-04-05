@@ -36,10 +36,10 @@ MeshComponent MakeGround()
 
     std::vector<Vertex> vertices =
     {
-        Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 0.0f, 0.0f),glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(0.0f, 0.0f, 0.0f),glm::vec2(0.0f, 1.0f)},
-        Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),glm::vec2(1.0f, 1.0f)},
-        Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),glm::vec2(1.0f, 0.0f)}
+        Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec2(0.0f, 1.0f)},
+        Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+        Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)}
     };
     // Indices for vertices order
     std::vector<GLuint> indices =
@@ -168,7 +168,10 @@ void Game()
 
     Scene scene(ecs);
 
-    Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
+    Model mariaModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
+    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
+    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
@@ -247,20 +250,15 @@ void Game()
     //}
 
 
-    //auto grounds = std::vector<MeshComponent>{MakeGround()};
-    //unsigned int groundId = ecs.AddAsset(grounds[0]);
-
     auto lights = std::vector<MeshComponent>{ makeLight() };
     auto lightId = ecs.AddAsset(lights[0]);
 
 
-    RenderableComponent renderableMaria{ mariaAssets , true};
-    //RenderableComponent renderableGround{ std::vector<unsigned int>{groundId} , false };
+    RenderableComponent renderableMaria{ mariaAssets , false};
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
     //RenderableComponent renderableSponza { sponzaAssets, false };
 
     auto light1 = scene.CreateEntity("light");
-    //auto ground1 = scene.CreateEntity("ground");
     auto sponza = scene.CreateEntity("sponza");
 
     std::default_random_engine generator;
@@ -271,9 +269,9 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 500; i++)
+    for (unsigned int i = 0; i < 1000 ; i++)
     {
-        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(0, randRotation(generator), 0), glm::vec3(0.01f) };
+        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(90, 0 /*randRotation(generator)*/, 90), glm::vec3(0.01f) };
 
         transforms.push_back(transform.GetMatrix());
         auto maria = scene.CreateEntity("maria1");
@@ -282,12 +280,11 @@ void Game()
             maria, 
             transform, 
             Player{5.0f, 5.0f},
-            renderableMaria,
-            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+            renderableMaria
+            //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
         );
     }
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
-    //scene.AddComponents(ground1, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(1)), renderableGround);
     //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
 
