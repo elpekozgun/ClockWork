@@ -216,6 +216,12 @@ namespace CW
 
 			std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, "Normal", slot);
 			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+			std::vector<Texture> metalMaps = LoadMaterialTextures(material, aiTextureType_METALNESS, "Metallic", slot);
+			textures.insert(textures.end(), metalMaps.begin(), metalMaps.end());
+
+			std::vector<Texture> roughnessMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "Roughness", slot);
+			textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 		}
 
 		MeshComponent meshComponent;

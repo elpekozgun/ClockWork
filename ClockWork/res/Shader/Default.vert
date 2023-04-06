@@ -14,6 +14,7 @@ out VS_OUT
 {
 	vec2 TexCoord;
 	vec3 FragmentPosition;
+	vec3 FragmentNormal;
 	mat3 TBN;
 } vs_out;
 
@@ -25,9 +26,11 @@ void main()
 	// http://www.lighthouse3d.com/tutorials/glsl-tutorial/the-normal-matrix/
 	vs_out.TexCoord = inTex;
 
+	vs_out.FragmentNormal = transpose(inverse(mat3(Model))) * inNormal;
 	mat3 normalMatrix = transpose(inverse(mat3(Model)));
     vec3 T = normalize(normalMatrix * inTangent);
     vec3 N = normalize(normalMatrix * inNormal);
+    //vec3 B = normalize(normalMatrix * inBitangent);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
 

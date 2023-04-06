@@ -167,15 +167,20 @@ void Game()
 
 
     Scene scene(ecs);
-
+    
+    //Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/doom_eternal_slayer/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/skull_downloadable/scene.gltf)");
     Model mariaModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/maria/scene.gltf)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
-    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
+    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
     auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
+    //auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultPBR.frag)", ShaderType::Fragment);
     auto defaultShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
     
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -183,30 +188,32 @@ void Game()
 
     defaultShader.Use();
 
-    defaultShader.setVec4("LightColor", lightColor);
-    defaultShader.SetFloat("Shineness", 32.0f);
-    defaultShader.setVec3("spotlight.ambient", 0.2f, 0.2f, 0.2f);
-    defaultShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f);
-    defaultShader.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
-    defaultShader.SetFloat("spotlight.cutOff", cos(glm::radians(20.5f)));
-    defaultShader.SetFloat("spotlight.outerCutOff", cos(glm::radians(26.0f)));
-    defaultShader.SetFloat("spotlight.Kconstant", 1.0f);
-    defaultShader.SetFloat("spotlight.Klinear", 0.027f);
-    defaultShader.SetFloat("spotlight.Kquad", 0.0028f);
-    
-    defaultShader.setVec3("pointLights[0].position", lightPos);
-    defaultShader.setVec3("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
-    defaultShader.setVec3("pointLights[0].ambient", 0.15f, 0.15f, 0.15f);
-    defaultShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    defaultShader.SetFloat("pointLights[0].Kconstant", 1.0f);
-    defaultShader.SetFloat("pointLights[0].Klinear", 0.09f);
-    defaultShader.SetFloat("pointLights[0].Kquad", 0.032f);
-    defaultShader.SetBool("IsBlinnPhong", true);
+    //defaultShader.setVec4("LightColor", lightColor);
+    //defaultShader.SetFloat("Shineness", 1.0f);
+    //defaultShader.setVec3("spotlight.ambient", 0.0f, 0.0f, 0.0f);
+    //defaultShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f);
+    //defaultShader.setVec3("spotlight.specular", 0.8f, 0.8f, 0.8f);
+    //defaultShader.SetFloat("spotlight.cutOff", cos(glm::radians(20.5f)));
+    //defaultShader.SetFloat("spotlight.outerCutOff", cos(glm::radians(26.0f)));
+    //defaultShader.SetFloat("spotlight.Kconstant", 1.0f);
+    //defaultShader.SetFloat("spotlight.Klinear", 0.027f);
+    //defaultShader.SetFloat("spotlight.Kquad", 0.0028f);
+    //
+    //defaultShader.setVec3("pointLights[0].position", lightPos);
+    //defaultShader.setVec3("pointLights[0].ambient", 0.1f, 0.1f, 0.1f);
+    //defaultShader.setVec3("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
+    //defaultShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    //defaultShader.SetFloat("pointLights[0].Kconstant", 1.0f);
+    //defaultShader.SetFloat("pointLights[0].Klinear", 0.09f);
+    //defaultShader.SetFloat("pointLights[0].Kquad", 0.032f);
+    //defaultShader.SetBool("IsBlinnPhong", false);
 
-    defaultShader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
-    defaultShader.setVec3("directLight.ambient", 0.05f, 0.05f, 0.05f);
-    defaultShader.setVec3("directLight.diffuse", 0.5f, 0.5f, 0.5f);
-    defaultShader.setVec3("directLight.specular", 1.0f, 1.0f, 1.0f);
+    defaultShader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
+    //defaultShader.setVec3("directLight.ambient", 0.05f, 0.05f, 0.05f);
+    //defaultShader.setVec3("directLight.diffuse", 0.4f, 0.4f, 0.4f);
+    //defaultShader.setVec3("directLight.specular", 0.5f, 0.5f, 0.5f);
+    defaultShader.setVec3("directLight.Color", vec3(0.8f));
+    defaultShader.SetFloat("directLight.Intensity", 1.0f);
 
 
     auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
@@ -269,9 +276,14 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 1000 ; i++)
+    for (unsigned int i = 0; i < 50 ; i++)
     {
-        auto transform = TransformComponent{ glm::vec3(randPosition(generator), 0, randPosition(generator)),glm::vec3(90, 0 /*randRotation(generator)*/, 90), glm::vec3(0.01f) };
+        auto transform = TransformComponent
+        { 
+            glm::vec3(randPosition(generator), 0, randPosition(generator)),\
+            glm::vec3(0, randRotation(generator), 0), 
+            glm::vec3(0.01f) 
+        };
 
         transforms.push_back(transform.GetMatrix());
         auto maria = scene.CreateEntity("maria1");

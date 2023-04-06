@@ -57,6 +57,7 @@ in VS_OUT
 {
 	vec2 TexCoord;
 	vec3 FragmentPosition;
+	vec3 FragmentNormal;
 	mat3 TBN;
 } fs_in;
 
@@ -75,7 +76,8 @@ uniform PointLight pointLights[POINT_LIGHTS];
 uniform SpotLight spotlight;
 
 uniform vec3 eyePosition;
-bool IsBlinnPhong;
+uniform bool IsBlinnPhong;
+uniform bool hasNormalMap;
 
 out vec4 FragColor;
 
@@ -83,27 +85,35 @@ uniform float normalScale;
 
 void main()
 {
-	vec3 norm = texture(Normal0,fs_in.TexCoord).xyz;
-	norm = norm * 2.0 - 1.0;
-	norm = normalize(fs_in.TBN * norm);
-	norm *= normalScale;
+	vec3 normal = vec3(0.0f);
+	if(hasNormalMap)
+	{
+		normal = texture(Normal0,fs_in.TexCoord).xyz;
+		normal = normal * 2.0 - 1.0;
+		normal = normalize(fs_in.TBN * normal);
+		normal *= normalScale;
+	}
+	else
+	{
+		normal = normalize(fs_in.FragmentNormal);
+	}
 
-	//vec3 norm = normalize(fs_in.FragmentNormal);
+	
 	vec3 viewdir = normalize(eyePosition - fs_in.FragmentPosition);
 
 	vec3 result = vec3(0.0f);
 
-	result += CalculateDirectLight(directLight, norm, viewdir);
+	result += CalculateDirectLight(directLight, normal, viewdir);
 	
 	for	(int i = 0; i < POINT_LIGHTS; i++)
 	{
-		result += CalculatePointLight(pointLights[i], norm, fs_in.FragmentPosition, viewdir);
+		result += CalculatePointLight(pointLights[i], normal, fs_in.FragmentPosition, viewdir);
 	}
 	
-	result += CalculateSpotLight(spotlight, norm, fs_in.FragmentPosition, viewdir);
+	result += CalculateSpotLight(spotlight, normal, fs_in.FragmentPosition, viewdir);
 
 	FragColor = vec4(result,1);
-	//FragColor = texture(Diffuse0,TexCoord);
+	//FragColor = vec4(normal,1);
 	//FragColor = vec4(vec3(gl_FragCoord.z),1);
 }
 
@@ -114,12 +124,12 @@ vec3 CalculateDirectLight(DirectLight light, vec3 normal, vec3 viewDir)
 	float diff = max(dot(normal,lightDir),0.0f);
 
 	float spec = 0.0f;
-	if(IsBlinnPhong)
-	{
-		vec3 halfwayDir = normalize(viewDir + lightDir);
-		spec = pow( max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 4);
-	}
-	else
+//	if(IsBlinnPhong)
+//	{
+//		vec3 halfwayDir = normalize(viewDir + lightDir);
+//		spec = pow( max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 2);
+//	}
+//	else
 	{
 		vec3 reflectDir = reflect(-lightDir,normal);
 		spec = pow( max(dot(viewDir, reflectDir),0.0f),/*material.*/Shineness);
@@ -134,12 +144,21 @@ vec3 CalculateDirectLight(DirectLight light, vec3 normal, vec3 viewDir)
 
 vec3 CalculatePointLight(PointLight light, vec3 normal,vec3 fragPos, vec3 viewDir)
 {
-	vec3 lightdir = normalize(light.position - fragPos);
+	vec3 lightDir = normalize(light.position - fragPos);
 
-	float diff = max(dot(normal, lightdir), 0.0f);
+	float diff = max(dot(normal, lightDir), 0.0f);
 
-	vec3 reflectDir = reflect(-lightdir,normal);
-	float spec = pow( max( dot(viewDir,reflectDir),0.0f),/*material.*/Shineness);
+	float spec = 0.0f;
+	if(IsBlinnPhong)
+	{
+		vec3 halfwayDir = normalize(viewDir + lightDir);
+		spec = pow(max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 2);
+	}
+	else
+	{
+		vec3 reflectDir = reflect(-lightDir,normal);
+		spec = pow( max( dot(viewDir,reflectDir),0.0f),/*material.*/Shineness);
+	}
 
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0f / (light.Kconstant + light.Klinear * distance + light.Kquad * distance * distance );
@@ -161,7 +180,7 @@ vec3 CalculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir
 	if(IsBlinnPhong)
 	{
 		vec3 halfwayDir = normalize(viewDir + lightDir);
-		spec = pow( max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 4);
+		spec = pow( max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 2);
 	}
 	else
 	{

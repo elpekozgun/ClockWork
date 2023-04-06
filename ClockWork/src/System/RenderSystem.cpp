@@ -69,9 +69,9 @@ namespace CW
 					if (frustum)
 					{
 						unsigned int depth = 0;
-						glm::mat4 mat = camera->CameraMatrix() * transform.GetMatrix();
+						//glm::mat4 mat = camera->CameraMatrix() * transform.GetMatrix();
 						//glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
-						if (IsInFrustum(camera->Position, mat, mesh.AABB, depth))
+						if (IsInFrustum(camera->Position, transformMatrix, mesh.AABB, depth))
 						{
 							Render(mesh, transform, *camera);
 						}
@@ -394,32 +394,42 @@ namespace CW
 
 		mesh.Shader.SetBool("instanced", false);
 
-		mesh.Shader.setVec3("spotlight.position", camera.Position);
-		mesh.Shader.setVec3("spotlight.direction", camera.Forward);
+		//mesh.Shader.setVec3("spotlight.position", camera.Position);
+		//mesh.Shader.setVec3("spotlight.direction", camera.Forward);
 		mesh.Shader.setMat4("Model", model);
 		mesh.Shader.setMat4("CamMat", camMat);
-		mesh.Shader.setVec3("eyePosition", camera.Position);
+		mesh.Shader.setVec3("CamPosition", camera.Position);
 
-		mesh.Shader.SetFloat("normalScale", std::clamp(normalScale, -2.0f, 2.0f));
+		mesh.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
+		mesh.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
+		mesh.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
 
 		if (directionalLight)
 		{
-			mesh.Shader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
-			mesh.Shader.setVec3("directLight.ambient", 0.05f, 0.05f, 0.05f);
-			mesh.Shader.setVec3("directLight.diffuse", 0.5f, 0.5f, 0.5f);
-			mesh.Shader.setVec3("directLight.specular", 1.0f, 1.0f, 1.0f);
+			mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
+			mesh.Shader.setVec3("directLight.Color", vec3(0.7f, 0.7f, 0.7f));
+			mesh.Shader.SetFloat("directLight.Intensity", 3.0f);
+			/*mesh.Shader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
+			mesh.Shader.setVec3("directLight.ambient", 0.2f, 0.2f, 0.2f);
+			mesh.Shader.setVec3("directLight.diffuse", 0.8f, 0.8f, 0.8f);
+			mesh.Shader.setVec3("directLight.specular", 0.5f, 0.5f, 0.5f);*/
 		}
 		else
 		{
-			mesh.Shader.setVec3("directLight.direction", 0.0f, 0.0f, 0.0f);
-			mesh.Shader.setVec3("directLight.ambient", 0.00f, 0.00f, 0.0f);
-			mesh.Shader.setVec3("directLight.diffuse", 0.0f, 0.0f, 0.0f);
-			mesh.Shader.setVec3("directLight.specular", 0.0f, 0.0f, 0.0f);
+			mesh.Shader.setVec3("directLight.Direction", 0,0,0);
+			mesh.Shader.setVec3("directLight.Color", 0,0,0);
+			mesh.Shader.SetFloat("directLight.Intensity", 0);
+			//mesh.Shader.setVec3("directLight.direction", 0.0f, 0.0f, 0.0f);
+			//mesh.Shader.setVec3("directLight.ambient", 0.00f, 0.00f, 0.0f);
+			//mesh.Shader.setVec3("directLight.diffuse", 0.0f, 0.0f, 0.0f);
+			//mesh.Shader.setVec3("directLight.specular", 0.0f, 0.0f, 0.0f);
 		}
 
 		unsigned int diffuseNo = 0;
 		unsigned int specularNo = 0;
 		unsigned int normalNo = 0;
+		unsigned int metallicNo = 0;
+		unsigned int roughnessNo = 0;
 		for (unsigned int i = 0; i < mesh.Textures.size(); i++)
 		{
 			int no = 0;
@@ -430,10 +440,19 @@ namespace CW
 				no = specularNo++;
 			else if (name == "Normal")
 				no = normalNo++;
+			else if (name == "Metallic")
+				no = metallicNo++;
+			else if (name == "Roughness")
+				no = roughnessNo++;
 
 			std::string fullName = name + std::to_string(no);
 
+			mesh.Shader.SetBool("HasNormalMap", normalNo != 0);
+			//mesh.Shader.SetBool("hasNormalMap",false);
+
 			mesh.Shader.SetTexture(fullName, i);
+
+
 
 			mesh.Textures[i].Bind();
 		}
@@ -597,6 +616,27 @@ namespace CW
 		{
 			normalScale -= 0.05f;
 			std::cout << "normal scale " << normalScale << "\n";
+		}
+		if (input.GetKeyPressed(CW::KEY_8))
+		{
+			metalScale += 0.05f;
+			std::cout << "metalness " << metalScale << "\n";
+		}
+		if (input.GetKeyPressed(CW::KEY_9))
+		{
+			metalScale -= 0.05f;
+			std::cout << "metalness " << metalScale << "\n";
+		}
+
+		if (input.GetKeyPressed(CW::KEY_I))
+		{
+			smoothScale += 0.05f;
+			std::cout << "smoothness " << smoothScale << "\n";
+		}
+		if (input.GetKeyPressed(CW::KEY_O))
+		{
+			smoothScale -= 0.05f;
+			std::cout << "smoothness " << smoothScale << "\n";
 		}
 	}
 

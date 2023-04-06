@@ -29,11 +29,11 @@ namespace CW
 		glm::mat4 GetMatrix()
 		{
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, Position);
+			model = glm::scale(model, Scale);
 			glm::quat rotation = glm::quat(glm::vec3(Rotation.x, Rotation.y, Rotation.z));
 			glm::mat quatMatrix = glm::toMat4(rotation);
 			model *= quatMatrix;
-			model = glm::scale(model, Scale);
+			model = glm::translate(model, Position);
 			return model;
 		}
 
