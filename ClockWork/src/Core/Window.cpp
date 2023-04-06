@@ -24,6 +24,7 @@ namespace CW
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+		glfwWindowHint(GLFW_SAMPLES, 3);
 
 		//glfwSetWindowSize(_window,CW::SCREEN_HEIGHT, CW::SCREEN_HEIGHT);
 		glfwMakeContextCurrent(_window);

@@ -136,9 +136,11 @@ void main()
 	// add ambient factor
 	color *= 1.03; 
 
-	// apply gamma correction
-	color = color / (color + vec3(1));
+	// HDR tone mapping.
+//	float exposure = 0.01;
+//	color = vec3(1) - exp(-color * exposure);
 
+	// apply gamma correction
 	color = pow(color, vec3(1 / 2.2));
 	FragColor = vec4(color,1);
 }

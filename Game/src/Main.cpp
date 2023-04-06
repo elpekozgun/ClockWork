@@ -168,19 +168,19 @@ void Game()
 
     Scene scene(ecs);
     
-    //Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
+    Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/doom_eternal_slayer/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/skull_downloadable/scene.gltf)");
-    Model mariaModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/maria/scene.gltf)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
-    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
-    //auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultPBR.frag)", ShaderType::Fragment);
+    //auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
+    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultPBR.frag)", ShaderType::Fragment);
     auto defaultShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
     
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -235,7 +235,7 @@ void Game()
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
     
 
-    //Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
+    Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
 
 
     std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
@@ -247,14 +247,14 @@ void Game()
         mariaAssets.push_back(asset);
     }
 
-    //std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
-    //std::vector<unsigned int> sponzaAssets;
-    //for (auto& mesh : sponzaMeshComponents)
-    //{
-    //    mesh.Shader = defaultShader;
-    //    auto asset = ecs.AddAsset(mesh);
-    //    sponzaAssets.push_back(asset);
-    //}
+    std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
+    std::vector<unsigned int> sponzaAssets;
+    for (auto& mesh : sponzaMeshComponents)
+    {
+        mesh.Shader = defaultShader;
+        auto asset = ecs.AddAsset(mesh);
+        sponzaAssets.push_back(asset);
+    }
 
 
     auto lights = std::vector<MeshComponent>{ makeLight() };
@@ -263,7 +263,7 @@ void Game()
 
     RenderableComponent renderableMaria{ mariaAssets , false};
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
-    //RenderableComponent renderableSponza { sponzaAssets, false };
+    RenderableComponent renderableSponza { sponzaAssets, false };
 
     auto light1 = scene.CreateEntity("light");
     auto sponza = scene.CreateEntity("sponza");
@@ -276,13 +276,13 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 50 ; i++)
+    for (unsigned int i = 0; i < 1 ; i++)
     {
         auto transform = TransformComponent
         { 
             glm::vec3(randPosition(generator), 0, randPosition(generator)),\
             glm::vec3(0, randRotation(generator), 0), 
-            glm::vec3(0.01f) 
+            glm::vec3(0.1f) 
         };
 
         transforms.push_back(transform.GetMatrix());
@@ -297,7 +297,7 @@ void Game()
         );
     }
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
-    //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
+    scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
 
     //auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());

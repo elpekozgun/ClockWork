@@ -11,6 +11,7 @@ namespace CW
 		SwitchState();
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_MULTISAMPLE);
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
@@ -69,9 +70,8 @@ namespace CW
 					if (frustum)
 					{
 						unsigned int depth = 0;
-						//glm::mat4 mat = camera->CameraMatrix() * transform.GetMatrix();
-						//glm::vec4 clipPos = camera->CameraMatrix() * transform.GetMatrix() * glm::vec4(mesh.Vertices[0].Position, 1);
-						if (IsInFrustum(camera->Position, transformMatrix, mesh.AABB, depth))
+						glm::mat4 mat = camera->CameraMatrix() * transformMatrix;
+						if (IsInFrustum(camera->Position, mat, mesh.AABB, depth))
 						{
 							Render(mesh, transform, *camera);
 						}
@@ -538,11 +538,11 @@ namespace CW
 	glm::mat4 RenderSystem::MatrixFromTransform(TransformComponent& transform	)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, transform.Position);
+		model = glm::scale(model, transform.Scale);
 		glm::quat rotation = glm::quat(glm::vec3(transform.Rotation.x, transform.Rotation.y, transform.Rotation.z));
 		glm::mat quatMatrix = glm::toMat4(rotation);
 		model *= quatMatrix;
-		model = glm::scale(model, transform.Scale);
+		model = glm::translate(model, transform.Position);
 		return model;
 	}
 
@@ -660,22 +660,23 @@ namespace CW
 		//}
 		//depth++;
 
-		std::array<glm::vec3, 8> aabbVertices = {
-		glm::vec3(aabb.minX, aabb.minY, aabb.minZ),
-		glm::vec3(aabb.maxX, aabb.minY, aabb.minZ),
-		glm::vec3(aabb.minX, aabb.maxY, aabb.minZ),
-		glm::vec3(aabb.maxX, aabb.maxY, aabb.minZ),
-		glm::vec3(aabb.minX, aabb.minY, aabb.maxZ),
-		glm::vec3(aabb.maxX, aabb.minY, aabb.maxZ),
-		glm::vec3(aabb.minX, aabb.maxY, aabb.maxZ),
-		glm::vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
+		std::array<glm::vec3, 8> aabbVertices = 
+		{
+			glm::vec3(aabb.minX, aabb.minY, aabb.minZ),
+			glm::vec3(aabb.maxX, aabb.minY, aabb.minZ),
+			glm::vec3(aabb.minX, aabb.maxY, aabb.minZ),
+			glm::vec3(aabb.maxX, aabb.maxY, aabb.minZ),
+			glm::vec3(aabb.minX, aabb.minY, aabb.maxZ),
+			glm::vec3(aabb.maxX, aabb.minY, aabb.maxZ),
+			glm::vec3(aabb.minX, aabb.maxY, aabb.maxZ),
+			glm::vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
 		};
 
 		for (unsigned int i = 0; i < 8; i++)
 		{
 			glm::vec4 clipPos = mvp * glm::vec4(aabbVertices[i], 1);
-			if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
-				std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+			if (std::abs(clipPos.x) <= clipPos.w * 0.75f &&
+				std::abs(clipPos.y) <= clipPos.w * 0.75f &&
 				std::abs(clipPos.z) <= clipPos.w)
 			{
 				return true;
