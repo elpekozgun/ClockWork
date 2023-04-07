@@ -21,6 +21,8 @@ uniform bool HasNormalMap;
 uniform float NormalStrength;
 uniform vec3 CamPosition;
 
+uniform vec3 AlbedoColor;
+
 uniform float metallnessModifier;
 uniform float smoothnessModifier;
 
@@ -58,14 +60,14 @@ const float PI = 3.14159265359;
 // done
 vec3 FresnelSchlick(float vDotH, vec3 F0)
 {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - vDotH,0,1), 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - vDotH, 0 ,1), 5.0);
 }
 
 // done
 float NDF_GGX(float nDotH, float roughness) 
 {
 	float a = roughness * roughness;
-	float a2 = a;
+	float a2 = a * a ;
     float d = (nDotH * nDotH * (a2  - 1) + 1);
     float denom = PI * d * d;
 
@@ -109,12 +111,12 @@ vec3 GetNormal()
 	return normal;
 }
 
-vec3 CalculateDirectionalLight(DirectLight directLight, vec3 albedo, vec3 normal, float roughness, vec3 ks, vec3 kd)
+vec3 CalculateDirectionalLight(DirectLight light, vec3 albedo, vec3 normal, float metallic, float roughness, vec3 f0)
 {
 	vec3 viewDir = normalize(CamPosition - fs_in.FragmentPosition); 
 
 	// calculate these for each lights.
-	vec3 lightDir = -directLight.Direction;
+	vec3 lightDir = -light.Direction;
 	vec3 halfway = normalize(viewDir + lightDir);
     
 	float nDotL = max(dot(normal,lightDir), 0.000001);
@@ -123,39 +125,43 @@ vec3 CalculateDirectionalLight(DirectLight directLight, vec3 albedo, vec3 normal
 	float vDotH = max(dot(viewDir,halfway), 0.0);
 
 	float D = NDF_GGX(nDotH,roughness);
-	vec3 F = FresnelSchlick(vDotH,ks);
+	vec3 F = FresnelSchlick(vDotH,f0);
 	float G = GeometrySmith(nDotV,nDotL, roughness);
 	
-
 	vec3 fCookTorrence = (D * F * G) / (4 * nDotV * nDotL + 0.000001);
 	vec3 fLambert = albedo / PI;
-	
+
+	vec3 ks = F;
+	vec3 kd = (vec3(1.0) - ks) * (1 - metallic);
 
 	vec3 BRDF = kd * fLambert + fCookTorrence;
 
+	vec3 color = BRDF * light.Color * nDotL;
+	
+	// image based ligthing
+	vec3 envColor = texture(EnvMap, reflect(-viewDir,normal)).rgb;
 
-	vec3 R = reflect(-viewDir,normal);
-	vec3 envColor = texture(EnvMap, R).rgb;
-		
-	vec3 color = BRDF * directLight.Color * nDotL;
+	//vec3 diffuse = albedo * (1 - metallic);
+	//
+	//f0 = mix(f0,albedo, metallic);
+
+	//color += diffuse * envColor;
 	color += BRDF * envColor;
 
 	return color;
 }
 
-vec3 CalculatePointLight(PointLight pointLight, vec3 albedo, vec3 normal, float roughness, vec3 ks, vec3 kd)
+vec3 CalculatePointLight(PointLight light, vec3 albedo, vec3 normal, float roughness, float metallic, vec3 f0)
 {
-
 	vec3 viewDir = normalize(CamPosition - fs_in.FragmentPosition); 
 
 	// calculate these for each lights.
-	vec3 lightDir = normalize(pointLight.Position - fs_in.FragmentPosition);
+	vec3 lightDir = normalize(light.Position - fs_in.FragmentPosition);
 	vec3 halfway = normalize(viewDir + lightDir);
 
-	float dist = length(pointLight.Position - fs_in.FragmentPosition);
+	float dist = length(light.Position - fs_in.FragmentPosition);
 	float attenuation = 1 / (dist * dist);
-	vec3 radiance = pointLight.Color * attenuation;
-
+	vec3 radiance = light.Color * attenuation;
     
 	float nDotL = max(dot(normal,lightDir), 0.000001);
 	float nDotV = max(dot(normal,viewDir), 0.000001);
@@ -163,37 +169,40 @@ vec3 CalculatePointLight(PointLight pointLight, vec3 albedo, vec3 normal, float 
 	float vDotH = max(dot(viewDir,halfway), 0.0);
 
 	float D = NDF_GGX(nDotH,roughness);
-	vec3 F = FresnelSchlick(vDotH,ks);
+	vec3 F = FresnelSchlick(vDotH,f0);
 	float G = GeometrySmith(nDotV,nDotL, roughness);
 	
 
 	vec3 fCookTorrence = (D * F * G) / (4 * nDotV * nDotL + 0.000001);
 	vec3 fLambert = albedo / PI;
 	
+	vec3 ks = F;
+	vec3 kd = (vec3(1.0) - ks) * (1 - metallic);
+
 
 	vec3 BRDF = kd * fLambert + fCookTorrence;
 
 	return BRDF * radiance * nDotL ;
 }
 
-vec3 CalculateSpotLight(SpotLight spotLight, vec3 albedo, vec3 normal, float roughness, vec3 ks, vec3 kd)
+vec3 CalculateSpotLight(SpotLight light, vec3 albedo, vec3 normal, float roughness, float metallic, vec3 f0)
 {
 
 	vec3 viewDir = normalize(CamPosition - fs_in.FragmentPosition); 
 
 	// calculate these for each lights.
-	vec3 lightDir = normalize(spotLight.Position - fs_in.FragmentPosition);
+	vec3 lightDir = normalize(light.Position - fs_in.FragmentPosition);
 	vec3 halfway = normalize(viewDir + lightDir);
 
-	float theta = dot(lightDir, -spotLight.Direction);
-	float epsilon = spotLight.CutOff - spotLight.OuterCutoff;
-	float intensity = clamp((theta - spotLight.CutOff)/ epsilon, 0.0, 1.0);
+	float theta = dot(lightDir, -light.Direction);
+	float epsilon = light.CutOff - light.OuterCutoff;
+	float intensity = clamp((theta - light.CutOff)/ epsilon, 0.0, 1.0);
 
 
-	float dist = length(spotLight.Position - fs_in.FragmentPosition);
+	float dist = length(light.Position - fs_in.FragmentPosition);
 	float attenuation = 1 / (dist * dist);
 	
-	vec3 radiance = spotLight.Color * attenuation;
+	vec3 radiance = light.Color * attenuation;
     
 	float nDotL = max(dot(normal,lightDir), 0.000001);
 	float nDotV = max(dot(normal,viewDir), 0.000001);
@@ -201,45 +210,73 @@ vec3 CalculateSpotLight(SpotLight spotLight, vec3 albedo, vec3 normal, float rou
 	float vDotH = max(dot(viewDir,halfway), 0.0);
 
 	float D = NDF_GGX(nDotH,roughness);
-	vec3 F = FresnelSchlick(vDotH,ks);
+	vec3 F = FresnelSchlick(vDotH,f0);
 	float G = GeometrySmith(nDotV,nDotL, roughness);
 	
-
 	vec3 fCookTorrence = (D * F * G) / (4 * nDotV * nDotL + 0.000001);
 	vec3 fLambert = albedo / PI;
 	
+	vec3 ks = F;
+	vec3 kd = (vec3(1.0) - ks) * (1 - metallic);
 
 	vec3 BRDF = kd * fLambert + fCookTorrence;
 
 	return BRDF * radiance * nDotL ;//* directLight.Intensity;
 }
 
+//vec3 CalculateEnvironmentLight(vec3 normal, vec3 f0, float metallic, float roughness)
+//{
+//	vec3 viewDir = normalize(CamPosition - fs_in.FragmentPosition); 
+//
+//    vec3 reflectDir = reflect(-viewDir, normal);
+//    vec3 envColor = texture(EnvMap, reflectDir).rgb;
+//
+//    vec3 kd = (1.0 - f0) * (1.0 - metallic);
+//    vec3 diffuse = kd * envColor.rgb;
+//
+//    vec3 specular = vec3(0.0);
+//    if (roughness > 0.0) {
+//        vec3 halfway = normalize(viewDir + reflectDir);
+//        float nDotH = max(dot(normal, halfway), 0.0);
+//        float vDotH = max(dot(viewDir, halfway), 0.0);
+//
+//        float D = NDF_GGX(nDotH, roughness);
+//        vec3 F = FresnelSchlick(vDotH, f0);
+//        float G = GeometrySmith(nDotV, nDotL, roughness);
+//
+//        vec3 fCookTorrence = (D * F * G) / (4.0 * nDotV * nDotL);
+//        specular = fCookTorrence * envColor.rgb;
+//    }
+//
+//    return mix(diffuse, specular, metallic);
+//}
+
 void main()
 {
 	vec3 normal = GetNormal();	
 	
 	// convert albedo color to linear space from sRGB
-	vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb, vec3(2.2));
+	vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb * AlbedoColor, vec3(2.2)) ;
 
 	float metallic = texture(Metallic0, fs_in.TexCoord).r;// * metallnessModifier;
-	//float roughness = texture(Roughness0, fs_in.TexCoord).r;
+	//float roughness = texture(Roughness0, fs_in.TexCoor1d).r;
 	
-	float roughness = clamp(1 - smoothnessModifier, 0.04, 1.0);
+	float roughness =  clamp(smoothnessModifier,0.0001,0.9999); //clamp(1 - smoothnessModifier, 0.04, 1.0);
 	//float roughness = max(texture(Roughness0, fs_in.TexCoord).r * (1 - smoothnessModifier), 0.05f);
 
 
-	vec3 ks = mix(vec3(0.04), albedo, metallic); // ks
-	vec3 kd = (vec3(1.0) - ks) * (1 - metallic);
+	vec3 f0 = mix(vec3(0.04), albedo, metallic); // ks
+	//vec3 kd = (vec3(1.0) - ks) * (1 - metallic);
 
 	// DirectLight;
 	vec3 color = vec3(0);
 	
-	color += CalculateDirectionalLight(directLight, albedo, normal, roughness, ks, kd);
-	color += CalculatePointLight(pointLight, albedo, normal, roughness, ks, kd);
-	color += CalculateSpotLight(spotLight, albedo, normal, roughness, ks, kd);
+	color += CalculateDirectionalLight(directLight, albedo, normal, metallic, roughness, f0);
+	//color += CalculatePointLight(pointLight, albedo, normal, roughness, ks, kd);
+	//color += CalculateSpotLight(spotLight, albedo, normal, roughness, ks, kd);
 
 	// tone map
-	color /= (color + vec3(1));
+	//color /= (color + vec3(1));
 
 	//color = normal;
 

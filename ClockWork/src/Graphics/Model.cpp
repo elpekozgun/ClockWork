@@ -224,12 +224,7 @@ namespace CW
 			textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 		}
 
-		MeshComponent meshComponent;
-
-		meshComponent.Vertices = vertices;
-		meshComponent.Indices = indices;
-		meshComponent.Textures = textures;
-		
+	
 		VAO vao;
 		vao.Bind();
 
@@ -266,11 +261,16 @@ namespace CW
 			maxZ = std::max(maxZ, vertex.Position.z);
 			minZ = std::min(minZ, vertex.Position.z);
 		}
-		meshComponent.AABB = { maxX,minX,maxY,minY,maxZ,minZ };
+		AABB aabb{ maxX,minX,maxY,minY,maxZ,minZ };
 
+		MeshComponent meshComponent;
+		meshComponent.Vertices = vertices;
+		meshComponent.Indices = indices;
+		meshComponent.Textures = textures;
 		meshComponent.Vao = vao;
+		meshComponent.AABB = aabb;
+		meshComponent.Color = vec3(0.35f);
 
 		return meshComponent;
-		//return Mesh(vertices, indices, textures);
 	}
 }

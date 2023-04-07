@@ -141,6 +141,7 @@ namespace CW
 		unsigned int instanceVbo;
 		Shader Shader;
 		AABB AABB;
+		vec3 Color = vec3(1);
 
 		void Setup()
 		{

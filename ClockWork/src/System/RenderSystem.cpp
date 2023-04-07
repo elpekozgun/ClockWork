@@ -119,11 +119,11 @@ namespace CW
 		}
 
 		cap += dt;
-		if (cap >= 1.0f)
-		{
-			std::cout << drawCall << "\n";
-			cap = 0;
-		}
+		//if (cap >= 1.0f)
+		//{
+		//	std::cout << drawCall << "\n";
+		//	cap = 0;
+		//}
 	}
 
 	// this runs super slow, seems like constructing meshcomponents map is costly rather than updating in place.
@@ -399,6 +399,7 @@ namespace CW
 		mesh.Shader.setMat4("Model", model);
 		mesh.Shader.setMat4("CamMat", camMat);
 		mesh.Shader.setVec3("CamPosition", camera.Position);
+		mesh.Shader.setVec3("AlbedoColor", vec3(1)/*vec3(0.784)*/);
 
 		mesh.Shader.setVec3("spotLight.Color", 150, 150, 150);
 		mesh.Shader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
@@ -410,7 +411,7 @@ namespace CW
 		mesh.Shader.setVec3("pointLight.Color", vec3(150, 150, 150));
 
 		mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
-		mesh.Shader.setVec3("directLight.Color", vec3(0.8f));
+		mesh.Shader.setVec3("directLight.Color", vec3(1.0f));
 		mesh.Shader.SetFloat("directLight.Intensity", 1.0f);
 
 		mesh.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
@@ -420,9 +421,17 @@ namespace CW
 
 		if (directionalLight)
 		{
-			mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
-			mesh.Shader.setVec3("directLight.Color", vec3(0.7f, 0.7f, 0.7f));
-			mesh.Shader.SetFloat("directLight.Intensity", 3.0f);
+			//auto direction = glm::vec3(
+			//	cos(glm::radians(50.0f)) * sin(glm::radians(-30.0f)),
+			//	sin(glm::radians(50.0f)),
+			//	cos(glm::radians(50.0f)) * cos(glm::radians(-30.0f))
+			//);
+			//mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
+			//mesh.Shader.setVec3("directLight.Color", vec3(100.8f));
+			//mesh.Shader.SetFloat("directLight.Intensity", 10.0f);
+			//mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
+			//mesh.Shader.setVec3("directLight.Color", vec3(1.0f, 1.0f, 1.0f));
+			//mesh.Shader.SetFloat("directLight.Intensity", 5.0f);
 			/*mesh.Shader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
 			mesh.Shader.setVec3("directLight.ambient", 0.2f, 0.2f, 0.2f);
 			mesh.Shader.setVec3("directLight.diffuse", 0.8f, 0.8f, 0.8f);
@@ -430,9 +439,7 @@ namespace CW
 		}
 		else
 		{
-			mesh.Shader.setVec3("directLight.Direction", 0,0,0);
 			mesh.Shader.setVec3("directLight.Color", 0,0,0);
-			mesh.Shader.SetFloat("directLight.Intensity", 0);
 			//mesh.Shader.setVec3("directLight.direction", 0.0f, 0.0f, 0.0f);
 			//mesh.Shader.setVec3("directLight.ambient", 0.00f, 0.00f, 0.0f);
 			//mesh.Shader.setVec3("directLight.diffuse", 0.0f, 0.0f, 0.0f);

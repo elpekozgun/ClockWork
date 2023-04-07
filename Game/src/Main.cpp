@@ -32,7 +32,6 @@ void RandomDistributionExample()
 
 MeshComponent MakeGround()
 {
-    MeshComponent groundMesh;
 
     std::vector<Vertex> vertices =
     {
@@ -53,6 +52,9 @@ MeshComponent MakeGround()
         Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "Diffuse", 0),
         Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "Specular", 1)
     };
+    VAO vao;
+
+    MeshComponent groundMesh;
 
     groundMesh.Vertices = vertices;
     groundMesh.Indices = indices;
@@ -152,9 +154,12 @@ void Game()
 
     CameraComponent camera;
 
-    camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
-    camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
-    camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
+    camera.Position = glm::vec3(0, 0, 1);
+    camera.Forward = glm::vec3(0, 0, -1);
+    camera.Up = glm::vec3(0, 1, 0);
+    //camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
+    //camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
+    //camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
     camera.Width = 1920;
     camera.height = 1080;
     camera.FoV = 60;
@@ -260,27 +265,39 @@ void Game()
 
     float scale = 1.01f;
 
-    std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 1000 ; i++)
-    {
-        auto transform = TransformComponent
-        { 
-            glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
-            glm::vec3(0, randRotation(generator), 0), 
-            glm::vec3(scale) 
-        };
+    //std::vector<glm::mat4> transforms;
+    //for (unsigned int i = 0; i < 1000 ; i++)
+    //{
+    //    auto transform = TransformComponent
+    //    { 
+    //        glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
+    //        glm::vec3(0, randRotation(generator), 0), 
+    //        glm::vec3(scale) 
+    //    };
 
-        transforms.push_back(transform.GetMatrix());
-        auto maria = scene.CreateEntity("maria1");
-        scene.AddComponents 
-        (
-            maria, 
-            transform, 
-            Player{5.0f, 5.0f},
-            renderableMaria
-            //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
-        );
-    }
+    //    transforms.push_back(transform.GetMatrix());
+    //    auto maria = scene.CreateEntity("maria1");
+    //    scene.AddComponents 
+    //    (
+    //        maria, 
+    //        transform, 
+    //        Player{5.0f, 5.0f},
+    //        renderableMaria
+    //        //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+    //    );
+    //}
+
+
+    auto maria = scene.CreateEntity("maria1");
+    scene.AddComponents
+    (
+        maria,
+        TransformComponent{ glm::vec3(0), glm::vec3(0), glm::vec3(1)},
+        Player{ 5.0f, 5.0f },
+        renderableMaria
+        //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+    );
+
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
     //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
@@ -296,10 +313,10 @@ void Game()
 
 
     //instanced rendering performance still slow..
-    for (auto& meshId : renderableMaria.MeshIds)
-    {
-        ecs.MakeMeshInstanced(meshId, transforms);
-    }
+    //for (auto& meshId : renderableMaria.MeshIds)
+    //{
+    //    ecs.MakeMeshInstanced(meshId, transforms);
+    //}
 
 
     app->Run(1920, 1080);
