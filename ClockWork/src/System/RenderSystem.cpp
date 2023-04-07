@@ -11,7 +11,7 @@ namespace CW
 		SwitchState();
 
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_MULTISAMPLE);
+		//glEnable(GL_MULTISAMPLE);
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
@@ -400,9 +400,23 @@ namespace CW
 		mesh.Shader.setMat4("CamMat", camMat);
 		mesh.Shader.setVec3("CamPosition", camera.Position);
 
+		mesh.Shader.setVec3("spotLight.Color", 150, 150, 150);
+		mesh.Shader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
+		mesh.Shader.SetFloat("spotLight.OuterCutoff", cos(glm::radians(26.0f)));
+		mesh.Shader.setVec3("spotLight.Position", camera.Position);
+		mesh.Shader.setVec3("spotLight.Direction", camera.Forward);
+
+		mesh.Shader.setVec3("pointLight.Position", vec3(0, 1.9f, 0));
+		mesh.Shader.setVec3("pointLight.Color", vec3(150, 150, 150));
+
+		mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
+		mesh.Shader.setVec3("directLight.Color", vec3(0.8f));
+		mesh.Shader.SetFloat("directLight.Intensity", 1.0f);
+
 		mesh.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
 		mesh.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
 		mesh.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
+
 
 		if (directionalLight)
 		{
@@ -451,10 +465,11 @@ namespace CW
 			//mesh.Shader.SetBool("hasNormalMap",false);
 
 			mesh.Shader.SetTexture(fullName, i);
-
-
-
 			mesh.Textures[i].Bind();
+
+			mesh.Shader.SetTexture("EnvMap", 4);
+			glActiveTexture(GL_TEXTURE4);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
 		}
 
 		mesh.Vao.Bind();

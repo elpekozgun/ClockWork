@@ -167,8 +167,11 @@ void Game()
 
 
     Scene scene(ecs);
-    
-    Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/pbr_sphere.glb)");
+    Model mariaModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/sphere/source/sphere_sampleScene_1cm.fbx)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/pbrspherefbx/source/sphere_sampleScene_1cm.fbx)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/doom_eternal_slayer/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/skull_downloadable/scene.gltf)");
@@ -187,31 +190,12 @@ void Game()
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
 
     defaultShader.Use();
-
-    //defaultShader.setVec4("LightColor", lightColor);
-    //defaultShader.SetFloat("Shineness", 1.0f);
-    //defaultShader.setVec3("spotlight.ambient", 0.0f, 0.0f, 0.0f);
-    //defaultShader.setVec3("spotlight.diffuse", 0.8f, 0.8f, 0.8f);
-    //defaultShader.setVec3("spotlight.specular", 0.8f, 0.8f, 0.8f);
-    //defaultShader.SetFloat("spotlight.cutOff", cos(glm::radians(20.5f)));
-    //defaultShader.SetFloat("spotlight.outerCutOff", cos(glm::radians(26.0f)));
-    //defaultShader.SetFloat("spotlight.Kconstant", 1.0f);
-    //defaultShader.SetFloat("spotlight.Klinear", 0.027f);
-    //defaultShader.SetFloat("spotlight.Kquad", 0.0028f);
-    //
-    //defaultShader.setVec3("pointLights[0].position", lightPos);
-    //defaultShader.setVec3("pointLights[0].ambient", 0.1f, 0.1f, 0.1f);
-    //defaultShader.setVec3("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
-    //defaultShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    //defaultShader.SetFloat("pointLights[0].Kconstant", 1.0f);
-    //defaultShader.SetFloat("pointLights[0].Klinear", 0.09f);
-    //defaultShader.SetFloat("pointLights[0].Kquad", 0.032f);
-    //defaultShader.SetBool("IsBlinnPhong", false);
-
+    defaultShader.setVec3("spotLight.Color", 150, 150, 150);
+    defaultShader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
+    defaultShader.SetFloat("spotLight.OuterCutoff", cos(glm::radians(26.0f)));
+    defaultShader.setVec3("pointLight.Position", lightPos);
+    defaultShader.setVec3("pointLight.Color", vec3(150, 150, 150));
     defaultShader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
-    //defaultShader.setVec3("directLight.ambient", 0.05f, 0.05f, 0.05f);
-    //defaultShader.setVec3("directLight.diffuse", 0.4f, 0.4f, 0.4f);
-    //defaultShader.setVec3("directLight.specular", 0.5f, 0.5f, 0.5f);
     defaultShader.setVec3("directLight.Color", vec3(0.8f));
     defaultShader.SetFloat("directLight.Intensity", 1.0f);
 
@@ -235,7 +219,7 @@ void Game()
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
     
 
-    Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
+    //Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
 
 
     std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
@@ -247,14 +231,14 @@ void Game()
         mariaAssets.push_back(asset);
     }
 
-    std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
+   /* std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
     std::vector<unsigned int> sponzaAssets;
     for (auto& mesh : sponzaMeshComponents)
     {
         mesh.Shader = defaultShader;
         auto asset = ecs.AddAsset(mesh);
         sponzaAssets.push_back(asset);
-    }
+    }*/
 
 
     auto lights = std::vector<MeshComponent>{ makeLight() };
@@ -263,7 +247,7 @@ void Game()
 
     RenderableComponent renderableMaria{ mariaAssets , false};
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
-    RenderableComponent renderableSponza { sponzaAssets, false };
+    //RenderableComponent renderableSponza { sponzaAssets, false };
 
     auto light1 = scene.CreateEntity("light");
     auto sponza = scene.CreateEntity("sponza");
@@ -274,15 +258,16 @@ void Game()
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
 
+    float scale = 1.01f;
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 1 ; i++)
+    for (unsigned int i = 0; i < 1000 ; i++)
     {
         auto transform = TransformComponent
         { 
-            glm::vec3(randPosition(generator), 0, randPosition(generator)),\
+            glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
             glm::vec3(0, randRotation(generator), 0), 
-            glm::vec3(0.1f) 
+            glm::vec3(scale) 
         };
 
         transforms.push_back(transform.GetMatrix());
@@ -297,7 +282,7 @@ void Game()
         );
     }
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
-    scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
+    //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
     
 
     //auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());

@@ -1,10 +1,12 @@
 #pragma once
 #include "VAO.h"
+#include <iostream>
 
 namespace CW
 {
 	VAO::VAO()
 	{
+		std::cout << "created vao\n";
 		glGenVertexArrays(1, &Id);
 	}
 
