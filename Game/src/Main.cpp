@@ -172,8 +172,9 @@ void Game()
 
 
     Scene scene(ecs);
-    //Model mariaModel(R"(C:/Users/user/Desktop/pbr_sphere.glb)");
-    Model mariaModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/Vanguard/Vanguard By T. Choonyung.dae)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/damaged_helmet/scene.gltf)");
+    //Model mariaModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/sphere/source/sphere_sampleScene_1cm.fbx)");
     //Model mariaModel(R"(C:/Users/user/Desktop/pbrspherefbx/source/sphere_sampleScene_1cm.fbx)");
     //Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
@@ -183,7 +184,7 @@ void Game()
     //Model mariaModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
     //Model mariaModel(R"(C:/Users/user/Desktop/maria/scene.gltf)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
-    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
+    Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
     //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
@@ -203,13 +204,9 @@ void Game()
     defaultShader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
     defaultShader.setVec3("directLight.Color", vec3(0.8f));
     defaultShader.SetFloat("directLight.Intensity", 1.0f);
+    defaultShader.SetTexture("IrradianceMap", 4);
 
-
-    auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
-    auto skyboxFrag = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
-    auto skyboxShader = Shader::CreateShader("skybox", { skyboxVertex, skyboxFrag});
-
-    std::vector<std::string> faces
+    /*std::vector<std::string> faces
     {
         R"(C:\_Dev\ClockWork\ClockWork\res\skybox\right.jpg)",
         R"(C:\_Dev\ClockWork\ClockWork\res\skybox\left.jpg)",
@@ -217,12 +214,15 @@ void Game()
         R"(C:\_Dev\ClockWork\ClockWork\res\skybox\bottom.jpg)",
         R"(C:\_Dev\ClockWork\ClockWork\res\skybox\front.jpg)",
         R"(C:\_Dev\ClockWork\ClockWork\res\skybox\back.jpg)"
-    };
+    };*/
 
     Skybox skybox;
-    auto skyboxComponent = skybox.Load(faces, skyboxShader);
+    //auto skyboxComponent = skybox.Load(faces, skyboxShader);
+    //auto skyboxComponent = skybox.LoadHdr(R"(C:/Users/user/Desktop/HDR_029_Sky_Cloudy_Free/HDR_029_Sky_Cloudy_Free/HDR_029_Sky_Cloudy_Ref.hdr)", skyboxShader);
+    auto skyboxComponent= skybox.LoadHdr(R"(C:/Users/user/Desktop/daytime.hdr)");
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
-    
+
+
 
     //Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
 
@@ -263,7 +263,7 @@ void Game()
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
 
-    float scale = 1.01f;
+    float scale = 0.01f;
 
     //std::vector<glm::mat4> transforms;
     //for (unsigned int i = 0; i < 1000 ; i++)
@@ -275,7 +275,6 @@ void Game()
     //        glm::vec3(scale) 
     //    };
 
-    //    transforms.push_back(transform.GetMatrix());
     //    auto maria = scene.CreateEntity("maria1");
     //    scene.AddComponents 
     //    (
@@ -288,11 +287,11 @@ void Game()
     //}
 
 
-    auto maria = scene.CreateEntity("maria1");
+    auto model = scene.CreateEntity("maria1");
     scene.AddComponents
     (
-        maria,
-        TransformComponent{ glm::vec3(0), glm::vec3(0), glm::vec3(1)},
+        model,
+        TransformComponent{ glm::vec3(0), glm::vec3(0)/*glm::vec3(3.141592f / 2.0f,0,0)*/, glm::vec3(0.01f)},
         Player{ 5.0f, 5.0f },
         renderableMaria
         //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}

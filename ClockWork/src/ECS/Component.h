@@ -77,8 +77,11 @@ namespace CW
 		}
 
 		std::vector<float> Vertices;
+		unsigned int IrradianceMap;
+		unsigned int BrdfLutMap;
+		unsigned int PrefilterMap;
 		Shader Shader;
-		VAO Vao;
+		unsigned int Vao;
 		unsigned int TextureId;
 	};
 

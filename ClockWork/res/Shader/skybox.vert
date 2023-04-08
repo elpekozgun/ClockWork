@@ -8,7 +8,7 @@ uniform mat4 CamMat;
 
 void main()
 {
-	vec4 pos = CamMat * vec4(inPos,1.0f);
-	gl_Position = pos.xyww;
+	vec4 clipPos = CamMat * vec4(inPos,1.0f);
+	gl_Position = clipPos.xyww;
 	TexCoords = inPos;
 }

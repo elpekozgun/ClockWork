@@ -37,5 +37,7 @@ namespace CW
 		unsigned int _instanceCount = 0;
 		const char* _file;
 		std::vector<unsigned char> data;
+
+		Assimp::Importer importer;
 	};
 }

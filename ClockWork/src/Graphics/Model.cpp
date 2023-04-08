@@ -20,8 +20,7 @@ namespace CW
 		// aiProcess_SplitLargeMeshes-> bigger meshes to smaller ones for max mesh element count optimization
 		// aiPriocess_GenNormals -> generates normals from vertex data, ez.
 		// aiProcess_OptimizeMeshes -> Smaller meshes into bigger ones to reduce draw calls.
-
-		Assimp::Importer importer;				  // convert faces to triangles   // flip UVS for opengl
+							     				  // convert faces to triangles   // flip UVS for opengl
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -133,11 +132,12 @@ namespace CW
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
 			aiString str;
-			mat->GetTexture(type, i, &str);
+			aiReturn a = mat->GetTexture(type, i, &str);
+
 
 			auto path = directory + "/" + str.C_Str();
 
-			Texture texture(path.c_str(), name, i+(slot++));
+			Texture texture(path.c_str(), name, i + (slot++));
 
 			textures.push_back(texture);
 		}

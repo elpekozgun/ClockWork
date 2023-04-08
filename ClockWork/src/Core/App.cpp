@@ -7,13 +7,10 @@ namespace CW
 	{
 		_ecs.Init();
 		_window.Setup(1920, 1080);
-
-		_isRunning = false;
 	}
 
 	App::~App()
 	{
-		_isRunning = false;
 		glfwTerminate();
 	}
 
@@ -23,15 +20,12 @@ namespace CW
 
 		//TempRender tempRender;
 
-		_isRunning = true;
-
-
 		double prevTime = 0.0;
 		double currentTime = 0.0;
 		int frameCount = 0;
 		double dt;
 
-		while (_isRunning)
+		while (!_window.ShouldClose)
 		{
 			currentTime = glfwGetTime();
 			dt = currentTime - prevTime;

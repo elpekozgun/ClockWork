@@ -11,6 +11,8 @@ namespace CW
 		SwitchState();
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 		//glEnable(GL_MULTISAMPLE);
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -105,13 +107,15 @@ namespace CW
 			skybox->Shader.Use();
 
 			// both matrices same but wtf???
-			//auto what = glm::mat4(glm::mat3(cameraMat));
+			//auto what = glm::mat4(glm::mat3(camera->CameraMatrix()));
 			glm::mat4 modifiedCamMat = glm::mat4(glm::mat3(camera->View()));
 			modifiedCamMat = camera->Projection() * modifiedCamMat;
 			skybox->Shader.setMat4("CamMat", modifiedCamMat);
 
+
 			// skybox cube
-			skybox->Vao.Bind();
+			//skybox->Vao.Bind();
+			glBindVertexArray(skybox->Vao);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -419,31 +423,10 @@ namespace CW
 		mesh.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
 
 
-		if (directionalLight)
-		{
-			//auto direction = glm::vec3(
-			//	cos(glm::radians(50.0f)) * sin(glm::radians(-30.0f)),
-			//	sin(glm::radians(50.0f)),
-			//	cos(glm::radians(50.0f)) * cos(glm::radians(-30.0f))
-			//);
-			//mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
-			//mesh.Shader.setVec3("directLight.Color", vec3(100.8f));
-			//mesh.Shader.SetFloat("directLight.Intensity", 10.0f);
-			//mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
-			//mesh.Shader.setVec3("directLight.Color", vec3(1.0f, 1.0f, 1.0f));
-			//mesh.Shader.SetFloat("directLight.Intensity", 5.0f);
-			/*mesh.Shader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
-			mesh.Shader.setVec3("directLight.ambient", 0.2f, 0.2f, 0.2f);
-			mesh.Shader.setVec3("directLight.diffuse", 0.8f, 0.8f, 0.8f);
-			mesh.Shader.setVec3("directLight.specular", 0.5f, 0.5f, 0.5f);*/
-		}
-		else
+
+		if (!directionalLight)
 		{
 			mesh.Shader.setVec3("directLight.Color", 0,0,0);
-			//mesh.Shader.setVec3("directLight.direction", 0.0f, 0.0f, 0.0f);
-			//mesh.Shader.setVec3("directLight.ambient", 0.00f, 0.00f, 0.0f);
-			//mesh.Shader.setVec3("directLight.diffuse", 0.0f, 0.0f, 0.0f);
-			//mesh.Shader.setVec3("directLight.specular", 0.0f, 0.0f, 0.0f);
 		}
 
 		unsigned int diffuseNo = 0;
@@ -474,10 +457,22 @@ namespace CW
 			mesh.Shader.SetTexture(fullName, i);
 			mesh.Textures[i].Bind();
 
-			mesh.Shader.SetTexture("EnvMap", 4);
-			glActiveTexture(GL_TEXTURE4);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
+			//glActiveTexture(GL_TEXTURE4);
+			//glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
 		}
+		mesh.Shader.SetTexture("IrradianceMap", 4);
+		mesh.Shader.SetTexture("PrefilterMap", 5);
+		mesh.Shader.SetTexture("BrdfLut", 6);
+
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->IrradianceMap);
+
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->PrefilterMap);
+
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, skybox->BrdfLutMap);
+
 
 		mesh.Vao.Bind();
 		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);

@@ -68,8 +68,8 @@ namespace CW
 		unsigned int drawCall = 0;
 		float cap;
 		float normalScale = 1;
-		float metalScale = 0.6f;
-		float smoothScale = 0.75f;
+		float metalScale = 1.0f;
+		float smoothScale = 1.0f;
 
 	};
 }

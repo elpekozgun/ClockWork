@@ -16,5 +16,17 @@ namespace CW
     public:
         Skybox();
         std::unique_ptr<SkyboxComponent> Load(std::vector<std::string>& faces, Shader& shader);
+        std::unique_ptr<SkyboxComponent> LoadHdr(const char* path);
+        void RenderCube();
+        void SetupCube(std::vector<float>& vertices);
+
+        void RenderQuad();
+        void SetupQuad();
+
+        unsigned int cubeVAO = 0;
+        unsigned int cubeVBO = 0;
+
+        unsigned int quadVBO = 0;
+        unsigned int quadVAO = 0;
     };
 }

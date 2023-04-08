@@ -26,6 +26,8 @@ namespace CW
 			glfwSetWindowTitle(_window, title);
 		}
 
+		bool ShouldClose = false;
+
 	private:
 		void HandleCursor();
 

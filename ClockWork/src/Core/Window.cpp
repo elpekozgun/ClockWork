@@ -52,6 +52,7 @@ namespace CW
 
 	void Window::Update()
 	{
+		ShouldClose = glfwWindowShouldClose(_window);
 		glfwPollEvents();
 		HandleCursor();
 		glfwSwapBuffers(_window);
@@ -90,6 +91,7 @@ namespace CW
 	void Window::Shutdown()
 	{
 	}
+
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{

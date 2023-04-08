@@ -6,7 +6,7 @@ namespace CW
 {
 	VAO::VAO()
 	{
-		std::cout << "created vao\n";
+		//std::cout << "created vao\n";
 		glGenVertexArrays(1, &Id);
 	}
 
