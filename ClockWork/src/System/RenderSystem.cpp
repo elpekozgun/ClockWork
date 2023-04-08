@@ -11,7 +11,7 @@ namespace CW
 		SwitchState();
 
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		//glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		//glEnable(GL_MULTISAMPLE);
 
@@ -111,7 +111,7 @@ namespace CW
 			glm::mat4 modifiedCamMat = glm::mat4(glm::mat3(camera->View()));
 			modifiedCamMat = camera->Projection() * modifiedCamMat;
 			skybox->Shader.setMat4("CamMat", modifiedCamMat);
-
+			skybox->Shader.SetTexture("SkyBox", 0);
 
 			// skybox cube
 			//skybox->Vao.Bind();
@@ -123,11 +123,11 @@ namespace CW
 		}
 
 		cap += dt;
-		//if (cap >= 1.0f)
-		//{
-		//	std::cout << drawCall << "\n";
-		//	cap = 0;
-		//}
+		if (cap >= 1.0f)
+		{
+			std::cout << drawCall << "\n";
+			cap = 0;
+		}
 	}
 
 	// this runs super slow, seems like constructing meshcomponents map is costly rather than updating in place.
@@ -398,32 +398,20 @@ namespace CW
 
 		mesh.Shader.SetBool("instanced", false);
 
-		//mesh.Shader.setVec3("spotlight.position", camera.Position);
-		//mesh.Shader.setVec3("spotlight.direction", camera.Forward);
+
+		// TODO: UPDATING THESE PROPERTIES EVERY FRAME IS SUPER COSTLY, NO NEED TO CHANGE UNLESS THERE IS A CHANGE IN STATE...
 		mesh.Shader.setMat4("Model", model);
 		mesh.Shader.setMat4("CamMat", camMat);
 		mesh.Shader.setVec3("CamPosition", camera.Position);
 		mesh.Shader.setVec3("AlbedoColor", vec3(1)/*vec3(0.784)*/);
 
-		mesh.Shader.setVec3("spotLight.Color", 150, 150, 150);
-		mesh.Shader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
-		mesh.Shader.SetFloat("spotLight.OuterCutoff", cos(glm::radians(26.0f)));
-		mesh.Shader.setVec3("spotLight.Position", camera.Position);
-		mesh.Shader.setVec3("spotLight.Direction", camera.Forward);
-
-		mesh.Shader.setVec3("pointLight.Position", vec3(0, 1.9f, 0));
-		mesh.Shader.setVec3("pointLight.Color", vec3(150, 150, 150));
-
-		mesh.Shader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
-		mesh.Shader.setVec3("directLight.Color", vec3(1.0f));
-		mesh.Shader.SetFloat("directLight.Intensity", 1.0f);
-
 		mesh.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
 		mesh.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
 		mesh.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
-
-
-
+		
+		mesh.Shader.setVec3("spotLight.Position", camera.Position);
+		mesh.Shader.setVec3("spotLight.Direction", camera.Forward);
+		
 		if (!directionalLight)
 		{
 			mesh.Shader.setVec3("directLight.Color", 0,0,0);
@@ -451,18 +439,16 @@ namespace CW
 
 			std::string fullName = name + std::to_string(no);
 
-			mesh.Shader.SetBool("HasNormalMap", normalNo != 0);
+			//mesh.Shader.SetBool("HasNormalMap", normalNo != 0);
 			//mesh.Shader.SetBool("hasNormalMap",false);
 
-			mesh.Shader.SetTexture(fullName, i);
+			//mesh.Shader.SetTexture(fullName, i);
 			mesh.Textures[i].Bind();
 
-			//glActiveTexture(GL_TEXTURE4);
-			//glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
 		}
-		mesh.Shader.SetTexture("IrradianceMap", 4);
-		mesh.Shader.SetTexture("PrefilterMap", 5);
-		mesh.Shader.SetTexture("BrdfLut", 6);
+		//mesh.Shader.SetTexture("IrradianceMap", 4);
+		//mesh.Shader.SetTexture("PrefilterMap", 5);
+		//mesh.Shader.SetTexture("BrdfLut", 6);
 
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->IrradianceMap);
@@ -551,15 +537,14 @@ namespace CW
 		}
 	}
 
-
-	glm::mat4 RenderSystem::MatrixFromTransform(TransformComponent& transform	)
+	glm::mat4 RenderSystem::MatrixFromTransform(TransformComponent& transform)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::scale(model, transform.Scale);
+		model = glm::translate(model, transform.Position);
 		glm::quat rotation = glm::quat(glm::vec3(transform.Rotation.x, transform.Rotation.y, transform.Rotation.z));
 		glm::mat quatMatrix = glm::toMat4(rotation);
 		model *= quatMatrix;
-		model = glm::translate(model, transform.Position);
+		model = glm::scale(model, transform.Scale);
 		return model;
 	}
 
@@ -655,6 +640,7 @@ namespace CW
 			smoothScale -= 0.05f;
 			std::cout << "smoothness " << smoothScale << "\n";
 		}
+
 	}
 
 	// lets make this recursively traverse as an octree.

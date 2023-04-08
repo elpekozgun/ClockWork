@@ -4,7 +4,7 @@ namespace CW
 {
     Skybox::Skybox() { }
 
-    std::unique_ptr<SkyboxComponent> Skybox::Load(std::vector<std::string>& faces, Shader& shader)
+    std::unique_ptr<SkyboxComponent> Skybox::Load(std::vector<std::string>& faces)
     {
         try
         {
@@ -90,15 +90,16 @@ namespace CW
             vao.Unbind();
             vbo.Unbind();
 
-            shader.Use();
-            shader.SetTexture("Skybox", 0);
 
+            auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
+            auto skyboxFrag = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
+            Shader skyboxShader = Shader::CreateShader("skybox", { skyboxVertex, skyboxFrag });
 
             SkyboxComponent skybox;
             skybox.Vao = vao.Id;
             skybox.Vertices = vertices;
             skybox.TextureId = textureID;
-            skybox.Shader = shader;
+            skybox.Shader = skyboxShader;
             
             return std::make_unique<SkyboxComponent>(skybox);
         }

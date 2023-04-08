@@ -15,7 +15,7 @@ namespace CW
     {
     public:
         Skybox();
-        std::unique_ptr<SkyboxComponent> Load(std::vector<std::string>& faces, Shader& shader);
+        std::unique_ptr<SkyboxComponent> Load(std::vector<std::string>& faces);
         std::unique_ptr<SkyboxComponent> LoadHdr(const char* path);
         void RenderCube();
         void SetupCube(std::vector<float>& vertices);

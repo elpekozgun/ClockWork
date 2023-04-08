@@ -112,6 +112,8 @@ void main()
 	
 	result += CalculateSpotLight(spotlight, normal, fs_in.FragmentPosition, viewdir);
 
+	result += vec3(0.1);
+
 	FragColor = vec4(result,1);
 	//FragColor = vec4(normal,1);
 	//FragColor = vec4(vec3(gl_FragCoord.z),1);
@@ -124,16 +126,16 @@ vec3 CalculateDirectLight(DirectLight light, vec3 normal, vec3 viewDir)
 	float diff = max(dot(normal,lightDir),0.0f);
 
 	float spec = 0.0f;
-//	if(IsBlinnPhong)
-//	{
-//		vec3 halfwayDir = normalize(viewDir + lightDir);
-//		spec = pow( max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 2);
+	//if(IsBlinnPhong)
+	//{
+		vec3 halfwayDir = normalize(viewDir + lightDir);
+		spec = pow( max(dot(normal, halfwayDir),0.0f),/*material.*/Shineness * 2);
 //	}
 //	else
-	{
-		vec3 reflectDir = reflect(-lightDir,normal);
-		spec = pow( max(dot(viewDir, reflectDir),0.0f),/*material.*/Shineness);
-	}
+//	{
+//		vec3 reflectDir = reflect(-lightDir,normal);
+//		spec = pow( max(dot(viewDir, reflectDir),0.0f),/*material.*/Shineness);
+//	}
 
 	vec3 ambient = light.ambient * vec3(texture(/*material.*/Diffuse0,fs_in.TexCoord));
 	vec3 diffuse = light.diffuse * diff * vec3(texture(/*material.*/Diffuse0, fs_in.TexCoord));

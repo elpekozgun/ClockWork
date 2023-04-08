@@ -206,19 +206,38 @@ void Game()
     defaultShader.SetFloat("directLight.Intensity", 1.0f);
     defaultShader.SetTexture("IrradianceMap", 4);
 
-    /*std::vector<std::string> faces
-    {
-        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\right.jpg)",
-        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\left.jpg)",
-        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\top.jpg)",
-        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\bottom.jpg)",
-        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\front.jpg)",
-        R"(C:\_Dev\ClockWork\ClockWork\res\skybox\back.jpg)"
-    };*/
+    defaultShader.setVec3("spotLight.Color", 150, 150, 150);
+    defaultShader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
+    defaultShader.SetFloat("spotLight.OuterCutoff", cos(glm::radians(26.0f)));
+    defaultShader.setVec3("spotLight.Position", camera.Position);
+    defaultShader.setVec3("spotLight.Direction", camera.Forward);
+
+    defaultShader.setVec3("pointLight.Position", vec3(0, 1.9f, 0));
+    defaultShader.setVec3("pointLight.Color", vec3(150, 150, 150));
+    defaultShader.setVec3("directLight.Direction", -0.2f, -1.0f, -0.3f);
+    defaultShader.setVec3("directLight.Color", vec3(1.0f));
+    defaultShader.SetFloat("directLight.Intensity", 1.0f);
+    defaultShader.setVec3("directLight.direction", -0.2f, -1.0f, -0.3f);
+    defaultShader.setVec3("directLight.ambient", vec3(0.1f));
+    defaultShader.setVec3("directLight.diffuse", glm::vec3(0.3f));
+    defaultShader.setVec3("directLight.specular", glm::vec3(0.2f));
+    defaultShader.SetTexture("IrradianceMap", 4);
+    defaultShader.SetTexture("PrefilterMap", 5);
+    defaultShader.SetTexture("BrdfLut", 6);
+
+
+    //std::vector<std::string> faces
+    //{
+    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\right.jpg)",
+    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\left.jpg)",
+    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\top.jpg)",
+    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\bottom.jpg)",
+    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\front.jpg)",
+    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\back.jpg)"
+    //};
 
     Skybox skybox;
-    //auto skyboxComponent = skybox.Load(faces, skyboxShader);
-    //auto skyboxComponent = skybox.LoadHdr(R"(C:/Users/user/Desktop/HDR_029_Sky_Cloudy_Free/HDR_029_Sky_Cloudy_Free/HDR_029_Sky_Cloudy_Ref.hdr)", skyboxShader);
+    //auto skyboxComponent = skybox.Load(faces);
     auto skyboxComponent= skybox.LoadHdr(R"(C:/Users/user/Desktop/daytime.hdr)");
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
 
@@ -258,43 +277,43 @@ void Game()
     auto sponza = scene.CreateEntity("sponza");
 
     std::default_random_engine generator;
-    std::uniform_real_distribution<float> randPosition(-40.0f, 40.0f);
+    std::uniform_real_distribution<float> randPosition(-0.40f, 0.40f);
     std::uniform_real_distribution<float> randRotation(0.0f, 359.0f);
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
-
+     
     float scale = 0.01f;
 
-    //std::vector<glm::mat4> transforms;
-    //for (unsigned int i = 0; i < 1000 ; i++)
-    //{
-    //    auto transform = TransformComponent
-    //    { 
-    //        glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
-    //        glm::vec3(0, randRotation(generator), 0), 
-    //        glm::vec3(scale) 
-    //    };
+    std::vector<glm::mat4> transforms;
+    for (unsigned int i = 0; i < 3000 ; i++)
+    {
+        auto transform = TransformComponent
+        { 
+            glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
+            glm::vec3(0, randRotation(generator), 0), 
+            glm::vec3(scale) 
+        };
 
-    //    auto maria = scene.CreateEntity("maria1");
-    //    scene.AddComponents 
-    //    (
-    //        maria, 
-    //        transform, 
-    //        Player{5.0f, 5.0f},
-    //        renderableMaria
-    //        //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
-    //    );
-    //}
+        auto maria = scene.CreateEntity("maria1");
+        scene.AddComponents 
+        (
+            maria, 
+            transform, 
+            Player{5.0f, 5.0f},
+            renderableMaria,
+            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+        );
+    }
 
 
     auto model = scene.CreateEntity("maria1");
     scene.AddComponents
     (
         model,
-        TransformComponent{ glm::vec3(0), glm::vec3(0)/*glm::vec3(3.141592f / 2.0f,0,0)*/, glm::vec3(0.01f)},
+        TransformComponent{ glm::vec3(0), glm::vec3(0)/*glm::vec3(3.141592f / 2.0f,0,0)*/, glm::vec3(scale)},
         Player{ 5.0f, 5.0f },
-        renderableMaria
-        //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+        renderableMaria,
+        PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
     );
 
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
