@@ -43,6 +43,7 @@ namespace CW
 		virtual void Update(float deltaTime) override;
 		void Update2(float deltaTime);
 		void UpdateSlow(float deltaTime);
+		void UpdateGetComponent(float deltaTime);
 
 		std::vector<std::pair<TransformComponent, RenderableComponent>> RenderTuples;
 
@@ -57,6 +58,8 @@ namespace CW
 
 		bool IsInFrustum(glm::vec3& camPosition, glm::mat4& mvp, AABB& boundingbox, unsigned int& depth);
 		
+		std::unordered_map<unsigned int, MeshComponent> CachedMeshes;
+
 		unsigned int maxOctreeDepth = 32;
 		// for testing and profiling.	
 		unsigned int MaxTri = 4000000;

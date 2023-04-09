@@ -24,7 +24,7 @@ namespace CW
 	public:
 		uint AddData(T& asset)
 		{
-			_assetData[_size] = asset;                                         
+			_assetData.emplace_back(asset);
 			_size++; 
 
 			return _size - 1;
@@ -48,7 +48,8 @@ namespace CW
 
 	private:
 
-		T _assetData[MAX_ENTITY];
+		std::vector<T> _assetData;
+		//T _assetData[MAX_ENTITY];
 
 		//std::unordered_map<unsigned int, T> _assetData;
 		/*T _assetArray[MAX_ENTITY];

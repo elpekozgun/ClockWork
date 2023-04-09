@@ -52,8 +52,6 @@ MeshComponent MakeGround()
         Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\crate.png)", "Diffuse", 0),
         Texture(R"(C:\_Dev\ClockWork\ClockWork\res\Texture\cratespecular.png)", "Specular", 1)
     };
-    VAO vao;
-
     MeshComponent groundMesh;
 
     groundMesh.Vertices = vertices;
@@ -196,6 +194,7 @@ void Game()
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
 
     defaultShader.Use();
+    defaultShader.setVec3("AlbedoColor", vec3(1)/*vec3(0.784)*/);
     defaultShader.setVec3("spotLight.Color", 150, 150, 150);
     defaultShader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
     defaultShader.SetFloat("spotLight.OuterCutoff", cos(glm::radians(26.0f)));
@@ -285,7 +284,7 @@ void Game()
     float scale = 0.01f;
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 3000 ; i++)
+    for (unsigned int i = 0; i < 5000 ; i++)
     {
         auto transform = TransformComponent
         { 
@@ -348,28 +347,11 @@ void Game()
 
 int main()
 {
-#if CW_DEBUG
+#if !CW_DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     {
-        std::cout << "transform size:" << sizeof(Transform) << "\n";
-        std::cout << "physcics size:" << sizeof(Physics) << "\n";
-        std::cout << "transformPhysics size:" << sizeof(TransformPhysics) << "\n";
-        
-        int count = 1000000;
-        int iteration = 10;
-
-        for (unsigned int i = 0; i < 10; i++)
-        {
-            BenchmarkSOA(count, iteration);
-            BenchmarkSOAWithArray(count, iteration);
-            BenchmarkSOAWithTuple(count, iteration);
-            BenchmarkSOAWithArchetype(count, iteration);
-            BenchmarkAOS(count, iteration);
-            std::cout << "\n";
-        }
-
-        //Game();
+        Game();
     }
 #if CW_DEBUG
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

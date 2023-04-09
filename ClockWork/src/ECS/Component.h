@@ -119,7 +119,9 @@ namespace CW
 
 			auto right = glm::normalize(glm::cross(Forward, Up));
 
-			return projection * view;
+			auto result = projection * view;
+
+			return result;
 		}
 
 		glm::mat4 Projection()
@@ -141,7 +143,7 @@ namespace CW
 	{
 		MeshComponent()
 		{
-			//std::cout << "mesh\n";
+			std::cout << "mesh\n";
 		}
 
 		std::vector<Vertex> Vertices;

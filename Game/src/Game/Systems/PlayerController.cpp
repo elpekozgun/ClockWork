@@ -3,11 +3,18 @@
 void PlayerController::Update(float dt)
 {
 	auto& input = Input::Instance();
+
+	auto players = _ecs->GetComponentArray<CW::Player>();
+	auto transforms = _ecs->GetComponentArray<CW::TransformComponent>();
+
 	for (auto& entity : _entities)
 	{
 		dt = 0.01f;
-		auto& player = _ecs->GetComponent<CW::Player>(entity);
-		auto& transform = _ecs->GetComponent<CW::TransformComponent>(entity);
+		auto& player = players->GetData(entity);
+		auto& transform = transforms->GetData(entity);
+
+		//auto& player = _ecs->GetComponent<CW::Player>(entity);
+		//auto& transform = _ecs->GetComponent<CW::TransformComponent>(entity);
 
 		float horizontal = 0.0f;
 		float vertical = 0.0f;

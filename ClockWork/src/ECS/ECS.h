@@ -76,6 +76,12 @@ namespace CW
 		{
 			return _componentManager->GetComponent<T>(entity);
 		}
+
+		template<typename T>
+		std::shared_ptr<ComponentArray<T>> GetComponentArray()
+		{
+			return _componentManager->GetComponentArray<T>();
+		}
 		
 
 		template<typename T>

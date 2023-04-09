@@ -42,6 +42,13 @@ namespace CW
 		}
 
 		template<typename T>
+		std::shared_ptr<ComponentArray<T>> GetComponentArray()
+		{
+			std::string typeName = typeid(T).name();
+			return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
+		}
+
+		template<typename T>
 		T& GetComponent(EntityId entity)
 		{
 			return GetComponentArray<T>()->GetData(entity);
@@ -70,12 +77,7 @@ namespace CW
 		std::unordered_map<std::string, std::shared_ptr<IComponentArray>> _componentArrays;
 		ComponentType _nextComponentType;
 
-		template<typename T>
-		std::shared_ptr<ComponentArray<T>> GetComponentArray()
-		{
-			std::string typeName = typeid(T).name();
-			return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
-		}
+
 
 	};
 }

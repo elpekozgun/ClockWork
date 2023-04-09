@@ -7,6 +7,160 @@ namespace CW
 
 	void CW::RenderSystem::Update(float dt)
 	{
+		//drawCall = 0;
+		SwitchState();
+
+		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+		//glEnable(GL_MULTISAMPLE);
+
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT /*| GL_STENCIL_BUFFER_BIT*/);
+
+		std::map<unsigned int, std::vector<glm::mat4>> instanceTranslations;
+		std::vector< std::map<unsigned int, std::vector<glm::mat4>>> totalTranslations;
+		int tricount = 0;
+
+		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
+		auto skybox = _ecs->GetSingletonComponent<SkyboxComponent>();
+		auto cameraMatrix = camera->CameraMatrix();
+
+		auto renderables = _ecs->GetComponentArray<RenderableComponent>();
+		auto transforms = _ecs->GetComponentArray<TransformComponent>();
+
+
+		for (auto& entity : _entities)
+		{
+			auto& renderable = renderables->GetData(entity);
+			auto& transform = transforms->GetData(entity);
+
+			//auto& renderable = _ecs->GetComponent<RenderableComponent>(entity);
+			//auto& transform = _ecs->GetComponent<TransformComponent>(entity);
+
+			auto transformMatrix = MatrixFromTransform(transform);
+
+			auto clipMatrix = cameraMatrix * transformMatrix;
+
+			for (auto& meshId : renderable.MeshIds)
+			{
+				if (instanced && renderable.Instanced)
+				{
+					auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
+
+					if (frustum)
+					{
+						glm::vec4 clipPos = camera->CameraMatrix() * transformMatrix * glm::vec4(mesh.Vertices[0].Position, 1);
+
+						if (std::abs(clipPos.x) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.y) <= clipPos.w * 0.9f &&
+							std::abs(clipPos.z) <= clipPos.w)
+						{
+							instanceTranslations[meshId].push_back(transformMatrix);
+						}
+					}
+					else
+					{
+						instanceTranslations[meshId].push_back(transformMatrix);
+					}
+
+					if (pagedInstanced)
+					{
+						tricount += mesh.Indices.size() / 3;
+						if (tricount >= MaxTri)
+						{
+							totalTranslations.push_back(instanceTranslations);
+							instanceTranslations.clear();
+							tricount = 0;
+						}
+					}
+				}
+				else
+				{
+					if (CachedMeshes.find(meshId) == CachedMeshes.end())
+					{
+						auto& mesh = _ecs->GetAsset<MeshComponent>(meshId);
+						CachedMeshes[meshId] = mesh;
+
+						if (frustum)
+						{
+							unsigned int depth = 0;
+							if (IsInFrustum(camera->Position, clipMatrix, mesh.AABB, depth))
+							{
+								Render(mesh, transform, *camera);
+							}
+						}
+						else
+						{
+							Render(mesh, transform, *camera);
+						}
+					}
+					else
+					{
+						auto& mesh = CachedMeshes[meshId];
+						if (frustum)
+						{
+							unsigned int depth = 0;
+							if (IsInFrustum(camera->Position, clipMatrix, mesh.AABB, depth))
+							{
+								Render(mesh, transform, *camera);
+							}
+						}
+						else
+						{
+							Render(mesh, transform, *camera);
+						}
+					}
+				}
+			}
+		}
+
+		if (instanced)
+		{
+			if (pagedInstanced)
+			{
+				for (auto& translations : totalTranslations)
+				{
+					RenderInstanced(translations, *camera);
+				}
+			}
+			else
+			{
+				RenderInstanced(instanceTranslations, *camera);
+			}
+		}
+
+		if (drawSkybox)
+		{
+			glDepthFunc(GL_LEQUAL);
+			skybox->Shader.Use();
+
+			// both matrices same but wtf???
+			//auto what = glm::mat4(glm::mat3(camera->CameraMatrix()));
+			glm::mat4 modifiedCamMat = glm::mat4(glm::mat3(camera->View()));
+			modifiedCamMat = camera->Projection() * modifiedCamMat;
+			skybox->Shader.setMat4("CamMat", modifiedCamMat);
+			skybox->Shader.SetTexture("SkyBox", 0);
+
+			// skybox cube
+			//skybox->Vao.Bind();
+			glBindVertexArray(skybox->Vao);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDepthFunc(GL_LESS);
+		}
+
+		cap += dt;
+		//if (cap >= 1.0f)
+		//{
+		//	std::cout << drawCall << "\n";
+		//	cap = 0;
+		//}
+	}
+
+	void CW::RenderSystem::UpdateGetComponent(float dt)
+	{
 		drawCall = 0;
 		SwitchState();
 
@@ -394,7 +548,9 @@ namespace CW
 		glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		glm::mat4 model = MatrixFromTransform(transform);  //transform.GetMatrix();
+		model = transform.GetMatrix();  //transform.GetMatrix();
 		auto camMat = CameraMat(camera);
+		camMat = camera.CameraMatrix();
 
 		mesh.Shader.SetBool("instanced", false);
 
@@ -403,12 +559,7 @@ namespace CW
 		mesh.Shader.setMat4("Model", model);
 		mesh.Shader.setMat4("CamMat", camMat);
 		mesh.Shader.setVec3("CamPosition", camera.Position);
-		mesh.Shader.setVec3("AlbedoColor", vec3(1)/*vec3(0.784)*/);
 
-		mesh.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
-		mesh.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
-		mesh.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
-		
 		mesh.Shader.setVec3("spotLight.Position", camera.Position);
 		mesh.Shader.setVec3("spotLight.Direction", camera.Forward);
 		
@@ -439,7 +590,7 @@ namespace CW
 
 			std::string fullName = name + std::to_string(no);
 
-			//mesh.Shader.SetBool("HasNormalMap", normalNo != 0);
+			mesh.Shader.SetBool("HasNormalMap", normalNo != 0);
 			//mesh.Shader.SetBool("hasNormalMap",false);
 
 			//mesh.Shader.SetTexture(fullName, i);
@@ -465,7 +616,7 @@ namespace CW
 
 
 
-		drawCall++;
+		//drawCall++;
 	}
 
 
@@ -613,32 +764,62 @@ namespace CW
 		{
 			normalScale += 0.05f;
 			std::cout << "normal scale " << normalScale << "\n";
+			for (auto& mesh : CachedMeshes)
+			{
+				mesh.second.Shader.Use();
+				mesh.second.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
+			}
 		}
 		if (input.GetKeyPressed(CW::KEY_7))
 		{
 			normalScale -= 0.05f;
 			std::cout << "normal scale " << normalScale << "\n";
+			for (auto& mesh : CachedMeshes)
+			{
+				mesh.second.Shader.Use();
+				mesh.second.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
+			}
 		}
 		if (input.GetKeyPressed(CW::KEY_8))
 		{
 			metalScale += 0.05f;
 			std::cout << "metalness " << metalScale << "\n";
+			for (auto& mesh : CachedMeshes)
+			{
+				mesh.second.Shader.Use();
+				mesh.second.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
+			}
 		}
 		if (input.GetKeyPressed(CW::KEY_9))
 		{
 			metalScale -= 0.05f;
 			std::cout << "metalness " << metalScale << "\n";
+			for (auto& mesh : CachedMeshes)
+			{
+				mesh.second.Shader.Use();
+				mesh.second.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
+			}
 		}
 
 		if (input.GetKeyPressed(CW::KEY_I))
 		{
 			smoothScale += 0.05f;
 			std::cout << "smoothness " << smoothScale << "\n";
+			for (auto& mesh : CachedMeshes)
+			{
+				mesh.second.Shader.Use();
+				mesh.second.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
+			}
 		}
 		if (input.GetKeyPressed(CW::KEY_O))
 		{
 			smoothScale -= 0.05f;
 			std::cout << "smoothness " << smoothScale << "\n";
+			for (auto& mesh : CachedMeshes)
+			{
+				mesh.second.Shader.Use();
+				mesh.second.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
+			}
 		}
 
 	}
@@ -678,11 +859,11 @@ namespace CW
 		for (unsigned int i = 0; i < 8; i++)
 		{
 			glm::vec4 clipPos = mvp * glm::vec4(aabbVertices[i], 1);
-			if (std::abs(clipPos.x) <= clipPos.w * 0.75f &&
-				std::abs(clipPos.y) <= clipPos.w * 0.75f &&
-				std::abs(clipPos.z) <= clipPos.w)
+			if (std::abs(clipPos.x) > clipPos.w * 0.75f ||
+				std::abs(clipPos.y) > clipPos.w * 0.75f ||
+				std::abs(clipPos.z) > clipPos.w)
 			{
-				return true;
+				return false;
 			}
 		}
 
@@ -722,6 +903,6 @@ namespace CW
 		if (IsInFrustum(camPosition, mvp, rightBottomBack, depth))
 			return true; */
 
-		return false;
+		return true;
 	}
 }
