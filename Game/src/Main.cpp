@@ -344,13 +344,32 @@ void Game()
 
 
 
+
+
 int main()
 {
 #if CW_DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     {
-        Game();
+        std::cout << "transform size:" << sizeof(Transform) << "\n";
+        std::cout << "physcics size:" << sizeof(Physics) << "\n";
+        std::cout << "transformPhysics size:" << sizeof(TransformPhysics) << "\n";
+        
+        int count = 1000000;
+        int iteration = 10;
+
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            BenchmarkSOA(count, iteration);
+            BenchmarkSOAWithArray(count, iteration);
+            BenchmarkSOAWithTuple(count, iteration);
+            BenchmarkSOAWithArchetype(count, iteration);
+            BenchmarkAOS(count, iteration);
+            std::cout << "\n";
+        }
+
+        //Game();
     }
 #if CW_DEBUG
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
