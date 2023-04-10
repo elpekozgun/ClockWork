@@ -149,7 +149,7 @@ namespace CW
 		std::vector<Vertex> Vertices;
 		std::vector<Texture> Textures;
 		std::vector<unsigned int> Indices;
-		VAO Vao;
+		unsigned int VaoId;
 		unsigned int instanceVbo;
 		Shader Shader;
 		AABB AABB;
@@ -157,20 +157,23 @@ namespace CW
 
 		void Setup()
 		{
-			Vao.Bind();
+			VAO vao;
+			vao.Bind();
 
 			EBO ebo(Indices);
 			VBO vbo(Vertices);
 
+			VaoId = vao.Id;
+
 			unsigned int stride = sizeof(Vertex) / sizeof(float);
 
-			Vao.LinkAttribArray<float>(vbo, 0, 3, GL_FLOAT, stride, 0);
-			Vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
-			Vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
-			Vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
-			Vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
+			vao.LinkAttribArray<float>(vbo, 0, 3, GL_FLOAT, stride, 0);
+			vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
+			vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
+			vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
+			vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
 
-			Vao.Unbind();
+			vao.Unbind();
 			vbo.Unbind();
 			ebo.Unbind();
 
@@ -196,7 +199,7 @@ namespace CW
 
 		void MakeInstanced(std::vector<glm::mat4>& transforms)
 		{
-			Vao.Bind();
+			glBindVertexArray(VaoId);
 
 			VBO instanceVBO(transforms);
 
@@ -222,7 +225,7 @@ namespace CW
 			glVertexAttribDivisor(7, 1);
 			glVertexAttribDivisor(8, 1);
 
-			Vao.Unbind();
+			glBindVertexArray(0);
 			instanceVBO.Unbind();
 		}
 	};

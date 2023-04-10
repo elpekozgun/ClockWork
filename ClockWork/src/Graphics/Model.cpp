@@ -267,7 +267,7 @@ namespace CW
 		meshComponent.Vertices = vertices;
 		meshComponent.Indices = indices;
 		meshComponent.Textures = textures;
-		meshComponent.Vao = vao;
+		meshComponent.VaoId = vao.Id;
 		meshComponent.AABB = aabb;
 		meshComponent.Color = vec3(0.35f);
 

@@ -284,6 +284,84 @@ namespace CW
 		}
 	}
 
+
+	void RenderSystem::Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera)
+	{
+		auto skybox = _ecs->GetSingletonComponent<SkyboxComponent>();
+		mesh.Shader.Use();
+
+		glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+		glm::mat4 model = MatrixFromTransform(transform);  //transform.GetMatrix();
+		model = transform.GetMatrix();  //transform.GetMatrix();
+		auto camMat = CameraMat(camera);
+		camMat = camera.CameraMatrix();
+
+		mesh.Shader.SetBool("instanced", false);
+
+
+		// TODO: UPDATING THESE PROPERTIES EVERY FRAME IS SUPER COSTLY, NO NEED TO CHANGE UNLESS THERE IS A CHANGE IN STATE...
+		mesh.Shader.setMat4("Model", model);
+		mesh.Shader.setMat4("CamMat", camMat);
+		mesh.Shader.setVec3("CamPosition", camera.Position);
+
+		mesh.Shader.setVec3("spotLight.Position", camera.Position);
+		mesh.Shader.setVec3("spotLight.Direction", camera.Forward);
+
+		if (!directionalLight)
+		{
+			mesh.Shader.setVec3("directLight.Color", 0, 0, 0);
+		}
+
+		unsigned int diffuseNo = 0;
+		unsigned int specularNo = 0;
+		unsigned int normalNo = 0;
+		unsigned int metallicNo = 0;
+		unsigned int roughnessNo = 0;
+		for (unsigned int i = 0; i < mesh.Textures.size(); i++)
+		{
+			int no = 0;
+			std::string name = mesh.Textures[i].TextureType;
+			if (name == "Diffuse")
+				no = diffuseNo++;
+			else if (name == "Specular")
+				no = specularNo++;
+			else if (name == "Normal")
+				no = normalNo++;
+			else if (name == "Metallic")
+				no = metallicNo++;
+			else if (name == "Roughness")
+				no = roughnessNo++;
+
+			std::string fullName = name + std::to_string(no);
+
+			mesh.Shader.SetBool("HasNormalMap", normalNo != 0);
+			//mesh.Shader.SetBool("hasNormalMap",false);
+
+			//mesh.Shader.SetTexture(fullName, i);
+			mesh.Textures[i].Bind();
+
+		}
+		//mesh.Shader.SetTexture("IrradianceMap", 4);
+		//mesh.Shader.SetTexture("PrefilterMap", 5);
+		//mesh.Shader.SetTexture("BrdfLut", 6);
+
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->IrradianceMap);
+
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->PrefilterMap);
+
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, skybox->BrdfLutMap);
+
+		glBindVertexArray(mesh.VaoId);
+		glDrawElements(GL_TRIANGLES, mesh.Indices.size(), GL_UNSIGNED_INT, 0);
+
+
+		//drawCall++;
+	}
+
 	void RenderSystem::RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera)
 	{
 		for (auto& pair : transformMap)
@@ -322,7 +400,7 @@ namespace CW
 				mesh.Textures[i].Bind();
 			}
 
-			mesh.Vao.Bind();
+			glBindVertexArray(mesh.VaoId);
 			glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceVbo);
 			glBufferData(GL_ARRAY_BUFFER, transforms.size() * sizeof(glm::mat4), transforms.data(), GL_STATIC_DRAW);
 

@@ -41,17 +41,13 @@ namespace CW
 	{
 	public:
 		virtual void Update(float deltaTime) override;
-		void Update2(float deltaTime);
-		void UpdateSlow(float deltaTime);
 		void UpdateGetComponent(float deltaTime);
 
 		std::vector<std::pair<TransformComponent, RenderableComponent>> RenderTuples;
 
 	private:
 		void Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera);
-		void Render(MeshComponent& mesh, glm::mat4& modelMat);
 		void RenderInstanced(std::map<unsigned int, std::vector<glm::mat4>>& transformMap, CameraComponent& camera);
-		void RenderInstanced(MeshComponent& mesh, std::map<unsigned int, std::vector<glm::mat4>>& transformMap);
 		glm::mat4 MatrixFromTransform(TransformComponent& component);
 		glm::mat4 CameraMat(CameraComponent& camera);
 		void SwitchState();
