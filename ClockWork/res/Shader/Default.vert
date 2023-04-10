@@ -21,30 +21,35 @@ out VS_OUT
 uniform bool instanced;
 
 
+void CalcNormal(mat4 modelMat)
+{
+	vs_out.FragmentNormal = transpose(inverse(mat3(modelMat))) * inNormal;
+	mat3 normalMatrix = transpose(inverse(mat3(modelMat)));
+	vec3 T = normalize(normalMatrix * inTangent);
+	vec3 N = normalize(normalMatrix * inNormal);
+	//vec3 B = normalize(normalMatrix * inBitangent);
+	T = normalize(T - dot(T, N) * N);
+	vec3 B = cross(N, T);
+	vs_out.TBN = mat3(T, B, N);   
+};
+
 void main()
 {
 	// http://www.lighthouse3d.com/tutorials/glsl-tutorial/the-normal-matrix/
 	vs_out.TexCoord = inTex;
 
-	vs_out.FragmentNormal = transpose(inverse(mat3(Model))) * inNormal;
-	mat3 normalMatrix = transpose(inverse(mat3(Model)));
-    vec3 T = normalize(normalMatrix * inTangent);
-    vec3 N = normalize(normalMatrix * inNormal);
-    //vec3 B = normalize(normalMatrix * inBitangent);
-    T = normalize(T - dot(T, N) * N);
-    vec3 B = cross(N, T);
-
-	vs_out.TBN = mat3(T, B, N);   
-
-
 	if(instanced)
 	{
 		vs_out.FragmentPosition = vec3(inInstancedTransform * vec4(inPos,1));
+		CalcNormal(inInstancedTransform);
 		gl_Position =  CamMat * inInstancedTransform * vec4(inPos, 1.0);
 	}
 	else
 	{
 		vs_out.FragmentPosition = vec3(Model * vec4(inPos,1));
+		CalcNormal(Model);
      	gl_Position =  CamMat * Model * vec4(inPos, 1.0);
 	}
 };
+
+

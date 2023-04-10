@@ -238,7 +238,7 @@ namespace CW
 		vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
 		vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
 		vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
-		
+
 
 		vao.Unbind();
 		vbo.Unbind();

@@ -63,6 +63,19 @@ namespace CW
 		float turnspeed;
 	};
 
+	struct CW_API BVHNode
+	{
+		AABB aabb;
+		BVHNode* Left;
+		BVHNode* Right;
+		uint Entity;
+	};
+
+	struct CW_API AABBComponent
+	{
+		glm::vec3 Min;
+		glm::vec3 Max;
+	};
 
 	struct CW_API PhysicsComponent
 	{

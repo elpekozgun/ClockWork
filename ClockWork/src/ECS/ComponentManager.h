@@ -55,6 +55,13 @@ namespace CW
 		}
 
 		template<typename T>
+		bool HasComponent(EntityId entity)
+		{
+			return GetComponentArray<T>()->HasData(entity);
+		}
+
+
+		template<typename T>
 		void SetComponent(EntityId entity, T value)
 		{
 			GetComponentArray<T>()->SetData(entity, value);

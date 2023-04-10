@@ -48,6 +48,12 @@ namespace CW
 			return _componentArray[_entityToIndex[entity]];
 		}
 
+		bool HasData(EntityId entity)
+		{
+			return _entityToIndex.contains(entity);
+		}
+
+
 		void DestroyEntity(EntityId entity) override
 		{
 			if (_entityToIndex.contains(entity))

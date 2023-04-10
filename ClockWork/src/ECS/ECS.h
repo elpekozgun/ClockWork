@@ -78,6 +78,13 @@ namespace CW
 		}
 
 		template<typename T>
+		bool HasComponent(EntityId entity)
+		{
+			return _componentManager->HasComponent<T>(entity);
+		}
+
+
+		template<typename T>
 		std::shared_ptr<ComponentArray<T>> GetComponentArray()
 		{
 			return _componentManager->GetComponentArray<T>();

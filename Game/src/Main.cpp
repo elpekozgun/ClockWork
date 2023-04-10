@@ -145,7 +145,8 @@ void Game()
         AddSystem<PlayerController, TransformComponent, Player>()->
         AddSystem<PhysicsSystem, TransformComponent, PhysicsComponent>()->
         AddSystem<CameraSystem, CameraComponent>()->
-        AddSystem<RenderSystem, RenderableComponent, TransformComponent>();
+        AddSystem<RenderSystem, RenderableComponent, TransformComponent>()->
+        AddSystem<CollisionSystem, AABBComponent, TransformComponent>();
 
     auto& ecs = app->GetECS();
 
@@ -246,12 +247,23 @@ void Game()
 
     std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
     std::vector<unsigned int> mariaAssets;
+
+    
+
     for (auto& mesh : meshComponents)
     {
         mesh.Shader = defaultShader;
         auto asset = ecs.AddAsset(mesh);
         mariaAssets.push_back(asset);
     }
+
+    auto& aabb1 = meshComponents[0].AABB;
+    auto& aabb2 = meshComponents[1].AABB;
+
+    AABBComponent AABB1{ glm::vec3(aabb1.minX, aabb1.minY, aabb1.minZ), glm::vec3(aabb1.maxX, aabb1.maxY, aabb1.maxZ) };
+    AABBComponent AABB2{ glm::vec3(aabb2.minX, aabb2.minY, aabb2.minZ), glm::vec3(aabb2.maxX, aabb2.maxY, aabb2.maxZ)};
+
+    std::cout << AABB1.Max.x << std::endl;
 
    /* std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
     std::vector<unsigned int> sponzaAssets;
@@ -268,22 +280,58 @@ void Game()
 
 
     RenderableComponent renderableMaria{ mariaAssets , false};
+
+
+
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
     //RenderableComponent renderableSponza { sponzaAssets, false };
 
-    auto light1 = scene.CreateEntity("light");
-    auto sponza = scene.CreateEntity("sponza");
 
     std::default_random_engine generator;
-    std::uniform_real_distribution<float> randPosition(-0.40f, 0.40f);
+    std::uniform_real_distribution<float> randPosition(-0.5f, 0.5f);
     std::uniform_real_distribution<float> randRotation(0.0f, 359.0f);
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
      
     float scale = 0.01f;
 
+
+
+    auto transform1 = TransformComponent
+    {
+        glm::vec3(0),
+        glm::vec3(0, randRotation(generator), 0),
+        glm::vec3(scale)
+    };
+
+
+    auto maria1 = scene.CreateEntity("maria1");
+    auto mariaWeapon1 = scene.CreateEntity("mariaWeapon");
+    scene.AddComponents
+    (
+        maria1,
+        transform1,
+        Player{ 5.0f, 5.0f },
+        RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
+        AABB1
+        //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+    );
+
+    scene.AddComponents
+    (
+        mariaWeapon1,
+        transform1,
+        //Player{ 5.0f, 5.0f },
+        RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
+        AABB2
+        // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
+    );
+
+    auto light1 = scene.CreateEntity("light");
+
+
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 5000 ; i++)
+    for (unsigned int i = 0; i < 20 ; i++)
     {
         auto transform = TransformComponent
         { 
@@ -291,48 +339,73 @@ void Game()
             glm::vec3(0, randRotation(generator), 0), 
             glm::vec3(scale) 
         };
+        //auto transform = TransformComponent
+        //{
+        //    glm::vec3(0),
+        //    glm::vec3(0, randRotation(generator), 0),
+        //    glm::vec3(scale)
+        //};
+
+        transforms.emplace_back(transform.GetMatrix());
 
         auto maria = scene.CreateEntity("maria1");
+        auto mariaWeapon = scene.CreateEntity("mariaWeapon");
         scene.AddComponents 
         (
             maria, 
             transform, 
-            Player{5.0f, 5.0f},
-            renderableMaria,
-            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+            //Player{5.0f, 5.0f},
+            RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
+            AABB1
+            //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+        );
+
+        scene.AddComponents
+        (
+            mariaWeapon,
+            transform,
+            //Player{ 5.0f, 5.0f },
+            RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
+            AABB2
+           // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
         );
     }
 
 
-    auto model = scene.CreateEntity("maria1");
-    scene.AddComponents
-    (
-        model,
-        TransformComponent{ glm::vec3(0), glm::vec3(0)/*glm::vec3(3.141592f / 2.0f,0,0)*/, glm::vec3(scale)},
-        Player{ 5.0f, 5.0f },
-        renderableMaria,
-        PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
-    );
 
+
+    //auto transform2 = TransformComponent
+    //{
+    //    glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
+    //    glm::vec3(0, randRotation(generator), 0),
+    //    glm::vec3(scale)
+    //};
+
+    //auto maria2 = scene.CreateEntity("maria1");
+    //auto mariaWeapon2 = scene.CreateEntity("mariaWeapon");
+    //scene.AddComponents
+    //(
+    //    maria2,
+    //    transform2,
+    //    //Player{ 5.0f, 5.0f },
+    //    RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
+    //    AABB1
+    //    //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+    //);
+
+    //scene.AddComponents
+    //(
+    //    mariaWeapon2,
+    //    transform2,
+    //    //Player{ 5.0f, 5.0f },
+    //    RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
+    //    AABB2
+    //    // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
+    //);
+
+    
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
     //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
-    
-
-    //auto renderSystem = std::dynamic_pointer_cast<RenderSystem>(ecs.GetSystem<RenderSystem>());
-    //auto ents = renderSystem->_entities;
-    //for (auto& ent : ents)
-    //{
-    //    auto a = ecs.GetComponent<TransformComponent>(ent);
-    //    auto b = ecs.GetComponent<RenderableComponent>(ent);
-    //    renderSystem->RenderTuples.push_back({ a,b });
-    //}
-
-
-    //instanced rendering performance still slow..
-    //for (auto& meshId : renderableMaria.MeshIds)
-    //{
-    //    ecs.MakeMeshInstanced(meshId, transforms);
-    //}
 
 
     app->Run(1920, 1080);
