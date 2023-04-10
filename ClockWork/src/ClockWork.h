@@ -15,6 +15,7 @@
 #include "System/RenderSystem.h"
 #include "System/PhysicsSystem.h"
 #include "System/CameraSystem.h"
+#include "System/PlayerController.h"
 
 #include "Graphics/Model.h"
 #include "Graphics/EBO.h"

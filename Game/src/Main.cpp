@@ -9,7 +9,6 @@
 
 #include "ClockWork.h"
 #include "../Example.h"
-#include "Game/Systems/PlayerController.h"
 #include <Graphics/Skybox.h>
 
 
