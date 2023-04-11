@@ -64,5 +64,6 @@ namespace CW
 			transform.Position += (movement + strafe) * dt;
 
 		}
+
 	}
 }

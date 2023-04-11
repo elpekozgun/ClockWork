@@ -1,4 +1,5 @@
 #include "App.h"
+#include "ThreadPool.h"
 
 namespace CW
 {
@@ -16,14 +17,14 @@ namespace CW
 
 	void App::Run(const unsigned int width, const unsigned int height)
 	{
-		//_window.Setup(width, height);
-
-		//TempRender tempRender;
-
 		double prevTime = 0.0;
 		double currentTime = 0.0;
 		int frameCount = 0;
 		double dt;
+
+		ThreadPool tp(_systems.size());
+
+		thread renderThread;
 
 		while (!_window.ShouldClose)
 		{
@@ -39,11 +40,22 @@ namespace CW
 				prevTime = currentTime;
 				frameCount = 0;
 			}
+			//for (auto& system : _systems)
+			//{
+			//	system->Update(dt);
+			//}
 
-			for (const auto& system : _systems)
+			for (size_t i = 1; i < _systems.size(); i++)
 			{
-				system->Update(dt);
+				auto& system = _systems[i];
+				tp.Push([&system, dt, i](size_t) 
+				{ 
+					system->Update(dt); });
 			}
+			tp.Wait();
+			_systems[0]->Update(dt);
+
+
 
 			_window.Update();
 		}

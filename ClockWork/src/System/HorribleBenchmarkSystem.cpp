@@ -1,8 +1,8 @@
-#include "CollisionSystem.h"
+#include "HorribleBenchmarkSystem.h"
 
 namespace CW
 {
-	void CollisionSystem::Update(float dt)
+	void HorribleBenchmarkSystem::Update(float dt)
 	{
 		auto aabbs = _ecs->GetComponentArray<AABBComponent>();
 		auto transforms = _ecs->GetComponentArray<TransformComponent>();
@@ -15,31 +15,31 @@ namespace CW
 			{
 				if (entity1 != entity2)
 				{
-					auto aabb2 = aabbs->GetData(entity2);
-					auto& transform2 = transforms->GetData(entity2);
+					//auto aabb2 = aabbs->GetData(entity2);
+					//auto& transform2 = transforms->GetData(entity2);
 
-					if (CheckAABBCollision(aabb1, transform1, aabb2, transform2))
-					{
-						/*bool isPlayer = _ecs->HasComponent<Player>(entity1);
-						if (isPlayer)
-						{
-							_ecs->DestroyEntity(entity2);
-						}
-						else
-						{
-							isPlayer = _ecs->HasComponent<Player>(entity2);
-							if (isPlayer)
-							{
-								_ecs->DestroyEntity(entity1);
-							}
-						}*/
-					}
+					//if (CheckAABBCollision(aabb1, transform1, aabb2, transform2))
+					//{
+					//	bool isPlayer = _ecs->HasComponent<Player>(entity1);
+					//	if (isPlayer)
+					//	{
+					//		_ecs->DestroyEntity(entity2);
+					//	}
+					//	else
+					//	{
+					//		isPlayer = _ecs->HasComponent<Player>(entity2);
+					//		if (isPlayer)
+					//		{
+					//			_ecs->DestroyEntity(entity1);
+					//		}
+					//	}
+					//}
 				}
 			}
 		}
 	}
 
-	bool CollisionSystem::CheckAABBCollision(const AABBComponent& aabb1, const TransformComponent& transform1, const AABBComponent& aabb2, const TransformComponent& transform2) {
+	bool HorribleBenchmarkSystem::CheckAABBCollision(const AABBComponent& aabb1, const TransformComponent& transform1, const AABBComponent& aabb2, const TransformComponent& transform2) {
 		// Compute the transformed AABBs for both entities
 		AABBComponent transformedAABB1 = TransformAABB(aabb1, transform1);
 		AABBComponent transformedAABB2 = TransformAABB(aabb2, transform2);
@@ -53,7 +53,7 @@ namespace CW
 		return overlapX && overlapY && overlapZ;
 	}
 
-	AABBComponent CollisionSystem::TransformAABB(const AABBComponent& aabb, const TransformComponent& transform) {
+	AABBComponent HorribleBenchmarkSystem::TransformAABB(const AABBComponent& aabb, const TransformComponent& transform) {
 		// Compute the transformed min and max values for the AABB
 		glm::vec3 min = transform.Position + aabb.Min * transform.Scale;
 		glm::vec3 max = transform.Position + aabb.Max * transform.Scale;

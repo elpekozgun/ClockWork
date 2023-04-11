@@ -142,11 +142,12 @@ MeshComponent makeLight()
 void Game()
 {
     auto app = App::Create("game")->
+        AddSystem<RenderSystem, RenderableComponent, TransformComponent>()->
         AddSystem<PlayerController, TransformComponent, Player>()->
         AddSystem<PhysicsSystem, TransformComponent, PhysicsComponent>()->
         AddSystem<CameraSystem, CameraComponent>()->
-        AddSystem<RenderSystem, RenderableComponent, TransformComponent>()->
-        AddSystem<CollisionSystem, AABBComponent, TransformComponent>();
+        AddSystem<CollisionSystem, AABBComponent, TransformComponent>()->
+        AddSystem<HorribleBenchmarkSystem, AABBComponent, TransformComponent>();
 
     auto& ecs = app->GetECS();
 
@@ -324,14 +325,14 @@ void Game()
         //Player{ 5.0f, 5.0f },
         RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
         AABB2
-        // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
+        //PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
     );
 
     auto light1 = scene.CreateEntity("light");
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 20 ; i++)
+    for (unsigned int i = 0; i < 500 ; i++)
     {
         auto transform = TransformComponent
         { 
@@ -354,20 +355,20 @@ void Game()
         (
             maria, 
             transform, 
-            //Player{5.0f, 5.0f},
+            Player{5.0f, 5.0f},
             RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
-            AABB1
-            //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+            AABB1,
+            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
         );
 
         scene.AddComponents
         (
             mariaWeapon,
             transform,
-            //Player{ 5.0f, 5.0f },
+            Player{ 5.0f, 5.0f },
             RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
-            AABB2
-           // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
+            AABB2,
+            PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
         );
     }
 

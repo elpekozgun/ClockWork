@@ -17,6 +17,7 @@
 #include "System/CameraSystem.h"
 #include "System/PlayerController.h"
 #include "System/CollisionSystem.h"
+#include "System/HorribleBenchmarkSystem.h"
 
 #include "Graphics/Model.h"
 #include "Graphics/EBO.h"
