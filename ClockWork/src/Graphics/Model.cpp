@@ -248,7 +248,7 @@ namespace CW
 		float minY = minX;
 		float minZ = minX;
 
-		float maxX = std::numeric_limits<float>::min();
+		float maxX = std::numeric_limits<float>::lowest();
 		float maxY = maxX;
 		float maxZ = maxX;
 

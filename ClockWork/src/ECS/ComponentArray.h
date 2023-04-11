@@ -29,18 +29,20 @@ namespace CW
 
 		void RemoveData(EntityId entity)
 		{
-			uint removedIndex = _entityToIndex[entity];
-			uint lastIndex = _size - 1;
-			_componentArray[removedIndex] = _componentArray[lastIndex];
+			if (_size > 0)
+			{
+				uint removedIndex = _entityToIndex[entity];
+				uint lastIndex = _size - 1;
+				_componentArray[removedIndex] = _componentArray[lastIndex];
 
-			EntityId temp = _indexToEntity[lastIndex];
-			_entityToIndex[temp] = removedIndex;
-			_indexToEntity[removedIndex] = temp;
-			
-			_entityToIndex.erase(lastIndex);
-			_indexToEntity.erase(entity);
+				EntityId temp = _indexToEntity[lastIndex];
+				_entityToIndex[temp] = removedIndex;
+				_indexToEntity[removedIndex] = temp;
 
-			_size--;
+				_entityToIndex.erase(entity);
+				_indexToEntity.erase(lastIndex);
+				_size--;
+			}
 		}
 
 		T& GetData(EntityId entity)

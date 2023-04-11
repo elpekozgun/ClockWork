@@ -7,6 +7,8 @@ namespace CW
 		auto aabbs = _ecs->GetComponentArray<AABBComponent>();
 		auto transforms = _ecs->GetComponentArray<TransformComponent>();
 
+		std::unordered_set<EntityId> destroyed;
+
 		for (auto& entity1 : _entities)
 		{
 			auto& aabb1 = aabbs->GetData(entity1);
@@ -20,22 +22,27 @@ namespace CW
 
 					if (CheckAABBCollision(aabb1, transform1, aabb2, transform2))
 					{
-						/*bool isPlayer = _ecs->HasComponent<Player>(entity1);
+						bool isPlayer = _ecs->HasComponent<Player>(entity1);
 						if (isPlayer)
 						{
-							_ecs->DestroyEntity(entity2);
+							destroyed.insert(entity2);
 						}
 						else
 						{
 							isPlayer = _ecs->HasComponent<Player>(entity2);
 							if (isPlayer)
 							{
-								_ecs->DestroyEntity(entity1);
+								destroyed.insert(entity1);
 							}
-						}*/
+						}
 					}
 				}
 			}
+		}
+
+		for (auto entity: destroyed)
+		{
+			_ecs->DestroyEntity(entity);
 		}
 	}
 
@@ -44,13 +51,16 @@ namespace CW
 		AABBComponent transformedAABB1 = TransformAABB(aabb1, transform1);
 		AABBComponent transformedAABB2 = TransformAABB(aabb2, transform2);
 
-		// Check for overlap in each dimension
-		bool overlapX = (transformedAABB1.Min.x <= transformedAABB2.Max.x) && (transformedAABB1.Max.x >= transformedAABB2.Min.x);
-		bool overlapY = (transformedAABB1.Min.y <= transformedAABB2.Max.y) && (transformedAABB1.Max.y >= transformedAABB2.Min.y);
-		bool overlapZ = (transformedAABB1.Min.z <= transformedAABB2.Max.z) && (transformedAABB1.Max.z >= transformedAABB2.Min.z);
+		if (transformedAABB1.Min.x < transformedAABB2.Min.x || transformedAABB1.Min.x > transformedAABB2.Max.x) 
+			return false;
 
-		// If there is overlap in all dimensions, there is a collision
-		return overlapX && overlapY && overlapZ;
+		if (transformedAABB1.Min.y < transformedAABB2.Min.y || transformedAABB1.Min.y > transformedAABB2.Max.y)
+			return false;
+		
+		if (transformedAABB1.Min.z < transformedAABB2.Min.z || transformedAABB1.Min.z > transformedAABB2.Max.z)
+			return false;
+
+		return true;
 	}
 
 	AABBComponent CollisionSystem::TransformAABB(const AABBComponent& aabb, const TransformComponent& transform) {

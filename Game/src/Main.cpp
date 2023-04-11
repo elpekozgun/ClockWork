@@ -147,7 +147,8 @@ void Game()
         AddSystem<PhysicsSystem, TransformComponent, PhysicsComponent>()->
         AddSystem<CameraSystem, CameraComponent>()->
         AddSystem<CollisionSystem, AABBComponent, TransformComponent>()->
-        AddSystem<HorribleBenchmarkSystem, AABBComponent, TransformComponent>();
+        //AddSystem<HorribleBenchmarkSystem, AABBComponent, TransformComponent>()->
+        AddSystem<AABBRenderer, AABBComponent, TransformComponent>();
 
     auto& ecs = app->GetECS();
 
@@ -264,8 +265,6 @@ void Game()
     AABBComponent AABB1{ glm::vec3(aabb1.minX, aabb1.minY, aabb1.minZ), glm::vec3(aabb1.maxX, aabb1.maxY, aabb1.maxZ) };
     AABBComponent AABB2{ glm::vec3(aabb2.minX, aabb2.minY, aabb2.minZ), glm::vec3(aabb2.maxX, aabb2.maxY, aabb2.maxZ)};
 
-    std::cout << AABB1.Max.x << std::endl;
-
    /* std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
     std::vector<unsigned int> sponzaAssets;
     for (auto& mesh : sponzaMeshComponents)
@@ -296,8 +295,6 @@ void Game()
      
     float scale = 0.01f;
 
-
-
     auto transform1 = TransformComponent
     {
         glm::vec3(0),
@@ -322,7 +319,7 @@ void Game()
     (
         mariaWeapon1,
         transform1,
-        //Player{ 5.0f, 5.0f },
+        Player{ 5.0f, 5.0f },
         RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
         AABB2
         //PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
@@ -332,7 +329,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 500 ; i++)
+    for (unsigned int i = 0; i < 50 ; i++)
     {
         auto transform = TransformComponent
         { 
@@ -355,20 +352,20 @@ void Game()
         (
             maria, 
             transform, 
-            Player{5.0f, 5.0f},
+            //Player{5.0f, 5.0f},
             RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
-            AABB1,
-            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
+            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
+            AABB1
         );
 
         scene.AddComponents
         (
             mariaWeapon,
             transform,
-            Player{ 5.0f, 5.0f },
+            //Player{ 5.0f, 5.0f },
             RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
-            AABB2,
-            PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
+            PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) },
+            AABB2
         );
     }
 
@@ -414,7 +411,38 @@ void Game()
     delete app;
 }
 
+void ThreadSafeTest()
+{
+    CW::ThreadPool tp;
 
+    int array[100];
+
+    for (size_t i = 0; i < 10; i++)
+    {
+        array[i] = i;
+    }
+
+    for (unsigned int i = 0; i < 10; i++)
+    {
+        auto& val = array[i];
+        tp.Push([&val, i](int) 
+        {
+            val+= 2;
+        });
+
+        tp.Push([&val, i](int)
+        {
+            val--;
+        });
+
+        tp.Push([&val, i](int)
+        {
+            std::cout << val << "\n";
+        });
+        tp.Wait();
+    }
+
+}
 
 
 
@@ -424,6 +452,7 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     {
+        //ThreadSafeTest();
         Game();
     }
 #if CW_DEBUG

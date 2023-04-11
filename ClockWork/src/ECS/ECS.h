@@ -34,7 +34,7 @@ namespace CW
 			return _entityManager->CreateEntity();
 		}
 
-		void DestroyEntity(EntityId entity)
+		void DestroyEntity(EntityId& entity)
 		{
 			_entityManager->DestroyEntity(entity);
 			_componentManager->DestroyEntity(entity);

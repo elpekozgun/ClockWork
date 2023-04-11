@@ -9,7 +9,8 @@
 
 namespace CW {
 
-    class ThreadPool {
+    class ThreadPool 
+    {
     public:
         using Task = std::function<void(size_t)>;
 

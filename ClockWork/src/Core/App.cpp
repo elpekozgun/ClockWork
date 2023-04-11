@@ -40,20 +40,22 @@ namespace CW
 				prevTime = currentTime;
 				frameCount = 0;
 			}
-			//for (auto& system : _systems)
-			//{
-			//	system->Update(dt);
-			//}
-
-			for (size_t i = 1; i < _systems.size(); i++)
+			for (auto& system : _systems)
 			{
-				auto& system = _systems[i];
-				tp.Push([&system, dt, i](size_t) 
-				{ 
-					system->Update(dt); });
+				system->Update(dt);
 			}
-			tp.Wait();
-			_systems[0]->Update(dt);
+
+			//for (size_t i = 1; i < _systems.size() - 1; i++)
+			//{
+			//	auto& system = _systems[i];
+			//	tp.Push([&system, dt, i](size_t) 
+			//	{ 
+			//		system->Update(dt); }
+			//	);
+			//}
+			//tp.Wait();
+			//_systems[0]->Update(dt);
+			//_systems[5]->Update(dt);
 
 
 
