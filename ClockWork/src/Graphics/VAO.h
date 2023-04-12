@@ -9,7 +9,6 @@ namespace CW
 	{
 	public:
 		VAO();
-		~VAO();
 
 		void Unbind();
 		void Bind();

@@ -375,6 +375,10 @@ namespace CW
         RenderQuad();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glBindVertexArray(0);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glBindTexture(GL_TEXTURE_2D, 0);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
         //----------------------------------------------------------------------
 
@@ -405,16 +409,16 @@ namespace CW
     void Skybox::SetupCube(std::vector<float>& vertices)
     {
         glGenVertexArrays(1, &cubeVAO);
+        glBindVertexArray(cubeVAO);
+
         glGenBuffers(1, &cubeVBO);
-        // fill buffer
         glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-        // link vertex attributes
-        glBindVertexArray(cubeVAO);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        
         glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
 
@@ -436,14 +440,19 @@ namespace CW
         };
         // setup plane VAO
         glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
         glBindVertexArray(quadVAO);
+
+        glGenBuffers(1, &quadVBO);
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
     }
 
 }

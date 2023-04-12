@@ -34,22 +34,22 @@ namespace CW
 
 			if (input.GetKeyDown(CW::KEY_Q))
 			{
-				horizontal = 1.0f;
+				horizontal = -1.0f;
 			}
 
 			if (input.GetKeyDown(CW::KEY_E))
 			{
-				horizontal = -1.0f;
+				horizontal = 1.0f;
 			}
 
 			if (input.GetKeyDown(CW::KEY_A))
 			{
-				rotational = -1.0f;
+				rotational = 1.0f;
 			}
 
 			if (input.GetKeyDown(CW::KEY_D))
 			{
-				rotational = 1.0f;
+				rotational = -1.0f;
 			}
 
 			float rotationAmount = rotational * player.turnspeed * dt;

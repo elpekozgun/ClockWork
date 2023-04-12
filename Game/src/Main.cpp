@@ -172,20 +172,20 @@ void Game()
 
 
     Scene scene(ecs);
-    //Model mariaModel(R"(C:/Users/user/Desktop/Vanguard/Vanguard By T. Choonyung.dae)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/damaged_helmet/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/sphere/source/sphere_sampleScene_1cm.fbx)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/pbrspherefbx/source/sphere_sampleScene_1cm.fbx)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/doom_eternal_slayer/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/skull_downloadable/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
-    //Model mariaModel(R"(C:/Users/user/Desktop/maria/scene.gltf)");
-    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
-    Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/Maria WProp J J Ong.dae)");
-    //Model mariaModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/Vanguard/Vanguard By T. Choonyung.dae)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/damaged_helmet/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/sphere/source/sphere_sampleScene_1cm.fbx)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/pbrspherefbx/source/sphere_sampleScene_1cm.fbx)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/doom_eternal_slayer/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/skull_downloadable/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/Character/scene.gltf)");
+    //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
+    Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)");
+    //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
     auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
     //auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
@@ -247,8 +247,8 @@ void Game()
     //Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
 
 
-    std::vector<MeshComponent>& meshComponents = mariaModel.MeshComponents;
-    std::vector<unsigned int> mariaAssets;
+    std::vector<MeshComponent>& meshComponents = CharacterModel.MeshComponents;
+    std::vector<unsigned int> CharacterAssets;
 
     
 
@@ -256,7 +256,7 @@ void Game()
     {
         mesh.Shader = defaultShader;
         auto asset = ecs.AddAsset(mesh);
-        mariaAssets.push_back(asset);
+        CharacterAssets.push_back(asset);
     }
 
     auto& aabb1 = meshComponents[0].AABB;
@@ -279,7 +279,7 @@ void Game()
     auto lightId = ecs.AddAsset(lights[0]);
 
 
-    RenderableComponent renderableMaria{ mariaAssets , false};
+    RenderableComponent renderableCharacter{ CharacterAssets , false};
 
 
 
@@ -303,24 +303,24 @@ void Game()
     };
 
 
-    auto maria1 = scene.CreateEntity("maria1");
-    auto mariaWeapon1 = scene.CreateEntity("mariaWeapon");
+    auto Character1 = scene.CreateEntity("Character1");
+    auto CharacterWeapon1 = scene.CreateEntity("CharacterWeapon");
     scene.AddComponents
     (
-        maria1,
+        Character1,
         transform1,
         Player{ 5.0f, 5.0f },
-        RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
+        RenderableComponent{ std::vector<unsigned int>{CharacterAssets[0]}, false },
         AABB1
         //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
     );
 
     scene.AddComponents
     (
-        mariaWeapon1,
+        CharacterWeapon1,
         transform1,
         Player{ 5.0f, 5.0f },
-        RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
+        RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
         AABB2
         //PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
     );
@@ -346,24 +346,24 @@ void Game()
 
         transforms.emplace_back(transform.GetMatrix());
 
-        auto maria = scene.CreateEntity("maria1");
-        auto mariaWeapon = scene.CreateEntity("mariaWeapon");
+        auto Character = scene.CreateEntity("Character1");
+        auto CharacterWeapon = scene.CreateEntity("CharacterWeapon");
         scene.AddComponents 
         (
-            maria, 
+            Character, 
             transform, 
             //Player{5.0f, 5.0f},
-            RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
+            RenderableComponent{ std::vector<unsigned int>{CharacterAssets[0]}, false },
             PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
             AABB1
         );
 
         scene.AddComponents
         (
-            mariaWeapon,
+            CharacterWeapon,
             transform,
             //Player{ 5.0f, 5.0f },
-            RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
+            RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
             PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) },
             AABB2
         );
@@ -379,24 +379,24 @@ void Game()
     //    glm::vec3(scale)
     //};
 
-    //auto maria2 = scene.CreateEntity("maria1");
-    //auto mariaWeapon2 = scene.CreateEntity("mariaWeapon");
+    //auto Character2 = scene.CreateEntity("Character1");
+    //auto CharacterWeapon2 = scene.CreateEntity("CharacterWeapon");
     //scene.AddComponents
     //(
-    //    maria2,
+    //    Character2,
     //    transform2,
     //    //Player{ 5.0f, 5.0f },
-    //    RenderableComponent{ std::vector<unsigned int>{mariaAssets[0]}, false },
+    //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[0]}, false },
     //    AABB1
     //    //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
     //);
 
     //scene.AddComponents
     //(
-    //    mariaWeapon2,
+    //    CharacterWeapon2,
     //    transform2,
     //    //Player{ 5.0f, 5.0f },
-    //    RenderableComponent{ std::vector<unsigned int>{mariaAssets[1]},false },
+    //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
     //    AABB2
     //    // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
     //);

@@ -54,7 +54,7 @@ namespace CW
 	{
 		try
 		{
-			//stbi_set_flip_vertically_on_load(true);
+			stbi_set_flip_vertically_on_load(true);
 			//unsigned char* bytes = stbi_load(path, &Width, &Height, &ChannelCount, 0);
 
 			GLenum format = GL_RGBA;

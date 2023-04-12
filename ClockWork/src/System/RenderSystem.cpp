@@ -148,6 +148,10 @@ namespace CW
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->TextureId);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
+			
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindVertexArray(0);
 			glDepthFunc(GL_LESS);
 		}
 

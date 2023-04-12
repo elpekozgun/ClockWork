@@ -33,9 +33,4 @@ namespace CW
 	{
 		glBindVertexArray(0);
 	}
-
-	VAO::~VAO()
-	{
-	}
-
 }

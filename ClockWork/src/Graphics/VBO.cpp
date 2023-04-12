@@ -37,7 +37,7 @@ namespace CW
 
 	VBO::~VBO()
 	{
-		//glDeleteBuffers(1, &Id);
+		glDeleteBuffers(1, &Id);
 	}
 
 }

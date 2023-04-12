@@ -241,6 +241,13 @@ namespace CW
 			glBindVertexArray(0);
 			instanceVBO.Unbind();
 		}
+
+		void Delete()
+		{
+			glDeleteVertexArrays(1, &VaoId);
+			glDeleteBuffers(1, &instanceVbo);
+			Shader.Delete();
+		}
 	};
 
 
