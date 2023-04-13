@@ -250,5 +250,28 @@ namespace CW
 		}
 	};
 
+	enum class ColliderType
+	{
+		Plane,
+		Box,
+		Sphere,
+		Capsule
+	};
 
+	struct CW_API ColliderTypeComponent
+	{
+		ColliderType Type;
+	};
+
+	struct CW_API PlaneColliderComponent
+	{
+		vec3 Point;
+		vec3 Normal;
+		vec2 Size;
+	};
+
+	struct CW_API BoxColliderComponent
+	{
+		AABB Box;
+	};
 }
