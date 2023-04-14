@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Shader.h"
+#include "ShaderFactory.h"
 #include "VAO.h"
 #include "EBO.h"
 #include "ECS/Component.h"

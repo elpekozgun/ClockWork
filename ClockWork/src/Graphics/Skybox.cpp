@@ -91,9 +91,9 @@ namespace CW
             vbo.Unbind();
 
 
-            auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
-            auto skyboxFrag = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
-            Shader skyboxShader = Shader::CreateShader("skybox", { skyboxVertex, skyboxFrag });
+            auto skyboxVertex = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
+            auto skyboxFrag = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
+            Shader skyboxShader = ShaderFactory::CreateShader("skybox", { skyboxVertex, skyboxFrag });
 
             SkyboxComponent skybox;
             skybox.Vao = vao.Id;
@@ -111,20 +111,20 @@ namespace CW
 
     std::unique_ptr<SkyboxComponent> Skybox::LoadHdr(const char* path)
     {
-        auto cubeVS = Shader::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/ToCubeMap.vert", ShaderType::Vertex);
-        auto cubeFS = Shader::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/ToCubeMap.frag", ShaderType::Fragment);
-        auto irradianceFS = Shader::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/irradiance.frag", ShaderType::Fragment);
-        auto prefilterFS = Shader::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/prefilter.frag", ShaderType::Fragment);
-        auto brdfLutFS = Shader::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/brdfLut.frag", ShaderType::Fragment);
-        auto brdfLutVS = Shader::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/brdfLut.vert", ShaderType::Vertex);
-        auto skyboxVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
-        auto skyboxFrag = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
+        auto cubeVS = ShaderFactory::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/ToCubeMap.vert", ShaderType::Vertex);
+        auto cubeFS = ShaderFactory::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/ToCubeMap.frag", ShaderType::Fragment);
+        auto irradianceFS = ShaderFactory::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/irradiance.frag", ShaderType::Fragment);
+        auto prefilterFS = ShaderFactory::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/prefilter.frag", ShaderType::Fragment);
+        auto brdfLutFS = ShaderFactory::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/brdfLut.frag", ShaderType::Fragment);
+        auto brdfLutVS = ShaderFactory::CreateShaderSource("C:/_Dev/ClockWork/ClockWork/res/Shader/brdfLut.vert", ShaderType::Vertex);
+        auto skyboxVertex = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.vert)", ShaderType::Vertex);
+        auto skyboxFrag = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\skybox.frag)", ShaderType::Fragment);
 
-        Shader ToCubeMapShader = Shader::CreateShader("to cubemap", std::vector<GLuint> {cubeVS, cubeFS});
-        Shader irradianceShader = Shader::CreateShader("irradiance", std::vector<GLuint> {cubeVS, irradianceFS});
-        Shader prefilterShader = Shader::CreateShader("prefilter", std::vector<GLuint> {cubeVS, prefilterFS});
-        Shader brdfLutShader = Shader::CreateShader("brdfLut", std::vector<GLuint> {brdfLutVS, brdfLutFS});
-        Shader skyboxShader = Shader::CreateShader("skybox", { skyboxVertex, skyboxFrag });
+        Shader ToCubeMapShader = ShaderFactory::CreateShader("to cubemap", std::vector<GLuint> {cubeVS, cubeFS});
+        Shader irradianceShader = ShaderFactory::CreateShader("irradiance", std::vector<GLuint> {cubeVS, irradianceFS});
+        Shader prefilterShader = ShaderFactory::CreateShader("prefilter", std::vector<GLuint> {cubeVS, prefilterFS});
+        Shader brdfLutShader = ShaderFactory::CreateShader("brdfLut", std::vector<GLuint> {brdfLutVS, brdfLutFS});
+        Shader skyboxShader = ShaderFactory::CreateShader("skybox", { skyboxVertex, skyboxFrag });
 
         std::vector<float> vertices{
             // back face

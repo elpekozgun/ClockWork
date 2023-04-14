@@ -19,8 +19,8 @@ namespace CW
 
 			//physics.Acceleration -= glm::vec3(0,0.00981f,0);
 
-			physics.Velocity += physics.Acceleration * dt;
-			transform.Position += physics.Velocity * dt;
+			//physics.Velocity += physics.Acceleration * dt;
+			//transform.Position += physics.Velocity * dt;
 
 			//if (abs(transform.Position.x) > 40.0f || abs(transform.Position.z) > 40.0f)
 			//{

@@ -7,39 +7,6 @@ namespace CW
 
 	}
 
-	GLuint Shader::CreateShaderSource(const char* path, ShaderType type)
-	{
-		GLuint id = glCreateShader((int)type);
-		auto source = Utilities::ReadFile(path);
-		const char* shaderSource = source.c_str();
-
-		glShaderSource(id, 1, &shaderSource, 0);
-		glCompileShader(id);
-		CheckShaderCompileError(id);
-
-		return id;
-	}
-
-	Shader Shader::CreateShader(const std::string& name, std::vector<GLuint> shaderIds)
-	{
-		int id = glCreateProgram();
-
-		for (auto& shaderId : shaderIds)
-		{
-			glAttachShader(id, shaderId);
-		}
-
-		glLinkProgram(id);
-		CheckLinkingError(id);
-
-		for (auto& shaderId : shaderIds)
-		{
-			glDeleteShader(shaderId);
-		}
-
-		return Shader(name, id);
-	}
-
 	void Shader::Use() const
 	{
 		glUseProgram(Id);
@@ -108,32 +75,6 @@ namespace CW
 	void Shader::setMat4(const std::string& name, const glm::mat4& mat) 
 	{
 		glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
-	}
-
-	void Shader::CheckShaderCompileError(GLuint shader)
-	{
-		int success;
-		char infolog[1024];
-
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(shader, sizeof(infolog), NULL, infolog);
-			std::cout << "Compilation Error: " << infolog << "\n";
-		}
-	}
-
-	void Shader::CheckLinkingError(GLuint program)
-	{
-		int success;
-		char infolog[1024];
-
-		glGetShaderiv(program, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetProgramInfoLog(program, sizeof(infolog), NULL, infolog);
-			std::cout << "Program Linking Error: " << infolog << "\n";
-		}
 	}
 
 	GLint& Shader::GetUniformLocation(const std::string& uniform)

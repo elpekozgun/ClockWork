@@ -7,6 +7,7 @@
 #include "gtc/quaternion.hpp"
 #include "gtx/quaternion.hpp"
 #include "glm.hpp"
+#include "Graphics/ShaderFactory.h"
 
 #include <vector>
 #include <execution>
@@ -18,10 +19,10 @@ namespace CW
 	public:
 		AABBRenderer()
 		{
-			auto vs = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\aabb.vert)", ShaderType::Vertex);
-			auto fs = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\aabb.frag)", ShaderType::Fragment);
+			auto vs = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\aabb.vert)", ShaderType::Vertex);
+			auto fs = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\aabb.frag)", ShaderType::Fragment);
 
-			_aabbShader = Shader::CreateShader("aabb", { vs, fs });
+			_aabbShader = ShaderFactory::CreateShader("aabb", { vs, fs });
 
 			std::vector<glm::vec3> vertices = 
 			{

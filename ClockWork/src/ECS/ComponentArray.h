@@ -64,6 +64,12 @@ namespace CW
 			}
 		}
 
+		inline uint Size()
+		{
+			return _size;
+		}
+
+
 	private:
 
 		T _componentArray[MAX_ENTITY]{};

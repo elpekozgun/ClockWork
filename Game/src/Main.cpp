@@ -58,9 +58,9 @@ MeshComponent MakeGround()
     groundMesh.Textures = textures;
     groundMesh.Setup();
 
-    auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
-    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
-    groundMesh.Shader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
+    auto vertexShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
+    auto fragmentShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
+    groundMesh.Shader = ShaderFactory::CreateShader("shader", { vertexShader, fragmentShader });
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
 
@@ -126,9 +126,9 @@ MeshComponent makeLight()
 
     lightMesh.Setup();
 
-    auto lightVertex = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightVertex.glsl)", ShaderType::Vertex);
-    auto lightFragment = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightFragment.glsl)", ShaderType::Fragment);
-    lightMesh.Shader = Shader::CreateShader("shader", { lightVertex, lightFragment });
+    auto lightVertex = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightVertex.glsl)", ShaderType::Vertex);
+    auto lightFragment = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\LightFragment.glsl)", ShaderType::Fragment);
+    lightMesh.Shader = ShaderFactory::CreateShader("shader", { lightVertex, lightFragment });
 
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
@@ -187,10 +187,10 @@ void Game()
     Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)");
     //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
-    auto vertexShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
+    auto vertexShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
     //auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
-    auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultPBR.frag)", ShaderType::Fragment);
-    auto defaultShader = Shader::CreateShader("shader", { vertexShader, fragmentShader });
+    auto fragmentShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultPBR.frag)", ShaderType::Fragment);
+    auto defaultShader = ShaderFactory::CreateShader("shader", { vertexShader, fragmentShader });
     
     glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     glm::vec3 lightPos = glm::vec3(0, 1.9f, 0);
@@ -304,32 +304,32 @@ void Game()
 
 
     auto Character1 = scene.CreateEntity("Character1");
-    auto CharacterWeapon1 = scene.CreateEntity("CharacterWeapon");
+    //auto CharacterWeapon1 = scene.CreateEntity("CharacterWeapon");
     scene.AddComponents
     (
         Character1,
         transform1,
         Player{ 5.0f, 5.0f },
-        RenderableComponent{ std::vector<unsigned int>{CharacterAssets[0]}, false },
+        RenderableComponent{ CharacterAssets /*std::vector<unsigned int>{CharacterAssets[0]}*/, false },
         AABB1
         //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
     );
 
-    scene.AddComponents
-    (
-        CharacterWeapon1,
-        transform1,
-        Player{ 5.0f, 5.0f },
-        RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
-        AABB2
-        //PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
-    );
+    //scene.AddComponents
+    //(
+    //    CharacterWeapon1,
+    //    transform1,
+    //    Player{ 5.0f, 5.0f },
+    //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
+    //    AABB2
+    //    //PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
+    //);
 
     auto light1 = scene.CreateEntity("light");
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 50 ; i++)
+    for (unsigned int i = 0; i < 300 ; i++)
     {
         auto transform = TransformComponent
         { 
@@ -353,20 +353,20 @@ void Game()
             Character, 
             transform, 
             //Player{5.0f, 5.0f},
-            RenderableComponent{ std::vector<unsigned int>{CharacterAssets[0]}, false },
+            RenderableComponent{ CharacterAssets, /*std::vector<unsigned int>{CharacterAssets[0]},*/ false },
             PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
             AABB1
         );
 
-        scene.AddComponents
-        (
-            CharacterWeapon,
-            transform,
-            //Player{ 5.0f, 5.0f },
-            RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
-            PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) },
-            AABB2
-        );
+        //scene.AddComponents
+        //(
+        //    CharacterWeapon,
+        //    transform,
+        //    //Player{ 5.0f, 5.0f },
+        //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
+        //    PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) },
+        //    AABB2
+        //);
     }
 
 

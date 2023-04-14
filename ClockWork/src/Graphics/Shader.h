@@ -10,16 +10,6 @@
 
 namespace CW
 {
-	enum class CW_API ShaderType
-	{
-		Vertex = GL_VERTEX_SHADER,
-		Fragment = GL_FRAGMENT_SHADER,
-		Geometry = GL_GEOMETRY_SHADER,
-		Compute = GL_COMPUTE_SHADER,
-		TessEval = GL_TESS_EVALUATION_SHADER,
-		TessControl = GL_TESS_CONTROL_SHADER
-	};
-
 	class CW_API Shader
 	{
 	public:
@@ -27,9 +17,6 @@ namespace CW
 		Shader() {};
 
 		void Delete();
-
-		static GLuint CreateShaderSource(const char* path, ShaderType type);
-		static Shader CreateShader(const std::string& name, std::vector<GLuint> shaderIds);
 
 		void Use() const;
 		void SetBool(const std::string& name, bool value);
@@ -52,8 +39,5 @@ namespace CW
 	private:
 		std::unordered_map<std::string, GLint> _uniformLocations;
 		GLint& GetUniformLocation(const std::string& uniform);
-
-		static void CheckShaderCompileError(GLuint shader);
-		static void CheckLinkingError(GLuint program);
 	};
 }
