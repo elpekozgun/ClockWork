@@ -1,36 +1,37 @@
 #version 450 core
 
-layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+#extension GL_NV_shader_atomic_float: enable
+
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 struct Box
 {
 	vec3 Min;
+	uint Id;
 	vec3 Max;
-	//uint Id;
 };
 
-layout(std430, binding = 0) buffer BoxBuffer1 
+layout(std430, binding = 1) buffer BoxBuffer1 
 {
 	Box boxes1[];
 };
 
-layout(std430, binding = 1) buffer BoxBuffer2
+layout(std430, binding = 2) buffer BoxBuffer2
 {
 	Box boxes2[];
 };
 
-layout(std430, binding = 2) buffer CollisionBuffer
+layout(std430, binding = 3) buffer CollisionBuffer
 {
 	vec2 CollisionIndex[];
 };
 
-layout(binding = 3) uniform atomic_uint CollisionCounter;
-
+layout(binding = 4) uniform atomic_uint Counter;
 
 void main()
 {
-	uint gid = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * gl_WorkGroupSize.x;
-	
+	uint gid = gl_GlobalInvocationID.x;
+
 	if(gid >= boxes1.length() * boxes2.length())
 		return;
 
@@ -46,22 +47,18 @@ void main()
 	bool intersect = true;
 	for(int k = 0; k < 3; k++)
 	{
-		//if(box1.Min[k] < box2.Min[k] || box1.Min[k] > box2.Max[k])
-		if (box1.Min[k] > box2.Max[k] || box1.Max[k] < box2.Min[k])
+		if(box1.Max[k] < box2.Min[k] || box1.Min[k] > box2.Max[k])
 		{
 			intersect = false;
 			break;
 		}
 	}
 
-	//CollisionIndex[gid] = intersect ? vec2(box1.Max.x, box2.Max.y) : vec2(-1,-1);		
-
 	if(intersect)
 	{
-		//uint index = atomicCounter(CollisionCounter);
-		uint index = atomicCounterIncrement(CollisionCounter);
-		//CollisionIndex[gid] = vec2(box1.Max.x, box2.Max.y);		
-		CollisionIndex[index] = vec2(box1.Max.x, box2.Max.y);		
+		uint index = atomicCounterIncrement(Counter);
+            CollisionIndex[index] = vec2(box1.Id, box2.Id);
 	}
-
+    memoryBarrierBuffer();
 }
+

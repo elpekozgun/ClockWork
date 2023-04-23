@@ -21,6 +21,7 @@ namespace CW
 		void Use() const;
 		void SetBool(const std::string& name, bool value);
 		void SetInt(const std::string& name, int value);
+		void SetUInt(const std::string& name, unsigned int value);
 		void SetTexture(const std::string& name, GLenum textureType);
 		void SetFloat(const std::string& name, float value);
 		void setVec2(const std::string& name, const glm::vec2& value);

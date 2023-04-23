@@ -39,10 +39,10 @@ namespace CW
 	// align to 16bytes per std430
 	struct CW_API GPUBox
 	{
-		vec4 Min;
-		vec4 Max;
-		//unsigned int Id;
-		//float padding;
+		vec3 Min;
+		unsigned int Id;
+		vec3 Max;
+		float padding;
 	};
 
 }

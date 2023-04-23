@@ -274,7 +274,7 @@ void Game()
         sponzaAssets.push_back(asset);
     }*/
 
-
+    
     auto lights = std::vector<MeshComponent>{ makeLight() };
     auto lightId = ecs.AddAsset(lights[0]);
 
@@ -329,7 +329,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 300 ; i++)
+    for (unsigned int i = 0; i < 3000 ; i++)
     {
         auto transform = TransformComponent
         { 

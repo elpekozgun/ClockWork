@@ -17,9 +17,14 @@ namespace CW
 		glUniform1i(GetUniformLocation(name), (int)value);
 	}
 
-	void Shader::SetInt(const std::string& name, int value) 
+	void Shader::SetInt(const std::string& name, int value)
 	{
 		glUniform1i(GetUniformLocation(name), value);
+	}
+
+	void Shader::SetUInt(const std::string& name, unsigned int value)
+	{
+		glUniform1ui(GetUniformLocation(name), value);
 	}
 
 	void Shader::SetTexture(const std::string& name, GLenum slot) 

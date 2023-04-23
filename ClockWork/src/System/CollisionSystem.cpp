@@ -6,8 +6,8 @@ namespace CW
 	void CollisionSystem::Update(float dt)
 	{
 		ComputeCollisions();
-
-		/*auto aabbs = _ecs->GetComponentArray<AABBComponent>();
+		return;
+		auto aabbs = _ecs->GetComponentArray<AABBComponent>();
 		auto transforms = _ecs->GetComponentArray<TransformComponent>();
 
 		std::unordered_set<EntityId> destroyed;
@@ -46,7 +46,7 @@ namespace CW
 		for (auto entity: destroyed)
 		{
 			_ecs->DestroyEntity(entity);
-		}*/
+		}
 	}
 
 	void CollisionSystem::ComputeCollisions()
@@ -54,7 +54,7 @@ namespace CW
 		auto aabbs = _ecs->GetComponentArray<AABBComponent>();
 		auto transforms = _ecs->GetComponentArray<TransformComponent>();
 
- 		std::vector<GPUBox> aabbData;
+		std::vector<GPUBox> aabbData;
 		aabbData.reserve(_entities.size());
 
 		for (const auto& entity : _entities)
@@ -63,59 +63,60 @@ namespace CW
 			const auto& transform = transforms->GetData(entity);
 			const auto transformedAABB = TransformAABB(aabb, transform);
 
-			aabbData.emplace_back(GPUBox{ glm::vec4(transformedAABB.Min,0), glm::vec4(transformedAABB.Max,0)});
-			//aabbData.emplace_back(GPUBox{ transformedAABB.Min, transformedAABB.Max, entity });
+			//aabbData.emplace_back(GPUBox{ glm::vec4(transformedAABB.Min,0), glm::vec4(transformedAABB.Max,0) });
+			aabbData.emplace_back(GPUBox{ transformedAABB.Min, entity, transformedAABB.Max, 0});
 		}
 
 		const auto size = static_cast<unsigned int>(aabbData.size());
 
 		// Upload the boxes to the GPU
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _boxBuffer1);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_READ);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _boxBuffer1);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_COPY);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _boxBuffer1);
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _boxBuffer2);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_READ);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _boxBuffer2);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_COPY);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _boxBuffer2);
 
 		// Upload the collision data to the GPU
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffer);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _collisionBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size * size * sizeof(vec2), NULL, GL_DYNAMIC_COPY);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size * size * sizeof(vec2), NULL, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _collisionBuffer);
 
 		// Bind atomic counter
 		unsigned int collisionCount = 0;
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer);
-		glClearBufferData(GL_ATOMIC_COUNTER_BUFFER, GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, nullptr);
-		//glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(unsigned int), &collisionCount, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 3, _atomicCounterBuffer);
+		glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(unsigned int), &collisionCount, GL_DYNAMIC_READ);
+		glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 4, _atomicCounterBuffer);
 
-		const auto items = size * size;
-		const auto groups = (items + 63) / 64;
+		const auto groups = (size + 63) / 64;
 
 		CollisionCompute.Use();
-		CollisionCompute.Dispatch(groups, groups, 1, GL_ALL_BARRIER_BITS);
+		CollisionCompute.Dispatch(groups, 1, 1, GL_ALL_BARRIER_BITS);
 
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer);
 		glGetBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(unsigned int), &collisionCount);
 
 		if (collisionCount > 0)
 		{
+			//std::cout << collisionCount << '\n';
 			std::vector<vec2> output(collisionCount);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffer);
 			glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, collisionCount * sizeof(vec2), output.data());
+			
+			for (const auto& collision : output)
+			{
+				//std::cout << collision.x << " , " << collision.y << '\n';
+				if (collision.x == 0)
+				{
+					auto id = (unsigned int)(collision.y);
+					_ecs->DestroyEntity(id);
+				}
+			}
 		}
 
-
-		//for (const auto& collision : collisionData)
-		//{
-		//	std::cout << collision.x << " , " << collision.y << '\n';
-		//}
-
-		if (collisionCount != 0)
-		{
-			std::cout << collisionCount << '\n';
-		}
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 	}
 
 
