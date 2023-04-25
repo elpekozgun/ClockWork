@@ -297,7 +297,7 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 500 ; i++)
+    for (unsigned int i = 0; i < 1000 ; i++)
     {
         auto transform = TransformComponent
         { 

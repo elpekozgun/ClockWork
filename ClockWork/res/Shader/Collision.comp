@@ -101,7 +101,7 @@ vec3 GetPenetration(Box box1, Box box2)
 	
 	float minPenetration = 200000000;
 	int minAxis = -1;
-	for(int i =0 ; i < 3; i++)
+	for(int i = 0 ; i < 3; i++)
 	{
 		float penetrationDepth = min(box1.Max[i] - box2.Min[i], box2.Max[i] - box1.Min[i]);
 		if(penetrationDepth < minPenetration)
