@@ -21,16 +21,20 @@ namespace CW
 			glGenBuffers(1, &_collisionBuffer);
 			glGenBuffers(1, &_atomicCounterBuffer);
 			Name = "CollisionSystem";
+
+			_updateRate = 0.02f;
 		}
 
 		void Update(float dt) override;
 	private:
-		bool CheckAABBCollision(const AABBComponent& aabb1, const TransformComponent& transform1, const AABBComponent& aabb2, const TransformComponent& transform2);
 		AABBComponent TransformAABB(const AABBComponent& aabb, const TransformComponent& transform);
 
 		void ComputeCollisions();
 
 		ComputeShader CollisionCompute;
+
+		//std::vector<vec2> collisionPairs;
+		//std::vector<float> collisionPoints;
 
         GLuint _boxBuffer1;
 		GLuint _boxBuffer2;
@@ -45,6 +49,14 @@ namespace CW
 		unsigned int Id;
 		vec3 Max;
 		float padding;
+	};
+
+	struct CW_API GPUCollision
+	{
+		vec3 Point;
+		unsigned int Id1;
+		vec3 Normal;
+		unsigned int Id2;
 	};
 
 }

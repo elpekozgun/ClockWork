@@ -152,6 +152,11 @@ namespace CW
 
 	};
 
+	//struct CW_API CollisionDataSourceComponent : SingletonComponent
+	//{
+	//	vector<GPUCollision> collisions;
+	//};
+
 	struct CW_API MeshComponent
 	{
 		MeshComponent()

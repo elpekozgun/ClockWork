@@ -17,7 +17,13 @@ namespace CW
 			auto& physics = array1->GetData(entity);
 			auto& transform = array2->GetData(entity);
 
-			//physics.Acceleration -= glm::vec3(0,0.00981f,0);
+			physics.Acceleration -= glm::vec3(0,0.00981f,0);
+			physics.Velocity += physics.Acceleration * dt;
+
+
+			transform.Position += physics.Velocity * dt;
+
+			transform.Position.y = std::max(transform.Position.y, 0.0f);
 
 			//physics.Velocity += physics.Acceleration * dt;
 			//transform.Position += physics.Velocity * dt;

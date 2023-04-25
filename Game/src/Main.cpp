@@ -227,30 +227,12 @@ void Game()
     defaultShader.SetTexture("BrdfLut", 6);
 
 
-    //std::vector<std::string> faces
-    //{
-    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\right.jpg)",
-    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\left.jpg)",
-    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\top.jpg)",
-    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\bottom.jpg)",
-    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\front.jpg)",
-    //    R"(C:\_Dev\ClockWork\ClockWork\res\skybox\back.jpg)"
-    //};
-
     Skybox skybox;
-    //auto skyboxComponent = skybox.Load(faces);
     auto skyboxComponent= skybox.LoadHdr(R"(C:/Users/user/Desktop/daytime.hdr)");
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
 
-
-
-    //Model sponzaModel(R"(C:/Users/user/Desktop/sponza/scene.gltf)");
-
-
     std::vector<MeshComponent>& meshComponents = CharacterModel.MeshComponents;
     std::vector<unsigned int> CharacterAssets;
-
-    
 
     for (auto& mesh : meshComponents)
     {
@@ -262,30 +244,15 @@ void Game()
     auto& aabb1 = meshComponents[0].AABB;
     auto& aabb2 = meshComponents[1].AABB;
 
-    AABBComponent AABB1{ glm::vec3(aabb1.minX, aabb1.minY, aabb1.minZ), glm::vec3(aabb1.maxX, aabb1.maxY, aabb1.maxZ) };
-    AABBComponent AABB2{ glm::vec3(aabb2.minX, aabb2.minY, aabb2.minZ), glm::vec3(aabb2.maxX, aabb2.maxY, aabb2.maxZ)};
-
-   /* std::vector<MeshComponent>& sponzaMeshComponents = sponzaModel.MeshComponents;
-    std::vector<unsigned int> sponzaAssets;
-    for (auto& mesh : sponzaMeshComponents)
-    {
-        mesh.Shader = defaultShader;
-        auto asset = ecs.AddAsset(mesh);
-        sponzaAssets.push_back(asset);
-    }*/
-
-    
+    // make it square for testing collisions
+    AABBComponent AABB1{ glm::vec3(aabb1.minX, aabb1.minY, aabb1.minX), glm::vec3(aabb1.maxX, aabb1.maxY, aabb1.maxX) };
+    AABBComponent AABB2{ glm::vec3(aabb2.minX, aabb2.minY, aabb2.minX), glm::vec3(aabb2.maxX, aabb2.maxY, aabb2.maxX)};
+  
     auto lights = std::vector<MeshComponent>{ makeLight() };
     auto lightId = ecs.AddAsset(lights[0]);
 
-
     RenderableComponent renderableCharacter{ CharacterAssets , false};
-
-
-
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
-    //RenderableComponent renderableSponza { sponzaAssets, false };
-
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> randPosition(-0.5f, 0.5f);
@@ -297,7 +264,7 @@ void Game()
 
     auto transform1 = TransformComponent
     {
-        glm::vec3(0),
+        glm::vec3(0, 2, 0),
         glm::vec3(0, randRotation(generator), 0),
         glm::vec3(scale)
     };
@@ -311,7 +278,8 @@ void Game()
         transform1,
         Player{ 5.0f, 5.0f },
         RenderableComponent{ CharacterAssets /*std::vector<unsigned int>{CharacterAssets[0]}*/, false },
-        AABB1
+        AABB1,
+        PhysicsComponent{ glm::vec3(0), glm::vec3(0) }
         //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
     );
 
@@ -329,11 +297,11 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 3000 ; i++)
+    for (unsigned int i = 0; i < 500 ; i++)
     {
         auto transform = TransformComponent
         { 
-            glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
+            glm::vec3(randPosition(generator) / scale, 3, randPosition(generator) / scale),
             glm::vec3(0, randRotation(generator), 0), 
             glm::vec3(scale) 
         };
@@ -354,7 +322,8 @@ void Game()
             transform, 
             //Player{5.0f, 5.0f},
             RenderableComponent{ CharacterAssets, /*std::vector<unsigned int>{CharacterAssets[0]},*/ false },
-            PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
+            //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
+            PhysicsComponent{ glm::vec3(0), glm::vec3(0) },
             AABB1
         );
 
