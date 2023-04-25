@@ -11,7 +11,7 @@ namespace CW
 
 		for (auto& entity : _entities)
 		{
-			dt = 0.01f;
+			//dt = 0.01f;
 			auto& player = players->GetData(entity);
 			auto& transform = transforms->GetData(entity);
 

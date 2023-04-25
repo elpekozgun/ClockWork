@@ -1,5 +1,5 @@
 #include "CollisionSystem.h"
-#include <math.h>
+
 
 namespace CW
 {
@@ -7,7 +7,7 @@ namespace CW
 	{
 		ComputeCollisions();
 		return;
-		auto aabbs = _ecs->GetComponentArray<AABBComponent>();
+		/*auto aabbs = _ecs->GetComponentArray<AABBComponent>();
 		auto transforms = _ecs->GetComponentArray<TransformComponent>();
 
 		std::unordered_set<EntityId> destroyed;
@@ -46,7 +46,7 @@ namespace CW
 		for (auto entity: destroyed)
 		{
 			_ecs->DestroyEntity(entity);
-		}
+		}*/
 	}
 
 	void CollisionSystem::ComputeCollisions()
@@ -89,24 +89,27 @@ namespace CW
 		glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(unsigned int), &collisionCount, GL_DYNAMIC_READ);
 		glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 4, _atomicCounterBuffer);
 
-		const auto groups = (size + 63) / 64;
+		const auto groups = (size * (size - 1) / 2 + 63) / 64;
 
 		CollisionCompute.Use();
-		CollisionCompute.Dispatch(groups, 1, 1, GL_ALL_BARRIER_BITS);
+		CollisionCompute.Dispatch(groups , 1, 1, GL_ALL_BARRIER_BITS);
 
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer);
 		glGetBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(unsigned int), &collisionCount);
 
 		if (collisionCount > 0)
 		{
-			//std::cout << collisionCount << '\n';
 			std::vector<vec2> output(collisionCount);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffer);
-			glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, collisionCount * sizeof(vec2), output.data());
-			
+			auto pCollisionData = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, collisionCount * sizeof(vec2), GL_MAP_READ_BIT);
+			if (pCollisionData != nullptr)
+			{
+				std::memcpy(output.data(), pCollisionData, collisionCount * sizeof(vec2));
+			}
+			glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
 			for (const auto& collision : output)
 			{
-				//std::cout << collision.x << " , " << collision.y << '\n';
 				if (collision.x == 0)
 				{
 					auto id = (unsigned int)(collision.y);
@@ -138,7 +141,8 @@ namespace CW
 		return true;
 	}
 
-	AABBComponent CollisionSystem::TransformAABB(const AABBComponent& aabb, const TransformComponent& transform) {
+	AABBComponent CollisionSystem::TransformAABB(const AABBComponent& aabb, const TransformComponent& transform) 
+	{
 		// Compute the transformed min and max values for the AABB
 		glm::vec3 min = transform.Position + aabb.Min * transform.Scale;
 		glm::vec3 max = transform.Position + aabb.Max * transform.Scale;

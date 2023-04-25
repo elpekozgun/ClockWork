@@ -163,7 +163,7 @@ void Game()
     camera.Width = 1920;
     camera.height = 1080;
     camera.FoV = 60;
-    camera.speed = 5.0f;
+    camera.speed = 15.0f;
     camera.sensitivity = 0.1f;
     camera.Near = 0.5f;
     camera.Far = 500.0f;

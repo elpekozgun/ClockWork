@@ -14,12 +14,15 @@ namespace CW
 
 		ComponentMask _systemMask;
 		ECS* _ecs = nullptr;
-
 		std::set<EntityId> _entities;
+
+		std::string Name;
+
 	protected:
 
 		float _updateRate = 0.01666666f;
 		float _currentDelta = 0;
+
 
 		friend class SystemManager;
 	};

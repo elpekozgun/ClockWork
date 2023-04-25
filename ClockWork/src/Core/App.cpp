@@ -1,5 +1,6 @@
 #include "App.h"
 #include "ThreadPool.h"
+#include "Macro.h"
 
 namespace CW
 {
@@ -17,32 +18,36 @@ namespace CW
 
 	void App::Run(const unsigned int width, const unsigned int height)
 	{
+		double windowReset = 0.0;
+
 		double prevTime = 0.0;
 		double currentTime = 0.0;
 		int frameCount = 0;
 		double dt;
 
-		ThreadPool tp(_systems.size());
+		//ThreadPool tp(_systems.size());
 
-		thread renderThread;
+		//thread renderThread;
 
 		while (!_window.ShouldClose)
 		{
 			currentTime = glfwGetTime();
 			dt = currentTime - prevTime;
-			frameCount++;
-			if (dt >= 1.0 / 60.0)
+			
+			windowReset += dt;
+			if (windowReset >= 0.25)
 			{
-				std::string FPS = std::to_string((1.0 / dt) * frameCount);
-				std::string ms = std::to_string(dt / frameCount * 1000);
+				std::string FPS = std::to_string((1.0 / dt));
+				std::string ms = std::to_string(dt * 1000);
 				std::string title = _name + " - FPS: " + FPS + " / ms: " + ms + " / dt: " + std::to_string(dt);
 				_window.SetTitle(title.c_str());
-				prevTime = currentTime;
-				frameCount = 0;
+				windowReset = 0;
 			}
+
 			for (auto& system : _systems)
 			{
 				system->Update(dt);
+				//TIMEIT(system->Update(dt), system->Name);
 			}
 
 			//for (size_t i = 1; i < _systems.size() - 1; i++)
@@ -56,6 +61,10 @@ namespace CW
 			//tp.Wait();
 			//_systems[0]->Update(dt);
 			//_systems[5]->Update(dt);
+
+			prevTime = currentTime;
+
+
 
 
 

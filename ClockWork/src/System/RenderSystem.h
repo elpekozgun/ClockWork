@@ -40,6 +40,11 @@ namespace CW
 	class CW_API RenderSystem : public ISystem
 	{
 	public:
+		RenderSystem()
+		{
+			Name = "RenderSystem";
+		}
+
 		virtual void Update(float deltaTime) override;
 		void UpdateGetComponent(float deltaTime);
 

@@ -7,7 +7,6 @@ namespace CW
 	{
 		// convert to singleton input.
 		auto& input = Input::Instance();
-		dt = 0.01f;
 
 		auto camera = _ecs->GetSingletonComponent<CameraComponent>();
 

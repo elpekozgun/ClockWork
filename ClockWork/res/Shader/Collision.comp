@@ -11,6 +11,12 @@ struct Box
 	vec3 Max;
 };
 
+//struct Plane
+//{
+//	vec3 normal;
+//	float dist;
+//};
+
 layout(std430, binding = 1) buffer BoxBuffer1 
 {
 	Box boxes1[];
@@ -28,7 +34,12 @@ layout(std430, binding = 3) buffer CollisionBuffer
 
 layout(binding = 4) uniform atomic_uint Counter;
 
-void main()
+//layout(std430, binding = 5) buffer PlaneBuffer
+//{
+//	Plane planes[];
+//};
+
+void BoxVsBox()
 {
 	uint gid = gl_GlobalInvocationID.x;
 
@@ -38,11 +49,14 @@ void main()
 	uint i = gid / boxes2.length();
 	uint j = gid % boxes2.length();
 
-	if(i == j)
+	if(i >= j)
 		return;
 
 	Box box1 = boxes1[i];
 	Box box2 = boxes2[j];
+
+	if(box1.Id == box2.Id)
+		return;
 
 	bool intersect = true;
 	for(int k = 0; k < 3; k++)
@@ -60,5 +74,15 @@ void main()
             CollisionIndex[index] = vec2(box1.Id, box2.Id);
 	}
     memoryBarrierBuffer();
+}
+
+void BoxVsPlane()
+{
+
+}
+
+void main()
+{
+	BoxVsBox();
 }
 

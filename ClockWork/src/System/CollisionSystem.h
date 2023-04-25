@@ -1,7 +1,9 @@
 #pragma once
+#include <math.h>
 
 #include "Graphics/ShaderFactory.h"
 #include "ECS/ECS.h"
+#include "Core/Macro.h"
 
 namespace CW
 {
@@ -18,7 +20,7 @@ namespace CW
             glGenBuffers(1, &_boxBuffer2);
 			glGenBuffers(1, &_collisionBuffer);
 			glGenBuffers(1, &_atomicCounterBuffer);
-			         
+			Name = "CollisionSystem";
 		}
 
 		void Update(float dt) override;
