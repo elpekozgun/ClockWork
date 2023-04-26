@@ -46,8 +46,8 @@ namespace CW
 
 			for (auto& system : _systems)
 			{
-				//system->Update(dt);
-				TIMEIT(system->Update(dt), system->Name);
+				system->Update(dt);
+				//TIMEIT(system->Update(dt), system->Name);
 			}
 
 			//for (size_t i = 1; i < _systems.size() - 1; i++)

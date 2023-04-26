@@ -11,7 +11,7 @@
     } while (0)
 
 
-#define ProfileGpu(Code) \
+#define ProfileGpu(Code, message) \
     do { \
         GLuint query[2]; \
         glGenQueries(2, query); \
@@ -22,6 +22,6 @@
         glGetQueryObjectui64v(query[0], GL_QUERY_RESULT, &start_time); \
         glGetQueryObjectui64v(query[1], GL_QUERY_RESULT, &end_time); \
         GLuint64 elapsed_time = end_time - start_time; \
-        std::cout << "Time taken for compute shader: " << elapsed_time / 1000000.0 << " milliseconds" << std::endl; \
+        std::cout << message << ": " <<  elapsed_time / 1000000.0 << " milliseconds" << std::endl; \
         glDeleteQueries(2, query); \
     } while(0)
