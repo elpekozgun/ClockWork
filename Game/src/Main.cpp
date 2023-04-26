@@ -297,12 +297,14 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 1000 ; i++)
+    for (unsigned int i = 0; i < 3000; i++)
     {
+        auto pos = glm::vec3(randPosition(generator) * 5, 3, randPosition(generator) * 5);
         auto transform = TransformComponent
         { 
-            glm::vec3(randPosition(generator) / scale, 3, randPosition(generator) / scale),
-            glm::vec3(0, randRotation(generator), 0), 
+            pos,
+            //glm::vec3(randPosition(generator) / scale, 3, randPosition(generator) / scale),
+            glm::vec3(0, randRotation(generator), 0),
             glm::vec3(scale) 
         };
         //auto transform = TransformComponent
@@ -315,12 +317,12 @@ void Game()
         transforms.emplace_back(transform.GetMatrix());
 
         auto Character = scene.CreateEntity("Character1");
-        auto CharacterWeapon = scene.CreateEntity("CharacterWeapon");
+        //auto CharacterWeapon = scene.CreateEntity("CharacterWeapon");
         scene.AddComponents 
         (
             Character, 
             transform, 
-            //Player{5.0f, 5.0f},
+            Player{5.0f, 5.0f},
             RenderableComponent{ CharacterAssets, /*std::vector<unsigned int>{CharacterAssets[0]},*/ false },
             //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
             PhysicsComponent{ glm::vec3(0), glm::vec3(0) },

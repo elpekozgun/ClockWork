@@ -1,11 +1,23 @@
 #include "CollisionSystem.h"
+#include "Core/Input.h"
 
 
 namespace CW
 {
+	bool calculateCollisions = false;
+
 	void CollisionSystem::Update(float dt)
 	{
-		ComputeCollisions();
+		auto& input = Input::Instance();
+		if (input.GetKeyPressed(CW::KEY_C))
+		{
+			calculateCollisions = !calculateCollisions;
+		}
+
+		if (calculateCollisions)
+		{
+			ComputeCollisions();
+		}
 	}
 
 	void CollisionSystem::ComputeCollisions()
@@ -28,69 +40,65 @@ namespace CW
 		
 		const auto size = static_cast<unsigned int>(aabbData.size());
 
-		// Upload the boxes to the GPU
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _boxBuffer1);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_COPY);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _boxBuffer1);
-
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _boxBuffer2);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_COPY);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _boxBuffer2);
-
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size * size * sizeof(GPUCollision), NULL, GL_DYNAMIC_COPY);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _collisionBuffer);
-
 		// Bind atomic counter
 		unsigned int collisionCount = 0;
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer);
+		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer[_activeBuffer]);
 		glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(unsigned int), &collisionCount, GL_DYNAMIC_READ);
-		glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 4, _atomicCounterBuffer);
+		glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, _atomicCounterBuffer[_activeBuffer]);
 
-		const auto groups = (size * (size - 1) / 2 + 63) / 64;
-		
+		// Upload the boxes to the GPU
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _boxBuffers[_activeBuffer]);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(GPUBox), aabbData.data(), GL_DYNAMIC_COPY);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _boxBuffers[0]);
+	
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffers[_activeBuffer]);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size * (size - 1) / 2 * sizeof(GPUCollision), NULL, GL_DYNAMIC_COPY);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _collisionBuffers[_activeBuffer]);
+
+		const auto groups = (size + 7) / 8;
+
 		CollisionCompute.Use();
-		CollisionCompute.Dispatch(groups , 1, 1, GL_ALL_BARRIER_BITS);
+		CollisionCompute.Dispatch(groups, groups, 1, GL_ALL_BARRIER_BITS);
 
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer);
-		glGetBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(unsigned int), &collisionCount);
+		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer[_activeBuffer ^ 1]);
+		glGetBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(atomic_uint32_t), &collisionCount);
 
 		if (collisionCount > 0)
 		{
-			std::vector<GPUCollision> collisions(collisionCount);
+			//std::cout << collisionCount << std::endl;
 
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffer);
-			auto collisionDataPtr = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, collisionCount * sizeof(GPUCollision), GL_MAP_READ_BIT);
+			GPUCollision* collisionDataPtr = nullptr;
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffers[_activeBuffer ^ 1]);
+			collisionDataPtr = reinterpret_cast<GPUCollision*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, collisionCount * sizeof(GPUCollision), GL_MAP_READ_BIT));
+
 			if (collisionDataPtr != nullptr)
-				std::memcpy(collisions.data(), collisionDataPtr, collisionCount * sizeof(GPUCollision));
-
-			glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-			for (int i = 0; i < collisionCount; i++)
 			{
-				auto collision = collisions[i];
-
-				//if (collision.Id1 == 0)
+				for (int i = 0; i < collisionCount; i++)
 				{
-					//auto& point = collision.Point;
+					auto collision = collisionDataPtr[i];
 
-					//auto& transform = transforms->GetData(collision.Id1);
-					//auto& transform2 = transforms->GetData(collision.Id2);
-					//
-					//// collision.Point is actually the penetration amount of 2 boxes colliding.
-					//auto dot = glm::dot(transform2.Position - transform.Position, collision.Point);
+					auto& point = collision.Point;
 
-					//if (dot > 0)
-					//{
-					//	transform.Position -= collision.Point;
-					//}
-					//else
-					//{
-					//	transform.Position += collision.Point;
-					//}
+					auto& transform = transforms->GetData(collision.Id1);
+					auto& transform2 = transforms->GetData(collision.Id2);
+
+					// collision.Point is actually the penetration amount of 2 boxes colliding.
+					auto dot = glm::dot(transform2.Position - transform.Position, collision.Point);
+
+					if (dot >= 0)
+					{
+						transform.Position -= collision.Point;
+					}
+					else
+					{
+						transform.Position += collision.Point;
+					}
 				}
 			}
+			glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 		}
+		_activeBuffer ^= 1;
+		
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);

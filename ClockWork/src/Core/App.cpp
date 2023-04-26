@@ -35,7 +35,7 @@ namespace CW
 			dt = currentTime - prevTime;
 			
 			windowReset += dt;
-			if (windowReset >= 0.25)
+			if (windowReset >= 1)
 			{
 				std::string FPS = std::to_string((1.0 / dt));
 				std::string ms = std::to_string(dt * 1000);
@@ -46,8 +46,8 @@ namespace CW
 
 			for (auto& system : _systems)
 			{
-				system->Update(dt);
-				//TIMEIT(system->Update(dt), system->Name);
+				//system->Update(dt);
+				TIMEIT(system->Update(dt), system->Name);
 			}
 
 			//for (size_t i = 1; i < _systems.size() - 1; i++)
@@ -62,13 +62,9 @@ namespace CW
 			//_systems[0]->Update(dt);
 			//_systems[5]->Update(dt);
 
-			prevTime = currentTime;
-
-
-
-
-
 			_window.Update();
+
+			prevTime = currentTime;
 		}
 	}
 }

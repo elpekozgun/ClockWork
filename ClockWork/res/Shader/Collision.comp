@@ -1,6 +1,6 @@
 #version 450 core
 
-layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 
 struct Box
@@ -18,58 +18,46 @@ struct Collision
 	uint Id2;
 };
 
+layout(binding = 0) uniform atomic_uint Counter;
 
 layout(std430, binding = 1) buffer BoxBuffer1 
 {
-	Box boxes1[];
+	Box boxes[];
 };
 
-layout(std430, binding = 2) buffer BoxBuffer2
-{
-	Box boxes2[];
-};
-
-layout(std430, binding = 3) buffer CollisionBuffer
+layout(std430, binding = 2) buffer CollisionBuffer
 {
 	Collision Collisions[];
 };
-
-layout(binding = 4) uniform atomic_uint Counter;
-
-
 
 
 vec3 GetPenetration(Box box1, Box box2);
 
 void BoxVsBox()
 {
-	uint gid = gl_GlobalInvocationID.x;
 
-	if(gid >= boxes1.length() * boxes2.length())
+	uint xid = gl_GlobalInvocationID.x;
+	uint yid = gl_GlobalInvocationID.y;
+
+	uint gid = xid + yid * gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+
+	if(gid >= boxes.length() * boxes.length())
 		return;
 
-	uint i = gid / boxes2.length();
-	uint j = gid % boxes2.length();
+
+	uint i = gid / boxes.length();
+	uint j = gid % boxes.length();
 
 	if(i >= j)
 		return;
 
-	Box box1 = boxes1[i];
-	Box box2 = boxes2[j];
+	Box box1 = boxes[i];
+	Box box2 = boxes[j];
 
 	if(box1.Id == box2.Id)
 		return;
 
-	vec3 collisionPoint;
-
 	bool intersect = true;
-	float SeparationDistance = 0.02;
-	
-	vec3 penetration;
-
-	float minPenetration = 200000000;
-	int minAxis = -1;
-
 	for(int k = 0; k < 3; k++)
 	{
 		if(box1.Max[k] < box2.Min[k] || box1.Min[k] > box2.Max[k])
@@ -82,17 +70,18 @@ void BoxVsBox()
 	if(intersect)
 	{
 		uint index = atomicCounterIncrement(Counter);
-		penetration = GetPenetration(box1, box2);
+		vec3 penetration = GetPenetration(box1, box2);
 
 		Collision collision;
 		collision.Point = penetration;
 		collision.Id1 = box1.Id;
 		collision.Id2 = box2.Id;
-		collision.Normal = vec3(0,1,0);
+		collision.Normal = vec3(0,1,0);   
 
 		Collisions[index] = collision;
 	}
     memoryBarrierBuffer();
+	barrier();
 }
 
 vec3 GetPenetration(Box box1, Box box2)
@@ -112,7 +101,7 @@ vec3 GetPenetration(Box box1, Box box2)
 	}
 
 	if(minAxis >= 0)
-		penetration[minAxis] = minPenetration;
+		penetration[minAxis] = minPenetration  + 0.01;
 
 	return penetration;
 }
