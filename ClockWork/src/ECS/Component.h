@@ -260,12 +260,8 @@ namespace CW
 		Plane,
 		Box,
 		Sphere,
-		Capsule
-	};
-
-	struct CW_API ColliderTypeComponent
-	{
-		ColliderType Type;
+		Capsule,
+		ConvexHull
 	};
 
 	struct CW_API PlaneColliderComponent
@@ -273,10 +269,19 @@ namespace CW
 		vec3 Point;
 		vec3 Normal;
 		vec2 Size;
+		ColliderType Type;
 	};
 
 	struct CW_API BoxColliderComponent
 	{
-		AABB Box;
+		vec3 Point;
+		vec3 HalfSize;
+		ColliderType Type;
+	};
+
+	struct CW_API ConvexHullColliderComponent
+	{
+		std::vector<vec3> Points;
+		ColliderType Type;
 	};
 }
