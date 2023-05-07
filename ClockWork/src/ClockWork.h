@@ -20,6 +20,7 @@
 #include "System/CollisionSystem.h"
 #include "System/HorribleBenchmarkSystem.h"
 #include "System/AABBRenderer.h"
+#include "System/AnimationSystem.h"
 
 
 #include "Graphics/Model.h"

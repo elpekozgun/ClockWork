@@ -10,6 +10,7 @@
 
 #include <map>
 #include <execution>
+#include <Graphics/Model.h>
 
 
 /*
@@ -74,6 +75,5 @@ namespace CW
 		float normalScale = 1;
 		float metalScale = 1.0f;
 		float smoothScale = 1.0f;
-
 	};
 }

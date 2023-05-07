@@ -58,8 +58,10 @@ namespace CW
 		CollisionCompute.Use();
 		CollisionCompute.Dispatch(groups, groups, 1, GL_ALL_BARRIER_BITS);
 
+		//_activeBuffer ^= 1;
+
 		// use the data from the previous buffer.
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer[_activeBuffer ^ 1]);
+		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, _atomicCounterBuffer[_activeBuffer]);
 		glGetBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(atomic_uint32_t), &collisionCount);
 
 		if (collisionCount > 0)
@@ -67,7 +69,7 @@ namespace CW
 			//std::cout << collisionCount << std::endl;
 
 			GPUCollision* collisionDataPtr = nullptr;
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffers[_activeBuffer ^ 1]);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, _collisionBuffers[_activeBuffer]);
 			collisionDataPtr = reinterpret_cast<GPUCollision*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, collisionCount * sizeof(GPUCollision), GL_MAP_READ_BIT));
 			if (collisionDataPtr != nullptr)
 			{
@@ -97,7 +99,7 @@ namespace CW
 		}
 
 
-		_activeBuffer ^= 1;
+		//_activeBuffer ^= 1;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 	}

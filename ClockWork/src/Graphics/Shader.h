@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
+#include "gtc/type_ptr.hpp"
 #include <string>
 #include "Utility/Utilities.h"
 #include <vector>
@@ -33,6 +34,8 @@ namespace CW
 		void setMat2(const std::string& name, const glm::mat2& mat);
 		void setMat3(const std::string& name, const glm::mat3& mat);
 		void setMat4(const std::string& name, const glm::mat4& mat);
+		void setMat4Array(const std::string& name, const glm::mat4* mats, unsigned int count);
+		void setMat4(const std::string& name, const GLfloat* mat, const int count);
 		
 		std::string Name;
 		GLuint Id;

@@ -25,9 +25,9 @@ namespace CW
 		int frameCount = 0;
 		double dt;
 
-		//ThreadPool tp(_systems.size());
+		//thread renderthread;
 
-		//thread renderThread;
+		//ThreadPool tp(_systems.size());
 
 		while (!_window.ShouldClose)
 		{
@@ -35,7 +35,7 @@ namespace CW
 			dt = currentTime - prevTime;
 			
 			windowReset += dt;
-			if (windowReset >= 1)
+			if (windowReset >= 0.2f)
 			{
 				std::string FPS = std::to_string((1.0 / dt));
 				std::string ms = std::to_string(dt * 1000);
@@ -49,6 +49,8 @@ namespace CW
 				system->Update(dt);
 				//TIMEIT(system->Update(dt), system->Name);
 			}
+
+			//renderthread.join();
 
 			//for (size_t i = 1; i < _systems.size() - 1; i++)
 			//{

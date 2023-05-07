@@ -142,15 +142,18 @@ MeshComponent makeLight()
 void Game()
 {
     auto app = App::Create("game")->
-        AddSystem<RenderSystem, RenderableComponent, TransformComponent>()->
         AddSystem<PlayerController, TransformComponent, Player>()->
         AddSystem<PhysicsSystem, TransformComponent, PhysicsComponent>()->
         AddSystem<CameraSystem, CameraComponent>()->
         AddSystem<CollisionSystem, AABBComponent, TransformComponent>()->
-        //AddSystem<HorribleBenchmarkSystem, AABBComponent, TransformComponent>()->
-        AddSystem<AABBRenderer, AABBComponent, TransformComponent>();
+        AddSystem<RenderSystem, RenderableComponent, TransformComponent>()->
+        AddSystem<AABBRenderer, AABBComponent, TransformComponent>()->
+        AddSystem<AnimationSystem, RenderableComponent>();
+
 
     auto& ecs = app->GetECS();
+
+    
 
     CameraComponent camera;
 
@@ -172,6 +175,12 @@ void Game()
 
 
     Scene scene(ecs);
+    //Model CharacterModel(R"(C:/Users/user/Desktop/kalestra_the_sorceress/scene.gltf)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)");
+    Model CharacterModel(R"(C:/Users/user/Desktop/Idle/Idle.dae)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/Great Sword Idle/Great Sword Idle.dae)");
+    //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)");
+    //Model CharacterModel(R"(C:/Users/user/Desktop/robot_steampunk_3d-coat_4.5_pbr/scene.gltf)");
     //Model CharacterModel(R"(C:/Users/user/Desktop/Vanguard/Vanguard By T. Choonyung.dae)");
     //Model CharacterModel(R"(C:/Users/user/Desktop/damaged_helmet/scene.gltf)");
     //Model CharacterModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
@@ -184,11 +193,21 @@ void Game()
     //Model CharacterModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
     //Model CharacterModel(R"(C:/Users/user/Desktop/Character/scene.gltf)");
     //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
-    Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)");
     //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
-    auto vertexShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
-    //auto fragmentShader = Shader::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
+    //Animation animation(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)", &CharacterModel);
+    //Animator animator(&animation);
+    
+    auto as = std::dynamic_pointer_cast<AnimationSystem>(ecs.GetSystem<AnimationSystem>());
+    //Animation animation(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)", &CharacterModel);
+    Animation animation(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
+    Animator animator(&animation);
+    
+    as->_animator = &animator;
+
+    //auto vertexShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
+    auto vertexShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\animated.vert)", ShaderType::Vertex);
+    //auto fragmentShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.frag)", ShaderType::Fragment);
     auto fragmentShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\DefaultPBR.frag)", ShaderType::Fragment);
     auto defaultShader = ShaderFactory::CreateShader("shader", { vertexShader, fragmentShader });
     
@@ -260,11 +279,11 @@ void Game()
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
      
-    float scale = 0.01f;
+    float scale = 1.00f;
 
     auto transform1 = TransformComponent
     {
-        glm::vec3(0, 2, 0),
+        glm::vec3(0, 0, 0),
         glm::vec3(0, randRotation(generator), 0),
         glm::vec3(scale)
     };
@@ -297,13 +316,14 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 3000; i++)
+    for (unsigned int i = 0; i < 0; i++)
     {
         auto pos = glm::vec3(randPosition(generator) * 5, 3, randPosition(generator) * 5);
         auto transform = TransformComponent
         { 
             pos,
             //glm::vec3(randPosition(generator) / scale, 3, randPosition(generator) / scale),
+            //glm::vec3(-90, randRotation(generator), 0),
             glm::vec3(0, randRotation(generator), 0),
             glm::vec3(scale) 
         };
@@ -328,61 +348,16 @@ void Game()
             PhysicsComponent{ glm::vec3(0), glm::vec3(0) },
             AABB1
         );
-
-        //scene.AddComponents
-        //(
-        //    CharacterWeapon,
-        //    transform,
-        //    //Player{ 5.0f, 5.0f },
-        //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
-        //    PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) },
-        //    AABB2
-        //);
     }
 
-
-
-
-    //auto transform2 = TransformComponent
-    //{
-    //    glm::vec3(randPosition(generator) / scale, 0, randPosition(generator) / scale),
-    //    glm::vec3(0, randRotation(generator), 0),
-    //    glm::vec3(scale)
-    //};
-
-    //auto Character2 = scene.CreateEntity("Character1");
-    //auto CharacterWeapon2 = scene.CreateEntity("CharacterWeapon");
-    //scene.AddComponents
-    //(
-    //    Character2,
-    //    transform2,
-    //    //Player{ 5.0f, 5.0f },
-    //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[0]}, false },
-    //    AABB1
-    //    //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
-    //);
-
-    //scene.AddComponents
-    //(
-    //    CharacterWeapon2,
-    //    transform2,
-    //    //Player{ 5.0f, 5.0f },
-    //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
-    //    AABB2
-    //    // PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
-    //);
-
-    
     scene.AddComponents(light1, TransformComponent{ glm::vec3(0, 1.9f, 0), glm::vec3(0), glm::vec3(1) }, renderableLight/*, PhysicsComponent{ glm::vec3(0, 0, 0.1f), glm::vec3(0, 0, 1)}*/);
-    //scene.AddComponents(sponza, TransformComponent(glm::vec3(0), glm::vec3(0), glm::vec3(0.01f)), renderableSponza);
-
 
     app->Run(1920, 1080);
 
     delete app;
 }
 
-void ThreadSafeTest()
+void ThreadPoolTest()
 {
     CW::ThreadPool tp;
 
@@ -414,8 +389,6 @@ void ThreadSafeTest()
     }
 
 }
-
-
 
 int main()
 {
