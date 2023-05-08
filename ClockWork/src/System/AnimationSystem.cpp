@@ -11,12 +11,7 @@ namespace CW
 	void AnimationSystem::Update(float dt)
 	{
 		SwitchState();
-
-		//return;
-		if (!Idle)
-			_animator->SetAnimation("greatSword");
-		else
-			_animator->SetAnimation("idle");
+		_animator->SetAnimation(activeAnimName);
 
 		if (Play)
 		{
@@ -79,14 +74,33 @@ namespace CW
 	{
 		auto& input = Input::Instance();
 
+		//activeAnimName = "Idle";
 		if (input.GetKeyPressed(CW::KEY_0))
 		{
 			Idle = !Idle;
 		}
-		if (input.GetKeyPressed(CW::KEY_BACKSPACE))
+		else if (input.GetKeyDown(CW::KEY_W))
 		{
-			Play = !Play;
+			activeAnimName = "run";
 		}
+		else if (input.GetKeyDown(CW::KEY_S))
+		{
+			activeAnimName = "run_back";
+		}
+		else if (input.GetKeyDown(CW::KEY_Q))
+		{
+			activeAnimName = "strafe_left";
+		}
+		else if (input.GetKeyDown(CW::KEY_E))
+		{
+			activeAnimName = "strafe_right";
+		}
+		else if (input.GetKeyDown(CW::KEY_X))
+		{
+			activeAnimName = "forward_flip";
+		}
+		else
+			activeAnimName = "idle";
 	}
 
 

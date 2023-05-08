@@ -23,6 +23,8 @@ namespace CW
 		bool Idle = true;
 		bool Play = true;
 
+		std::string activeAnimName = "idle";
+
 		void SwitchState();
 	};
 

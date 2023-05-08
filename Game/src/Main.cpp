@@ -195,22 +195,32 @@ void Game()
     //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
     //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
 
-    //Animation animation(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)", &CharacterModel);
-    //Animator animator(&animation);
-    
     auto as = std::dynamic_pointer_cast<AnimationSystem>(ecs.GetSystem<AnimationSystem>());
     //Animation animation1(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)", &CharacterModel);
     //Animation animation(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
 
-    Animation animation1(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
-    Animation animation2(R"(C:/Users/user/Desktop/Great Sword Idle/Great Sword Idle.dae)", &CharacterModel);
-    //Animation animation3(R"(C:/Users/user/Desktop/GreatSwordAnimations/great sword walk.fbx)", &CharacterModel);
+    Animation animation1(R"(C:/Users/user/Desktop/maria animations/Great Sword Idle.dae)", &CharacterModel);
+    Animation animation2(R"(C:/Users/user/Desktop/maria animations/Running.dae)", &CharacterModel);
+    Animation animation3(R"(C:/Users/user/Desktop/maria animations/Unarmed Run Back.dae)", &CharacterModel);
+    Animation animation4(R"(C:/Users/user/Desktop/maria animations/Right Strafe.dae)", &CharacterModel);
+    Animation animation5(R"(C:/Users/user/Desktop/maria animations/Running Forward Flip.dae)", &CharacterModel);
+    Animation animation6(R"(C:/Users/user/Desktop/maria animations/Left Strafe.dae)", &CharacterModel);
+    
+    
+    
+    //Animation animation2(R"(C:/Users/user/Desktop/Great Sword Idle/Great Sword Idle.dae)", &CharacterModel);
+    //Animation animation2(R"(C:/Users/user/Desktop/GreatSwordAnimations/great sword walk.fbx)", &CharacterModel);
     //Animation animation4(R"(C:/Users/user/Desktop/GreatSwordAnimations/two handed sword death (2).fbx)", &CharacterModel);
     
-    Animator animator(&animation2);
 
-    animator.RegisterAnimation("idle", & animation1);
-    animator.RegisterAnimation("greatSword", & animation2);
+    Animator animator(&animation1);
+    animator.RegisterAnimation("idle", &animation1);
+    animator.RegisterAnimation("run", &animation2);
+    animator.RegisterAnimation("run_back", &animation3);
+    animator.RegisterAnimation("strafe_right", &animation4);
+    animator.RegisterAnimation("forward_flip", &animation5);
+    animator.RegisterAnimation("strafe_left", &animation6);
+    //animator.RegisterAnimation("greatSword", & animation2);
 
     //
     as->_animator = &animator;

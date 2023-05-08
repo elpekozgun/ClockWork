@@ -409,7 +409,7 @@ namespace CW
 
 		void SetAnimation(const std::string& name)
 		{
-			if (m_CurrentAnimation != Animations[name])
+			if (!m_CurrentAnimation || m_CurrentAnimation != Animations[name])
 			{
 				m_CurrentAnimation = Animations[name];
 				m_CurrentTime = 0.0f;
@@ -446,6 +446,11 @@ namespace CW
 			if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 			{
 				int index = boneInfoMap[nodeName].id;
+				if (index > 99)
+				{
+					return;
+				}
+
 				glm::mat4 offset = boneInfoMap[nodeName].offset;
 				m_FinalBoneMatrices[index] = globalTransformation * offset;
 			}
