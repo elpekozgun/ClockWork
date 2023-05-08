@@ -190,7 +190,7 @@ namespace CW
 		vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
 		vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
 		vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
-		vao.LinkAttribArray<float>(vbo, 5, 4, GL_INT, stride, 14);
+		vao.LinkAttribArray<float>(vbo, 5, 4, GL_FLOAT, stride, 14);
 		vao.LinkAttribArray<float>(vbo, 6, 4, GL_FLOAT, stride, 18);
 
 		//vbo.Bind();

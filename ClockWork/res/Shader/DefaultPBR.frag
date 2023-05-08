@@ -228,16 +228,16 @@ void main()
 	vec3 normal = GetNormal();	
 	
 	// convert albedo color to linear space from sRGB
-	//vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb * AlbedoColor, vec3(2.2)) ;
-	vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb, vec3(2.2)) ;
+	vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb * AlbedoColor, vec3(2.2)) ;
+	//vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb, vec3(2.2)) ;
 
 	//float metallic = metallnessModifier;
-	//float metallic = texture(Metallic0, fs_in.TexCoord).r * metallnessModifier;
-	float metallic = texture(Metallic0, fs_in.TexCoord).r;
+	float metallic = texture(Metallic0, fs_in.TexCoord).r * metallnessModifier;
+	//float metallic = texture(Metallic0, fs_in.TexCoord).r;
 	
 	//float roughness =  (1 - clamp(smoothnessModifier,0.0001,1.0));
-	//float roughness = texture(Roughness0, fs_in.TexCoord).r * (1 - clamp(smoothnessModifier,0.0001,0.9999));
-	float roughness = texture(Roughness0, fs_in.TexCoord).r;
+	float roughness = texture(Roughness0, fs_in.TexCoord).r * (1 - clamp(smoothnessModifier,0.0001,0.9999));
+	//float roughness = texture(Roughness0, fs_in.TexCoord).r;
 
 	
 	vec3 f0 = mix(vec3(0.04), albedo, metallic); 
@@ -245,9 +245,9 @@ void main()
 	// DirectLight;
 	vec3 color = vec3(0);
 	
-	color += CalculateDirectionalLight(directLight, albedo, normal, metallic, roughness, f0);
-	color += CalculatePointLight(pointLight, albedo, normal, roughness, metallic, f0);
-	color += CalculateSpotLight(spotLight, albedo, normal, roughness, metallic, f0);
+	//color += CalculateDirectionalLight(directLight, albedo, normal, metallic, roughness, f0);
+	//color += CalculatePointLight(pointLight, albedo, normal, roughness, metallic, f0);
+	//color += CalculateSpotLight(spotLight, albedo, normal, roughness, metallic, f0);
 
 	vec3 viewDir = normalize(CamPosition - fs_in.FragmentPosition); 
 
@@ -276,5 +276,7 @@ void main()
 	// apply gamma correction
 	color = pow(color, vec3(1 / 2.2));
 	FragColor = vec4(color,1);
+
+	//FragColor = vec4(normal,1);
 }
 

@@ -31,8 +31,8 @@ namespace CW
 		auto renderables = _ecs->GetComponentArray<RenderableComponent>();
 		auto transforms = _ecs->GetComponentArray<TransformComponent>();
 
-		auto as = std::dynamic_pointer_cast<AnimationSystem>(_ecs->GetSystem<AnimationSystem>());
-		as->_animator->UpdateAnimation(dt);
+		//auto as = std::dynamic_pointer_cast<AnimationSystem>(_ecs->GetSystem<AnimationSystem>());
+		//as->_animator->UpdateAnimation(dt);
 
 		for (auto& entity : _entities)
 		{
@@ -306,28 +306,6 @@ namespace CW
 		camMat = camera.CameraMatrix();
 
 		mesh.Shader.SetBool("instanced", false);
-
-		auto as = std::dynamic_pointer_cast<AnimationSystem>(_ecs->GetSystem<AnimationSystem>());
-		auto& transforms = as->_animator->GetFinalBoneMatrices();
-
-		mesh.Shader.setMat4Array("BoneMats", transforms.data(), 100);
-		//for (int i = 0; i < 100; i++)
-		//{
-		//	mesh.Shader.setMat4("BoneMats[" + std::to_string(i) + "]", transforms[i]);
-		//}
-
-		//mesh.Shader.setMat4("BoneMats[0]", transforms[0]);
-		//mesh.Shader.setMat4("BoneMats[1]", transforms[1]);
-		//mesh.Shader.setMat4("BoneMats[2]", transforms[2]);
-		//mesh.Shader.setMat4("BoneMats[3]", transforms[3]);
-
-
-		//mesh.Shader.setMat4("BoneMat1", transforms[8]);
-		//mesh.Shader.setMat4("BoneMat2", transforms[9]);
-		//mesh.Shader.setMat4("BoneMat3", transforms[10]);
-		//mesh.Shader.setMat4("BoneMat4", transforms[11]);
-
-
 
 		// TODO: UPDATING THESE PROPERTIES EVERY FRAME IS SUPER COSTLY, NO NEED TO CHANGE UNLESS THERE IS A CHANGE IN STATE...
 		mesh.Shader.setMat4("Model", model);

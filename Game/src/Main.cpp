@@ -199,10 +199,20 @@ void Game()
     //Animator animator(&animation);
     
     auto as = std::dynamic_pointer_cast<AnimationSystem>(ecs.GetSystem<AnimationSystem>());
-    //Animation animation(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)", &CharacterModel);
-    Animation animation(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
-    Animator animator(&animation);
+    //Animation animation1(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)", &CharacterModel);
+    //Animation animation(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
+
+    Animation animation1(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
+    Animation animation2(R"(C:/Users/user/Desktop/Great Sword Idle/Great Sword Idle.dae)", &CharacterModel);
+    //Animation animation3(R"(C:/Users/user/Desktop/GreatSwordAnimations/great sword walk.fbx)", &CharacterModel);
+    //Animation animation4(R"(C:/Users/user/Desktop/GreatSwordAnimations/two handed sword death (2).fbx)", &CharacterModel);
     
+    Animator animator(&animation2);
+
+    animator.RegisterAnimation("idle", & animation1);
+    animator.RegisterAnimation("greatSword", & animation2);
+
+    //
     as->_animator = &animator;
 
     //auto vertexShader = ShaderFactory::CreateShaderSource(R"(C:\_Dev\ClockWork\ClockWork\res\Shader\Default.vert)", ShaderType::Vertex);
@@ -274,7 +284,7 @@ void Game()
     RenderableComponent renderableLight{ std::vector<unsigned int>{lightId}, false };
 
     std::default_random_engine generator;
-    std::uniform_real_distribution<float> randPosition(-0.5f, 0.5f);
+    std::uniform_real_distribution<float> randPosition(-25.5f, 25.5f);
     std::uniform_real_distribution<float> randRotation(0.0f, 359.0f);
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
@@ -316,15 +326,15 @@ void Game()
 
 
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 0; i++)
+    for (unsigned int i = 0; i < 100; i++)
     {
         auto pos = glm::vec3(randPosition(generator) * 5, 3, randPosition(generator) * 5);
         auto transform = TransformComponent
         { 
-            pos,
-            //glm::vec3(randPosition(generator) / scale, 3, randPosition(generator) / scale),
-            //glm::vec3(-90, randRotation(generator), 0),
+            //pos,
+            glm::vec3(randPosition(generator) , 3, randPosition(generator)),
             glm::vec3(0, randRotation(generator), 0),
+            //glm::vec3(0, 0, 0),
             glm::vec3(scale) 
         };
         //auto transform = TransformComponent

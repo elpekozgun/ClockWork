@@ -369,6 +369,16 @@ namespace CW
 	class CW_API Animator
 	{
 	public:
+
+		Animator()
+		{
+			m_CurrentTime = 0;
+			m_FinalBoneMatrices.reserve(100);
+			
+			for (int i = 0; i < 100; i++)
+				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+		}
+
 		Animator(Animation* animation)
 		{
 			m_CurrentTime = 0.0;
@@ -380,6 +390,12 @@ namespace CW
 				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 
+		void RegisterAnimation(const std::string& name, Animation* animation)
+		{
+			Animations[name] = animation;
+		}
+
+
 		void UpdateAnimation(float dt)
 		{
 			m_DeltaTime = dt;
@@ -389,6 +405,20 @@ namespace CW
 				m_CurrentTime = fmod(m_CurrentTime, m_CurrentAnimation->GetDuration());
 				CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
 			}
+		}
+
+		void SetAnimation(const std::string& name)
+		{
+			if (m_CurrentAnimation != Animations[name])
+			{
+				m_CurrentAnimation = Animations[name];
+				m_CurrentTime = 0.0f;
+			}
+		}
+
+		void PlayAnimation(const std::string& name)
+		{
+			PlayAnimation(Animations[name]);
 		}
 
 		void PlayAnimation(Animation* pAnimation)
@@ -428,6 +458,8 @@ namespace CW
 		{
 			return m_FinalBoneMatrices;
 		}
+
+		std::map<std::string, Animation*> Animations;
 
 	private:
 		std::vector<glm::mat4> m_FinalBoneMatrices;
