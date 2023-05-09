@@ -75,16 +75,20 @@ namespace CW
 		{
 			Vertex vertex;
 
-			glm::vec3 data;
-			data.x = mesh->mVertices[i].x;
-			data.y = mesh->mVertices[i].y;
-			data.z = mesh->mVertices[i].z;
-			vertex.Position = data;
+			SetVertexBoneDataToDefault(vertex);
 
-			data.x = mesh->mNormals[i].x;
+			glm::vec3 data;
+			/*data.x = mesh->mVertices[i].x;
+			data.y = mesh->mVertices[i].y;
+			data.z = mesh->mVertices[i].z;*/
+			//vertex.Position = data;	
+			vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
+
+			/*data.x = mesh->mNormals[i].x;
 			data.y = mesh->mNormals[i].y;
-			data.z = mesh->mNormals[i].z;
-			vertex.Normal = data;
+			data.z = mesh->mNormals[i].z;*/
+			//vertex.Normal = data;
+			vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
 
 			data.x = mesh->mTangents[i].x;
 			data.y = mesh->mTangents[i].y;
@@ -143,7 +147,36 @@ namespace CW
 			textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 		}
 
-	
+		ExtractBoneWeightForVertices(vertices, mesh, scene);
+
+		std::vector<int>  boneStuff;
+
+		std::vector<float> weights;
+
+		for (size_t i = 0; i < vertices.size(); i++)
+		{
+			float weight = 0.0f;
+			weight += vertices[i].Weights[0];
+			weight += vertices[i].Weights[1];
+			weight += vertices[i].Weights[2];
+			weight += vertices[i].Weights[3];
+			if (weight > 1.0)
+			{
+				weights.push_back(weight);
+			}
+			
+
+			if (vertices[i].BoneIds[0] > 99)
+				boneStuff.push_back(vertices[i].BoneIds[0]);
+			if (vertices[i].BoneIds[1] > 99)
+				boneStuff.push_back(vertices[i].BoneIds[1]);
+			if (vertices[i].BoneIds[2] > 99)
+				boneStuff.push_back(vertices[i].BoneIds[2]);
+			if (vertices[i].BoneIds[3] > 99)
+				boneStuff.push_back(vertices[i].BoneIds[3]);
+		}
+
+
 		VAO vao;
 		vao.Bind();
 
@@ -157,6 +190,16 @@ namespace CW
 		vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
 		vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
 		vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
+		vao.LinkAttribArray<float>(vbo, 5, 4, GL_FLOAT, stride, 14);
+		vao.LinkAttribArray<float>(vbo, 6, 4, GL_FLOAT, stride, 18);
+
+		//vbo.Bind();
+
+		//glEnableVertexAttribArray(5);
+		//glVertexAttribPointer(5, 4, GL_INT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, BoneIds)));
+		//
+		//glEnableVertexAttribArray(6);
+		//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex,Weights)));
 
 
 		vao.Unbind();

@@ -82,6 +82,23 @@ namespace CW
 		glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 	}
 
+	void Shader::setMat4Array(const std::string& name, const glm::mat4* mats, unsigned int count)
+	{
+		GLint location = GetUniformLocation(name);
+		glUniformMatrix4fv(location, count, GL_FALSE, glm::value_ptr(mats[0]));
+
+		/*for (unsigned int i = 0; i < count; i++)
+		{
+			glUniformMatrix4fv(location + i, 1, GL_FALSE, &mats[i][0][0]);
+		}*/
+	}
+
+	void Shader::setMat4(const std::string& name, const GLfloat* mat, const int count)
+	{
+		//glUniformMatrix4fv(glGetUniformLocation(Id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+		glUniformMatrix4fv(GetUniformLocation(name), count, GL_FALSE, mat);
+	}
+
 	GLint& Shader::GetUniformLocation(const std::string& uniform)
 	{
 		if (_uniformLocations.find(uniform) == _uniformLocations.end())

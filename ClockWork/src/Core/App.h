@@ -19,13 +19,6 @@
 #include "../3rd/glfw/include/GLFW/glfw3.h"
 #include "Event.h"
 
-//#include "imgui.h"
-//
-//#include <imgui_impl_glfw.h>
-//#include <imgui_impl_opengl3.h>
-//#include <imgui_internal.h>
-//#include <imgui.h>
-//#include "imgui_impl_opengl3_loader.h"
 
 namespace CW
 {
@@ -43,6 +36,7 @@ namespace CW
 		{
 			shared_ptr<ISystem> system = _ecs.RegisterSystem<T, C...>();
 			_systems.push_back(system);
+			_window.AddGuiCallback([system]() {system->OnGui(); });
 			return this;
 		}
 

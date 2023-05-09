@@ -229,11 +229,15 @@ void main()
 	
 	// convert albedo color to linear space from sRGB
 	vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb * AlbedoColor, vec3(2.2)) ;
+	//vec3 albedo = pow(texture(Diffuse0, fs_in.TexCoord).rgb, vec3(2.2)) ;
 
+	//float metallic = metallnessModifier;
 	float metallic = texture(Metallic0, fs_in.TexCoord).r * metallnessModifier;
+	//float metallic = texture(Metallic0, fs_in.TexCoord).r;
 	
 	//float roughness =  (1 - clamp(smoothnessModifier,0.0001,1.0));
 	float roughness = texture(Roughness0, fs_in.TexCoord).r * (1 - clamp(smoothnessModifier,0.0001,0.9999));
+	//float roughness = texture(Roughness0, fs_in.TexCoord).r;
 
 	
 	vec3 f0 = mix(vec3(0.04), albedo, metallic); 
@@ -272,5 +276,7 @@ void main()
 	// apply gamma correction
 	color = pow(color, vec3(1 / 2.2));
 	FragColor = vec4(color,1);
+
+	//FragColor = vec4(normal,1);
 }
 

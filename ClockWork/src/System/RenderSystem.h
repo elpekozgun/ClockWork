@@ -7,9 +7,13 @@
 #include "gtc/quaternion.hpp"
 #include "gtx/quaternion.hpp"
 #include "glm.hpp"
+#include "Core/Input.h"
+#include "Graphics/Model.h"
 
 #include <map>
 #include <execution>
+
+
 
 
 /*
@@ -46,6 +50,8 @@ namespace CW
 		}
 
 		virtual void Update(float deltaTime) override;
+		virtual void OnGui() override;
+
 		void UpdateGetComponent(float deltaTime);
 
 		std::vector<std::pair<TransformComponent, RenderableComponent>> RenderTuples;
@@ -71,9 +77,12 @@ namespace CW
 		bool frustum = false;
 		unsigned int drawCall = 0;
 		float cap;
-		float normalScale = 1;
+
+		float normalScale = 1.0f;
 		float metalScale = 1.0f;
 		float smoothScale = 1.0f;
-
+		float prevNormalScale = 1.0f;
+		float prevMetalScale = 1.0f;
+		float prevSmoothScale = 1.0f;
 	};
 }

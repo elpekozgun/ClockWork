@@ -1,6 +1,9 @@
 #pragma once
 #include "Core/Core.h"
 #include "Core/Defines.h"
+#include "Core/Gui.h"
+
+
 #include <set>
 
 namespace CW
@@ -11,6 +14,7 @@ namespace CW
 	{
 	public:
 		virtual void Update(float dt) = 0;
+		virtual void OnGui() {};
 
 		ComponentMask _systemMask;
 		ECS* _ecs = nullptr;
@@ -22,7 +26,6 @@ namespace CW
 
 		float _updateRate = 0.01666666f;
 		float _currentDelta = 0;
-
 
 		friend class SystemManager;
 	};

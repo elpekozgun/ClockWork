@@ -19,7 +19,7 @@ project "Game"
 		"../ClockWork/%{IncludeDir.glm}",
 		"../ClockWork/%{IncludeDir.Glad}",
 		"../ClockWork/%{IncludeDir.stb}",
-		--"../ClockWork/%{IncludeDir.ImGui}"
+		"../ClockWork/%{IncludeDir.ImGui}",
         "../ClockWork/%{IncludeDir.assimp}"
     }
 
