@@ -64,6 +64,7 @@ namespace CW
 			//_systems[0]->Update(dt);
 			//_systems[5]->Update(dt);
 
+
 			_window.Update();
 
 			prevTime = currentTime;

@@ -40,6 +40,16 @@ namespace CW
 		glfwSetKeyCallback(_window, KeyCallback);
 		glfwSetMouseButtonCallback(_window, MouseButtonCallback);
 
+		// Setup ImGui binding
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		(void)io;
+
+		ImGui_ImplGlfw_InitForOpenGL(_window, true);
+		ImGui_ImplOpenGL3_Init("#version 450");
+
+
 		_lastX = width / 2;
 		_lastY = height / 2;
 	}
@@ -52,6 +62,18 @@ namespace CW
 
 	void Window::Update()
 	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		
+		for (const auto& cb : GuiCallbacks)
+		{
+			cb();
+		}
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		ShouldClose = glfwWindowShouldClose(_window);
 		glfwPollEvents();
 		HandleCursor();
@@ -90,9 +112,18 @@ namespace CW
 
 	void Window::Shutdown()
 	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
+		glfwDestroyWindow(_window);
+		glfwTerminate();
 	}
 
-
+	void Window::AddGuiCallback(const std::function<void()>& function)
+	{
+		GuiCallbacks.push_back(function);
+	}
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{

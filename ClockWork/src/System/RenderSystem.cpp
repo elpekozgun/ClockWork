@@ -1,13 +1,22 @@
 #include "RenderSystem.h"
-#include <Core/Input.h>
-#include "AnimationSystem.h"
 
 namespace CW
 {
 
 	
+	void RenderSystem::OnGui()
+	{
+		ImGui::Begin("renderer");
+		ImGui::SliderFloat("Normal", &normalScale, 0.0f, 1.0f);
+		ImGui::SliderFloat("Metalness", &metalScale, 0.0f, 1.0f);
+		ImGui::SliderFloat("Smoothness", &smoothScale, 0.0f, 1.0f);
+		ImGui::Checkbox("Show SkyBox", &drawSkybox);
+		ImGui::Checkbox("Frustum Cull", &frustum);
+		ImGui::Checkbox("Show Directional Light", &directionalLight);
+		ImGui::End();
+	}
 
-	void CW::RenderSystem::Update(float dt)
+	void RenderSystem::Update(float dt)
 	{
 		//drawCall = 0;
 		SwitchState();
@@ -167,7 +176,7 @@ namespace CW
 		//}
 	}
 
-	void CW::RenderSystem::UpdateGetComponent(float dt)
+	void RenderSystem::UpdateGetComponent(float dt)
 	{
 		drawCall = 0;
 		SwitchState();
@@ -291,7 +300,6 @@ namespace CW
 			cap = 0;
 		}
 	}
-
 
 	void RenderSystem::Render(MeshComponent& mesh, TransformComponent& transform, CameraComponent& camera)
 	{
@@ -443,15 +451,7 @@ namespace CW
 	void RenderSystem::SwitchState()
 	{
 		auto& input = Input::Instance();
-		if (input.GetKeyPressed(CW::KEY_1))
-		{
-			frustum = !frustum;
-			std::cout << "frustum ";
-			if (frustum)
-				std::cout << " on\n";
-			else
-				std::cout << " off\n";
-		}
+
 		if (input.GetKeyPressed(CW::KEY_2))
 		{
 			instanced = !instanced;
@@ -470,84 +470,35 @@ namespace CW
 			else
 				std::cout << " off\n";
 		}
-		if (input.GetKeyPressed(CW::KEY_4))
+
+		if (normalScale != prevNormalScale)
 		{
-			drawSkybox = !drawSkybox;
-			std::cout << "drawSkybox ";
-			if (drawSkybox)
-				std::cout << " on\n";
-			else
-				std::cout << " off\n";
-		}
-		if (input.GetKeyPressed(CW::KEY_5))
-		{
-			directionalLight = !directionalLight;
-			std::cout << "directionalLight ";
-			if (directionalLight)
-				std::cout << " on\n";
-			else
-				std::cout << " off\n";
-		}
-		if (input.GetKeyPressed(CW::KEY_6))
-		{
-			normalScale += 0.05f;
-			std::cout << "normal scale " << normalScale << "\n";
 			for (auto& mesh : CachedMeshes)
 			{
 				mesh.second.Shader.Use();
 				mesh.second.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
 			}
-		}
-		if (input.GetKeyPressed(CW::KEY_7))
-		{
-			normalScale -= 0.05f;
-			std::cout << "normal scale " << normalScale << "\n";
-			for (auto& mesh : CachedMeshes)
-			{
-				mesh.second.Shader.Use();
-				mesh.second.Shader.SetFloat("NormalStrength", std::clamp(normalScale, -2.0f, 2.0f));
-			}
-		}
-		if (input.GetKeyPressed(CW::KEY_8))
-		{
-			metalScale += 0.05f;
-			std::cout << "metalness " << metalScale << "\n";
-			for (auto& mesh : CachedMeshes)
-			{
-				mesh.second.Shader.Use();
-				mesh.second.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
-			}
-		}
-		if (input.GetKeyPressed(CW::KEY_9))
-		{
-			metalScale -= 0.05f;
-			std::cout << "metalness " << metalScale << "\n";
-			for (auto& mesh : CachedMeshes)
-			{
-				mesh.second.Shader.Use();
-				mesh.second.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
-			}
+			prevNormalScale = normalScale;
 		}
 
-		if (input.GetKeyPressed(CW::KEY_I))
+		if (smoothScale != prevSmoothScale)
 		{
-			smoothScale += 0.05f;
-			std::cout << "smoothness " << smoothScale << "\n";
 			for (auto& mesh : CachedMeshes)
 			{
 				mesh.second.Shader.Use();
 				mesh.second.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
 			}
+			prevSmoothScale = smoothScale;
 		}
-		if (input.GetKeyPressed(CW::KEY_O))
+
+		if (metalScale != prevMetalScale)
 		{
-			smoothScale -= 0.05f;
-			std::cout << "smoothness " << smoothScale << "\n";
 			for (auto& mesh : CachedMeshes)
 			{
 				mesh.second.Shader.Use();
-				mesh.second.Shader.SetFloat("smoothnessModifier", std::clamp(smoothScale, -2.0f, 2.0f));
+				mesh.second.Shader.SetFloat("metallnessModifier", std::clamp(metalScale, -2.0f, 2.0f));
 			}
+			prevMetalScale = metalScale;
 		}
 
 	}

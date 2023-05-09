@@ -245,9 +245,9 @@ void main()
 	// DirectLight;
 	vec3 color = vec3(0);
 	
-	//color += CalculateDirectionalLight(directLight, albedo, normal, metallic, roughness, f0);
-	//color += CalculatePointLight(pointLight, albedo, normal, roughness, metallic, f0);
-	//color += CalculateSpotLight(spotLight, albedo, normal, roughness, metallic, f0);
+	color += CalculateDirectionalLight(directLight, albedo, normal, metallic, roughness, f0);
+	color += CalculatePointLight(pointLight, albedo, normal, roughness, metallic, f0);
+	color += CalculateSpotLight(spotLight, albedo, normal, roughness, metallic, f0);
 
 	vec3 viewDir = normalize(CamPosition - fs_in.FragmentPosition); 
 
