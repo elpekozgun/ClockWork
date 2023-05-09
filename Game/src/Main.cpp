@@ -160,9 +160,9 @@ void Game()
     camera.Position = glm::vec3(0, 0, 1);
     camera.Forward = glm::vec3(0, 0, -1);
     camera.Up = glm::vec3(0, 1, 0);
-    //camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
-    //camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
-    //camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
+    camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
+    camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
+    camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
     camera.Width = 1920;
     camera.height = 1080;
     camera.FoV = 60;
@@ -383,12 +383,12 @@ void ThreadPoolTest()
 
     int array[100];
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 100; i++)
     {
         array[i] = i;
     }
 
-    for (unsigned int i = 0; i < 10; i++)
+    for (unsigned int i = 0; i < 100; i++)
     {
         auto& val = array[i];
         tp.Push([&val, i](int) 
@@ -416,7 +416,7 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     {
-        //ThreadSafeTest();
+        //ThreadPoolTest();
         Game();
     }
 #if CW_DEBUG
