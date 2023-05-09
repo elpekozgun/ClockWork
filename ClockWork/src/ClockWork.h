@@ -22,6 +22,8 @@
 #include "System/AABBRenderer.h"
 #include "System/AnimationSystem.h"
 
+#include "Project/AssetDataBase.h"
+
 
 #include "Graphics/Model.h"
 #include "Graphics/EBO.h"

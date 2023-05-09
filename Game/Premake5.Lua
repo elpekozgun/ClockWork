@@ -20,7 +20,8 @@ project "Game"
 		"../ClockWork/%{IncludeDir.Glad}",
 		"../ClockWork/%{IncludeDir.stb}",
 		"../ClockWork/%{IncludeDir.ImGui}",
-        "../ClockWork/%{IncludeDir.assimp}"
+        "../ClockWork/%{IncludeDir.assimp}",
+        "../ClockWork/%{IncludeDir.Json}"
     }
 
     links

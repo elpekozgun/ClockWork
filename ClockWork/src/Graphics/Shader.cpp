@@ -4,7 +4,7 @@ namespace CW
 {
 	Shader::Shader(std::string name, GLuint id) : Id(id), Name(name)
 	{
-
+		
 	}
 
 	void Shader::Use() const

@@ -13,6 +13,8 @@ namespace CW
 	//ecs types
 	constexpr uint MAX_ENTITY = 32000;
 	constexpr unsigned short MAX_COMPONENT = 1250;
+	constexpr unsigned int MAX_BONE = 100;
+	constexpr unsigned int MAX_BONE_INFLUENCE = 4;
 
 	typedef uint EntityId;
 	typedef ubyte ComponentType;

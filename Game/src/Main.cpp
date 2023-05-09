@@ -410,6 +410,15 @@ void ThreadPoolTest()
 
 }
 
+//
+
+void AssetTest()
+{
+    AssetDataBase::LoadModel(R"(C:\Users\user\Desktop\test.json)");
+
+}
+
+
 int main()
 {
 #if !CW_DEBUG
@@ -417,7 +426,8 @@ int main()
 #endif
     {
         //ThreadPoolTest();
-        Game();
+        //Game();
+        AssetTest();
     }
 #if CW_DEBUG
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
