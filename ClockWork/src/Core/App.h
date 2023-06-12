@@ -52,7 +52,6 @@ namespace CW
 
 		Window _window;
 
-		bool _isRunning;
 		float _backColor[4];
 		std::string _name;
 
