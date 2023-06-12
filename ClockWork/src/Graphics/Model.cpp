@@ -22,10 +22,9 @@ namespace CW
 		}
 		directory = path.substr(0, path.find_last_of('/'));
 		
-		//unsigned int pos = directory.find('\\');
-
-
+		
 		ProcessNode(scene->mRootNode, scene);
+
 	}
 	
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
@@ -34,6 +33,7 @@ namespace CW
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 			//Meshes.push_back(ProcessMesh(mesh, scene));
+			ModelData.Meshes.push_back(CreateMesh(mesh, scene));
 			MeshComponents.push_back(CreateMeshComponent(mesh, scene));
 		}
 
@@ -41,8 +41,7 @@ namespace CW
 		{
 			ProcessNode(node->mChildren[i], scene);
 		}
-
-	}
+	}	
 
 	std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string name, unsigned int& slot)
 	{
@@ -64,6 +63,89 @@ namespace CW
 		return textures;
 	}
 
+	std::vector<std::string> Model::GetTexturePaths(aiMaterial* mat, aiTextureType type)
+	{
+		std::vector<std::string> paths;
+
+		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+		{
+			aiString str;
+			aiReturn a = mat->GetTexture(type, i, &str);
+			auto path = directory + "/" + str.C_Str();
+			paths.push_back(path);
+		}
+
+		return paths;
+	}
+
+	MeshData Model::CreateMesh(aiMesh* mesh, const aiScene* scene)
+	{
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<std::string> textures;
+
+		// vertices
+		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+		{
+			Vertex vertex;
+
+			SetVertexBoneDataToDefault(vertex);
+
+			glm::vec3 data;
+			vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
+			vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
+			vertex.Tangent = AssimpGLMHelpers::GetGLMVec(mesh->mTangents[i]);
+
+			if (mesh->mTextureCoords[0])
+				vertex.UV = AssimpGLMHelpers::GetGLMVec2(mesh->mTextureCoords[0][i]);
+			else
+				vertex.UV = glm::vec2(0);
+
+			vertices.push_back(vertex);
+		}
+
+		// indices
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; j++)
+			{
+				indices.push_back(face.mIndices[j]);
+			}
+		}
+
+		// textures
+		if (mesh->mMaterialIndex >= 0)
+		{
+			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+			unsigned int slot = 0;
+			std::vector<std::string> diffuseMaps = GetTexturePaths(material, aiTextureType_DIFFUSE);
+			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+			std::vector<std::string> specularMaps = GetTexturePaths(material, aiTextureType_SPECULAR);
+			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+			std::vector<std::string> normalMaps = GetTexturePaths(material, aiTextureType_NORMALS);
+			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+			std::vector<std::string> metalMaps = GetTexturePaths(material, aiTextureType_METALNESS);
+			textures.insert(textures.end(), metalMaps.begin(), metalMaps.end());
+
+			std::vector<std::string> roughnessMaps = GetTexturePaths(material, aiTextureType_DIFFUSE_ROUGHNESS);
+			textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
+		}
+
+		ExtractBoneWeightForVertices(vertices, mesh, scene);
+
+		MeshData data;
+		data.Indices = indices;
+		data.Vertices = vertices;
+		data.Textures = textures;
+
+		return data;
+	}
+
 	MeshComponent Model::CreateMeshComponent(aiMesh* mesh, const aiScene* scene)
 	{
 		std::vector<Vertex> vertices;
@@ -78,41 +160,17 @@ namespace CW
 			SetVertexBoneDataToDefault(vertex);
 
 			glm::vec3 data;
-			/*data.x = mesh->mVertices[i].x;
-			data.y = mesh->mVertices[i].y;
-			data.z = mesh->mVertices[i].z;*/
-			//vertex.Position = data;	
 			vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
-
-			/*data.x = mesh->mNormals[i].x;
-			data.y = mesh->mNormals[i].y;
-			data.z = mesh->mNormals[i].z;*/
-			//vertex.Normal = data;
 			vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
-
-			data.x = mesh->mTangents[i].x;
-			data.y = mesh->mTangents[i].y;
-			data.z = mesh->mTangents[i].z;
-			vertex.Tangent = data;
-
-			data.x = mesh->mBitangents[i].x;
-			data.y = mesh->mBitangents[i].y;
-			data.z = mesh->mBitangents[i].z;
-			vertex.Bitangent = data;
+			vertex.Tangent = AssimpGLMHelpers::GetGLMVec(mesh->mTangents[i]);
 
 			if (mesh->mTextureCoords[0])
-			{
-				glm::vec3 data;
-				data.x = mesh->mTextureCoords[0][i].x;
-				data.y = mesh->mTextureCoords[0][i].y;
-				vertex.UV = data;
-			}
+				vertex.UV = AssimpGLMHelpers::GetGLMVec2(mesh->mTextureCoords[0][i]);
 			else
-			{
 				vertex.UV = glm::vec2(0);
-			}
 
 			vertices.push_back(vertex);
+
 		}
 
 		// indices
@@ -176,6 +234,7 @@ namespace CW
 				boneStuff.push_back(vertices[i].BoneIds[3]);
 		}
 
+		//AssetDataBase::
 
 		VAO vao;
 		vao.Bind();
@@ -189,9 +248,8 @@ namespace CW
 		vao.LinkAttribArray<float>(vbo, 1, 3, GL_FLOAT, stride, 3);
 		vao.LinkAttribArray<float>(vbo, 2, 2, GL_FLOAT, stride, 6);
 		vao.LinkAttribArray<float>(vbo, 3, 3, GL_FLOAT, stride, 8);
-		vao.LinkAttribArray<float>(vbo, 4, 3, GL_FLOAT, stride, 11);
-		vao.LinkAttribArray<float>(vbo, 5, 4, GL_FLOAT, stride, 14);
-		vao.LinkAttribArray<float>(vbo, 6, 4, GL_FLOAT, stride, 18);
+		vao.LinkAttribArray<float>(vbo, 4, 4, GL_FLOAT, stride, 11);
+		vao.LinkAttribArray<float>(vbo, 5, 4, GL_FLOAT, stride, 15);
 
 		//vbo.Bind();
 

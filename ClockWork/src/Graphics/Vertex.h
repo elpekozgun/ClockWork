@@ -12,7 +12,6 @@ namespace CW
 		glm::vec3 Normal;
 		glm::vec2 UV;
 		glm::vec3 Tangent;
-		glm::vec3 Bitangent;
 		int BoneIds[MAX_BONE_INFLUENCE];
 		float Weights[MAX_BONE_INFLUENCE];
 	};

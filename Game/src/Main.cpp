@@ -160,9 +160,6 @@ void Game()
     camera.Position = glm::vec3(0, 0, 1);
     camera.Forward = glm::vec3(0, 0, -1);
     camera.Up = glm::vec3(0, 1, 0);
-    camera.Position = glm::vec3(-1.45f, 0.9f, -0.8f);
-    camera.Forward = glm::vec3(0.832167f, -0.377841f, 0.405875f);
-    camera.Up = glm::vec3(0.339601f, 0.925871f, 0.165634f);
     camera.Width = 1920;
     camera.height = 1080;
     camera.FoV = 60;
@@ -175,43 +172,18 @@ void Game()
 
 
     Scene scene(ecs);
-    //Model CharacterModel(R"(C:/Users/user/Desktop/kalestra_the_sorceress/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)");
-    Model CharacterModel(R"(C:/Users/user/Desktop/Idle/Idle.dae)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/Great Sword Idle/Great Sword Idle.dae)");
-    //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/maria/maria WProp J J Ong.dae)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/robot_steampunk_3d-coat_4.5_pbr/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/Vanguard/Vanguard By T. Choonyung.dae)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/damaged_helmet/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/pbrsphere/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/sphere/source/sphere_sampleScene_1cm.fbx)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/pbrspherefbx/source/sphere_sampleScene_1cm.fbx)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/robot/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/doom_eternal_slayer/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/medieval_vagrant_knights/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/skull_downloadable/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/golden_knight/scene.gltf)");
-    //Model CharacterModel(R"(C:/Users/user/Desktop/Character/scene.gltf)");
-    //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/gladiator.glb)");
-    //Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/cat/cat.obj)");
+    Model CharacterModel(R"(C:/_Dev/ClockWork/ClockWork/res/3DModel/Idle/Idle.dae)");
+    //ModelData data = AssetDataBase::ImportModel(R"(C:/Users/user/Desktop/Idle/Idle.dae)");
 
     auto as = std::dynamic_pointer_cast<AnimationSystem>(ecs.GetSystem<AnimationSystem>());
-    //Animation animation1(R"(C:/Users/user/Desktop/spartan_armour_mkv_-_halo_reach/Scene.gltf)", &CharacterModel);
-    //Animation animation(R"(C:/Users/user/Desktop/Idle/Idle.dae)", &CharacterModel);
 
-    Animation animation1(R"(C:/Users/user/Desktop/maria animations/Great Sword Idle.dae)", &CharacterModel);
-    Animation animation2(R"(C:/Users/user/Desktop/maria animations/Running.dae)", &CharacterModel);
-    Animation animation3(R"(C:/Users/user/Desktop/maria animations/Unarmed Run Back.dae)", &CharacterModel);
-    Animation animation4(R"(C:/Users/user/Desktop/maria animations/Right Strafe.dae)", &CharacterModel);
-    Animation animation5(R"(C:/Users/user/Desktop/maria animations/Running Forward Flip.dae)", &CharacterModel);
-    Animation animation6(R"(C:/Users/user/Desktop/maria animations/Left Strafe.dae)", &CharacterModel);
-    
-    
-    
-    //Animation animation2(R"(C:/Users/user/Desktop/Great Sword Idle/Great Sword Idle.dae)", &CharacterModel);
-    //Animation animation2(R"(C:/Users/user/Desktop/GreatSwordAnimations/great sword walk.fbx)", &CharacterModel);
-    //Animation animation4(R"(C:/Users/user/Desktop/GreatSwordAnimations/two handed sword death (2).fbx)", &CharacterModel);
-    
+    Animation animation1(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\animations\Great Sword Idle.dae)", &CharacterModel);
+    Animation animation2(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\animations\Running.dae)", &CharacterModel);
+    Animation animation3(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\animations\Unarmed Run Back.dae)", &CharacterModel);
+    Animation animation4(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\animations\Right Strafe.dae)", &CharacterModel);
+    Animation animation5(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\animations\Running Forward Flip.dae)", &CharacterModel);
+    Animation animation6(R"(C:\_Dev\ClockWork\ClockWork\res\3DModel\animations\Left Strafe.dae)", &CharacterModel);
+
 
     Animator animator(&animation1);
     animator.RegisterAnimation("idle", &animation1);
@@ -220,7 +192,7 @@ void Game()
     animator.RegisterAnimation("strafe_right", &animation4);
     animator.RegisterAnimation("forward_flip", &animation5);
     animator.RegisterAnimation("strafe_left", &animation6);
-    //animator.RegisterAnimation("greatSword", & animation2);
+    animator.RegisterAnimation("greatSword", & animation2);
 
     //
     as->_animator = &animator;
@@ -267,7 +239,7 @@ void Game()
 
 
     Skybox skybox;
-    auto skyboxComponent= skybox.LoadHdr(R"(C:/Users/user/Desktop/daytime.hdr)");
+    auto skyboxComponent= skybox.LoadHdr(R"(C:\_Dev\ClockWork\ClockWork\res\skybox\daytime.hdr)");
     ecs.RegisterSingletonComponent<SkyboxComponent>(*skyboxComponent);
 
     std::vector<MeshComponent>& meshComponents = CharacterModel.MeshComponents;
@@ -299,7 +271,7 @@ void Game()
     std::uniform_real_distribution<float> randAcceleration(-0.1f, 0.1);
     std::uniform_real_distribution<float> randVelocity(-0.1f, 0.1f);
      
-    float scale = 1.00f;
+    float scale = 1.0f;
 
     auto transform1 = TransformComponent
     {
@@ -310,7 +282,6 @@ void Game()
 
 
     auto Character1 = scene.CreateEntity("Character1");
-    //auto CharacterWeapon1 = scene.CreateEntity("CharacterWeapon");
     scene.AddComponents
     (
         Character1,
@@ -322,49 +293,27 @@ void Game()
         //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))}
     );
 
-    //scene.AddComponents
-    //(
-    //    CharacterWeapon1,
-    //    transform1,
-    //    Player{ 5.0f, 5.0f },
-    //    RenderableComponent{ std::vector<unsigned int>{CharacterAssets[1]},false },
-    //    AABB2
-    //    //PhysicsComponent{ glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator)) }
-    //);
-
     auto light1 = scene.CreateEntity("light");
 
-
     std::vector<glm::mat4> transforms;
-    for (unsigned int i = 0; i < 100; i++)
+    for (unsigned int i = 0; i < 3000; i++)
     {
         auto pos = glm::vec3(randPosition(generator) * 5, 3, randPosition(generator) * 5);
         auto transform = TransformComponent
         { 
-            //pos,
             glm::vec3(randPosition(generator) , 3, randPosition(generator)),
             glm::vec3(0, randRotation(generator), 0),
-            //glm::vec3(0, 0, 0),
             glm::vec3(scale) 
         };
-        //auto transform = TransformComponent
-        //{
-        //    glm::vec3(0),
-        //    glm::vec3(0, randRotation(generator), 0),
-        //    glm::vec3(scale)
-        //};
-
         transforms.emplace_back(transform.GetMatrix());
 
         auto Character = scene.CreateEntity("Character1");
-        //auto CharacterWeapon = scene.CreateEntity("CharacterWeapon");
         scene.AddComponents 
         (
             Character, 
             transform, 
             Player{5.0f, 5.0f},
             RenderableComponent{ CharacterAssets, /*std::vector<unsigned int>{CharacterAssets[0]},*/ false },
-            //PhysicsComponent{glm::vec3(0), glm::vec3(randAcceleration(generator),0,randAcceleration(generator))},
             PhysicsComponent{ glm::vec3(0), glm::vec3(0) },
             AABB1
         );
@@ -410,12 +359,9 @@ void ThreadPoolTest()
 
 }
 
-//
-
 void AssetTest()
 {
     AssetDataBase::LoadModel(R"(C:\Users\user\Desktop\test.json)");
-
 }
 
 
@@ -426,8 +372,8 @@ int main()
 #endif
     {
         //ThreadPoolTest();
-        //Game();
-        AssetTest();
+        Game();
+        //AssetTest();
     }
 #if CW_DEBUG
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
