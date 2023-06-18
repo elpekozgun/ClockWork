@@ -218,6 +218,7 @@ void Game()
     defaultShader.SetFloat("directLight.Intensity", 1.0f);
     defaultShader.SetTexture("IrradianceMap", 4);
 
+
     defaultShader.setVec3("spotLight.Color", 150, 150, 150);
     defaultShader.SetFloat("spotLight.CutOff", cos(glm::radians(20.5f)));
     defaultShader.SetFloat("spotLight.OuterCutoff", cos(glm::radians(26.0f)));
