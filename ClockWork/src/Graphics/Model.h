@@ -7,6 +7,7 @@
 #include "AssimpHelper.h"
 #include "ECS/Component.h"
 #include "Animation.h"
+#include "Project/AssetDataBase.h"
 
 #include <iostream>
 #include <vector>
@@ -15,8 +16,6 @@
 
 namespace CW
 {
-	const int MAX_BONE_INFLUENCE = 4;
-
 	struct BoneInfo
 	{
 		int id;
@@ -29,23 +28,28 @@ namespace CW
 		Model(const char* file);
 		
 		std::vector<MeshComponent> MeshComponents;
+		ModelData ModelData;
 
 		auto& GetBoneInfoMap() { return m_BoneInfoMap; }
 		int& GetBoneCount() { return m_BoneCounter; }
 
 	private:
 		void LoadModel(const std::string& path);
+
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		MeshComponent CreateMeshComponent(aiMesh* mesh, const aiScene* scene);
 
+		MeshData CreateMesh(aiMesh* mesh, const aiScene* scene);
+
 		std::vector<Texture> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string name, unsigned int& slot);
+		std::vector<std::string> GetTexturePaths(aiMaterial* mat, aiTextureType type);
 
 		std::string directory;
 
 
 		void SetVertexBoneDataToDefault(Vertex& vertex)
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
 			{
 				vertex.BoneIds[i] = -1;
 				vertex.Weights[i] = 0.0f;
@@ -54,7 +58,7 @@ namespace CW
 
 		void SetVertexBoneData(Vertex& vertex, int boneID, float weight)
 		{
-			for (int i = 0; i < 4; ++i)
+			for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
 			{
 				if (vertex.BoneIds[i] < 0)
 				{
@@ -373,9 +377,9 @@ namespace CW
 		Animator()
 		{
 			m_CurrentTime = 0;
-			m_FinalBoneMatrices.reserve(100);
+			m_FinalBoneMatrices.reserve(MAX_BONE);
 			
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < MAX_BONE; i++)
 				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 
@@ -384,9 +388,9 @@ namespace CW
 			m_CurrentTime = 0.0;
 			m_CurrentAnimation = animation;
 
-			m_FinalBoneMatrices.reserve(100);
+			m_FinalBoneMatrices.reserve(MAX_BONE);
 
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < MAX_BONE; i++)
 				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 

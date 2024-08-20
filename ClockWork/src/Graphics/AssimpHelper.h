@@ -26,6 +26,11 @@ public:
 		return glm::vec3(vec.x, vec.y, vec.z);
 	}
 
+	static inline glm::vec2 GetGLMVec2(const aiVector3D& vec)
+	{
+		return glm::vec2(vec.x, vec.y);
+	}
+
 	static inline glm::quat GetGLMQuat(const aiQuaternion& pOrientation)
 	{
 		return glm::quat(pOrientation.w, pOrientation.x, pOrientation.y, pOrientation.z);
